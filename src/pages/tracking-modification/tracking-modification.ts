@@ -32,7 +32,7 @@ export class TrackingModificationPage {
   }
 
   ionViewDidLoad() {
-    let activeGoals = this.couchDBService.getActiveGoals();
+    let activeGoals = this.couchDBService.getConfiguredRoutine();
     this.goals = activeGoals['goals'];
     this.notifications = activeGoals['notifications'];
     this.currentData = activeGoals['dataToTrack'];

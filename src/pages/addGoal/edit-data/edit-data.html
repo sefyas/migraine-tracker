@@ -6,7 +6,7 @@
 
   <ion-card-content>
 
-
+    <!--  Display Data Info  -->
     <div class="listElement" *ngIf="isCustom">
       <h3>Name:</h3>
       <ion-input class="inputText" type="text" [(ngModel)]="data.name" placeholder="Enter name"></ion-input>
@@ -24,25 +24,31 @@
     </div>
 
 
+    <!--  Set Data Tracking Method  -->
     <div class="listElement">
-    <h3>How you're tracking:</h3>
+      <h3>How you're tracking:</h3>
+
       <div class="fullSelect">
 
         <div class="selectOption">
+
           <div class="optionHeader" (click)="expandField(data)">
             <div class="optionName">{{data.field}}</div>
             <ion-icon class="dropdownIcon" *ngIf="!fieldButtonsExpanded && !data.fieldSet" name="arrow-dropdown"></ion-icon>
             <ion-icon class="dropdownIcon"  *ngIf="fieldButtonsExpanded && !data.fieldSet" name="arrow-dropup"></ion-icon>
           </div>
+
           <span *ngIf="fieldButtonsExpanded" class="optionDetails">
             <span *ngIf="!data.recommendedField || data.field!==data.recommendedField">
               {{data['fieldExplanation']}}
             </span>
+
             <span *ngIf="data.recommendedField && data.field===data.recommendedField">
-                  <div class="recommended">(recommended)</div>
+              <div class="recommended">(recommended)</div>
               {{data.fieldDescription}}
-                </span>
+            </span>
           </span>
+
         </div>
 
         <ng-container *ngIf="fieldButtonsExpanded">
@@ -65,7 +71,9 @@
             </ng-container>
           </ng-container>
         </ng-container>
+
       </div>
+
     </div>
 
 

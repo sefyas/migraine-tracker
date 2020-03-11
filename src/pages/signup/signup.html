@@ -1,0 +1,44 @@
+<!--
+  Generated template for the LoginPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+
+<ion-header>
+  <ion-navbar>
+    <ion-title>Create an Account</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+
+  <ion-row class="account-form">
+    <ion-col>
+      <ion-list inset>
+        <ion-item>
+           <ion-label class="label">Username:</ion-label>
+          <ion-input [(ngModel)]="username" (click)="typeUsername()" placeholder="Username" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label class="label">Password:</ion-label>
+          <ion-input [(ngModel)]="password" placeholder="Password" type="password"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label class="label">Confirm:</ion-label>
+          <ion-input [(ngModel)]="confirmPassword" placeholder="Confirm Password" type="password"></ion-input>
+        </ion-item>
+
+        <p ion-text color="danger" *ngIf="password !== confirmPassword && password !== '' && password != null && confirmPassword !== '' && confirmPassword != null">Passwords don't match!</p>
+        <p ion-text color="secondary" *ngIf="password === confirmPassword && password !== '' && password != null">Password is valid!</p>
+        <p ion-text color="danger" id="username-warning" *ngIf="usernameError">{{usernameError}}</p>
+
+        <button ion-button float-end (click)="signUp()" class="continue-button" [disabled]="!(username !== '' && username != null && password !== '' && password != null && confirmPassword !== '' && confirmPassword != null)">Sign Up</button>
+      </ion-list>
+    </ion-col>
+  </ion-row>
+
+</ion-content>

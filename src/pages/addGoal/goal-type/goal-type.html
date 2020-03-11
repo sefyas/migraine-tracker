@@ -5,17 +5,13 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-
   <ion-navbar>
     <ion-title>Select Tracking Goals</ion-title>
   </ion-navbar>
-
 </ion-header>
-
 
 <ion-content padding>
   <h3>Choose your migraine tracking goals:</h3>
-
 
     <ion-card *ngFor="let goal of goalList">
 
@@ -27,6 +23,7 @@
       </ion-card-header>
 
       <ion-card-content class="goalCardContent">
+
         <h2 class="effort">{{goal['effort']}} effort</h2>
 
         <p text-wrap>Choose if: {{goal['goodChoiceIf']}}</p>
@@ -60,7 +57,7 @@
           Record any other migraine-related goals you want have so you can
           reflect on them later or share them with your doctor!
         </p>
-        <ion-textarea [(ngModel)]="textGoals" rows="4" placeholder="Write any other goals you have here."></ion-textarea>
+        <ion-textarea [(ngModel)]="textGoals" placeholder="Write any other goals you have here."></ion-textarea>
       </div>
     </ion-card-content>
   </ion-card>

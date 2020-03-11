@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import {NavController, NavParams, ViewController} from 'ionic-angular';
-import {HomePage} from "../../home/home";
-import {GoalModificationPage} from "../../goal-modification/goal-modification";
-import {CouchDbServiceProvider} from "../../../providers/couch-db-service/couch-db-service";
-import {GoalDetailsServiceProvider} from "../../../providers/goal-details-service/goal-details-service";
-import {Notification} from "../../../interfaces/customTypes";
-import {ConfiguredRoutine} from "../../../interfaces/customTypes";
+import { NavController, NavParams, ViewController } from 'ionic-angular';
+import { HomePage } from "../../home/home";
+import { GoalModificationPage } from "../../goal-modification/goal-modification";
+import { CouchDbServiceProvider } from "../../../providers/couch-db-service/couch-db-service";
+import { GoalDetailsServiceProvider } from "../../../providers/goal-details-service/goal-details-service";
+import { Notification } from "../../../interfaces/customTypes";
+import { ConfiguredRoutine } from "../../../interfaces/customTypes";
 /**
  * Generated class for the SelectTrackingFrequencyPage page.
  *
@@ -30,13 +30,17 @@ export class SelectTrackingFrequencyPage {
                   'regular': false,
                   'delayScale': false, 'timescale': false, 'dayOfWeek':false, 'dayOfMonth': false};
 
-  constructor(public navCtrl: NavController, public viewCtrl: ViewController,
-              public navParams: NavParams, public couchDBService: CouchDbServiceProvider,
+  constructor(public navCtrl: NavController,
+              public viewCtrl: ViewController,
+              public navParams: NavParams,
+              public couchDbService: CouchDbServiceProvider,
               private goalDetails: GoalDetailsServiceProvider) {
   }
 
-  ionViewDidLoad() {
-    let activeGoals : ConfiguredRoutine = this.couchDBService.getActiveGoals();
+  async ionViewDidLoad() {
+    let activeGoals = await this.couchDbService.getConfiguredRoutine().then((val) => {
+      return val;
+    });
     this.hasActiveGoals = (activeGoals !== null);
     if(this.hasActiveGoals){ // if they have configured notifications, display those
       this.notificationData = activeGoals['notifications'];
@@ -115,7 +119,7 @@ export class SelectTrackingFrequencyPage {
   }
 
 
-  canContinue(){
+  canContinue() {
     if(this.notificationData['retroactive']){
       if(!this.notificationData['retroactive']['delayNum']) return false;
       if(!this.notificationData['retroactive']['delayScale']) return false;
@@ -136,20 +140,16 @@ export class SelectTrackingFrequencyPage {
   }
 
   continue() {
-    if(this.isModal) {
+    if (this.isModal) {
       this.viewCtrl.dismiss(this.notificationData);
-    }
-    else{
+    } else {
       this.navParams.data['notifications'] = this.notificationData;
-      if(this.hasActiveGoals){
+      if (this.hasActiveGoals) {
         this.navCtrl.setRoot(GoalModificationPage, this.navParams.data);
-      }
-      else{ // first goal we're adding
+      } else { // first goal we're adding
         this.navCtrl.setRoot(HomePage, this.navParams.data);
       }
     }
+    this.couchDbService.logConfiguredRoutine(this.navParams['data']);
   }
-
-
-
 }

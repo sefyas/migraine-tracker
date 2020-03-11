@@ -31,7 +31,7 @@
             "goodChoiceIf": "You want to know how often you experience symptoms (or pursue treatment)"
         },
         {
-            "name": "Learn what factors may contribute to symmptoms",
+            "name": "Learn what factors may contribute to symptoms",
             "suggestedFrequency": "regular",
             "goalID": "2b",
             "visType": "correlation",

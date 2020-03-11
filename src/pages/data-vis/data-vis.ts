@@ -105,7 +105,7 @@ export class DataVisPage {
 
   ionViewDidLoad() {
     this.allTrackedData = this.sortByDate(this.couchDBService.getTrackedData());
-    this.currentGoals = this.couchDBService.getActiveGoals();
+    this.currentGoals = this.couchDBService.getConfiguredRoutine();
     this.setVisTypes();
   }
 

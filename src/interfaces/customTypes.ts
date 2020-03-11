@@ -16,12 +16,11 @@ export interface Goal {
 }
 
 
-
 export interface DataType {
   dataType: string, // name of the data type (e.g., symptom)
   dataGoals: boolean, // whether you can set element-specific goals (e.g., "I want to exercise x hours")
   description?: string, // for a better page title, where applicable
-  conditionalGoals?: string[], // e.g., "changes" only if learning:changes selected
+  conditionalGoals?: string[], // e.g., "changes" only if learning: changes selected
   startDate?: boolean, // currently only for before/after
   recommendForGoals?: string[], // when we don't recommend SPECIFIC ones but they need to track some
   toDisplay?: string,
@@ -42,13 +41,14 @@ export interface DataElement {
   goal?: ElementGoal,
   suggestedGoal?: ElementGoal,
   field?: string, // required for set fields
-  quickTrack?: boolean, //whether it's a quick tracker, if it's selected
+  quickTrack?: boolean, // whether it's a quick tracker, if it's selected
   alwaysQuickTrack?: boolean, // whether we just always include it as a quick tracker, even if not selected
   fieldSet?: boolean // whether the field is "set" (i.e., people can't change it)
   selected?: boolean,
   dataType?: string,
   opts?: any
 }
+
 
 export interface ElementGoal{
   freq: string, //"Less" | "More", <- that's supposed to work, but won't
@@ -60,7 +60,6 @@ export interface DataField {
   name: string,
   explanation: string
 }
-
 
 
 export interface Notification{
@@ -82,6 +81,7 @@ export interface ConfiguredRoutine {
   notifications: {[notificationType:string] : Notification}
 }
 
+
 export interface DataReport {
   [dataType: string] : any, // should be {[dataElementName: string] : any} but it won't let me
   allDay: string | Date, // horrible but it's not always parsing right; need to figure out with couch stuff
@@ -92,7 +92,6 @@ export interface DataReport {
 }
 
 
-
 export interface Break {
   notifyDate?: string,
   dateToCheckIn?: string,
@@ -100,7 +99,6 @@ export interface Break {
   ended?: Date,
   noDates?: boolean
 }
-
 
 
 export interface MigraineQACategories {

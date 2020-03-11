@@ -1,10 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {Events, ModalController, Nav, Platform} from 'ionic-angular';
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
-import { ErrorHandler, NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {StatusBar} from '@ionic-native/status-bar';
+import {SplashScreen} from '@ionic-native/splash-screen';
+import {ErrorHandler, NgModule, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 
-import { HomePage } from '../pages/home/home';
+import {HomePage} from '../pages/home/home';
 import {GoalModificationPage} from "../pages/goal-modification/goal-modification";
 import {TrackingModificationPage} from "../pages/tracking-modification/tracking-modification";
 import {CouchDbServiceProvider} from "../providers/couch-db-service/couch-db-service";
@@ -13,6 +13,7 @@ import {DataSummaryPage} from "../pages/data-summary/data-summary";
 import {DataCalendarPage} from "../pages/data-calendar/data-calendar";
 import {BreakFromTrackingPage} from "../pages/break-from-tracking/break-from-tracking";
 import {DataVisPage} from "../pages/data-vis/data-vis";
+import {DebugPage} from "../pages/debug-page/debug-page";
 
 @Component({
   templateUrl: 'app.html'
@@ -20,6 +21,7 @@ import {DataVisPage} from "../pages/data-vis/data-vis";
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
+  // make HomePage the root (or first) page, which will be the first page loaded in the nav controller
   rootPage: any = HomePage;
 
   pages: Array<{title: string, component: any}>;
@@ -38,13 +40,14 @@ export class MyApp {
         { title: 'Goals', component: GoalModificationPage},
         { title: 'Tracking Routine', component: TrackingModificationPage},
         { title: 'Take a Break from Tracking', component: BreakFromTrackingPage},
+        { title: 'Debug Page', component: DebugPage},
       ];
     });
 
     this.initializeApp();
 
     // used for an example of ngFor and navigation
-    if(this.couchDBService.getActiveGoals() === null){
+    if(this.couchDBService.getConfiguredRoutine() === null){
       this.pages = [
         { title: 'Home', component: HomePage},
         { title: 'About Migraine', component: FaqPage}
@@ -60,11 +63,11 @@ export class MyApp {
         { title: 'Goals', component: GoalModificationPage},
         { title: 'Tracking Routine', component: TrackingModificationPage},
         { title: 'Take a Break from Tracking', component: BreakFromTrackingPage},
+        { title: 'Debug Page', component: DebugPage},
       ];
     }
 
   }
-
 
 
   initializeApp() {
@@ -75,6 +78,7 @@ export class MyApp {
       this.splashScreen.hide();
     });
   }
+
 
   openPage(page) {
     // Reset the content nav to have just this page

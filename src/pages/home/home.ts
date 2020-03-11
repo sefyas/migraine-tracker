@@ -1,20 +1,22 @@
 import { Component } from '@angular/core';
-import {ModalController, NavController, NavParams} from 'ionic-angular';
-import {CouchDbServiceProvider} from "../../providers/couch-db-service/couch-db-service";
-import {GoalTypePage} from "../addGoal/goal-type/goal-type";
-import {LoginPage} from "../login/login";
-import {DataDetailsServiceProvider} from "../../providers/data-details-service/data-details-service";
-import {DateFunctionServiceProvider} from "../../providers/date-function-service/date-function-service";
-import {GlobalFunctionsServiceProvider} from "../../providers/global-functions-service/global-functions-service";
 import { Events } from 'ionic-angular';
-import {ConfiguredRoutine, DataElement} from "../../interfaces/customTypes";
+import { ModalController, NavController, NavParams } from 'ionic-angular';
+import { CouchDbServiceProvider } from "../../providers/couch-db-service/couch-db-service";
+import { GoalTypePage } from "../addGoal/goal-type/goal-type";
+import { LoginPage } from "../login/login";
+import { DataDetailsServiceProvider } from "../../providers/data-details-service/data-details-service";
+import { DateFunctionServiceProvider } from "../../providers/date-function-service/date-function-service";
+import { GlobalFunctionsServiceProvider } from "../../providers/global-functions-service/global-functions-service";
+import { ConfiguredRoutine, DataElement } from "../../interfaces/customTypes";
+import {Storage} from "@ionic/storage";
+
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
-export class HomePage {
 
+export class HomePage {
   private skipConfig = false;
   // private skipConfig = true;
 
@@ -22,14 +24,15 @@ export class HomePage {
   private quickTrackers : DataElement[] = [];
   private tracked : {[dataType : string] : any} = {};
   private goalProgresses : {[dataType : string] : any} = {};
-  private dataToTrack : {[dataType:string] : DataElement[]} = {};
+  private dataToTrack : {[dataType : string] : DataElement[]} = {};
   private dataList : {[dataType : string] : string} = {};
   private dataTypes : string[];
   private previouslyTracked : {[dataType : string] : any}[];
   private somethingTracked : boolean;
   private durationItemStart : {[dataType : string] : any} = {};
   private durationItemEnd : {[dataType : string] : any} ={};
-  private cardExpanded : {[dataType: string] : boolean} = {};
+  private cardExpanded : {[dataType : string] : boolean} = {};
+
 
   constructor(public navCtrl: NavController,
               private couchDbService: CouchDbServiceProvider,
@@ -38,29 +41,37 @@ export class HomePage {
               private dateFunctionsProvider: DateFunctionServiceProvider,
               private globalFuns: GlobalFunctionsServiceProvider,
               private modalCtrl: ModalController,
-              public events: Events){
+              public events: Events,
+              private storage: Storage) {
   }
 
-  ionViewDidEnter(){
-    if(this.navParams.data['goalIDs']){ //Came from setting a goal up.  todo: notification stuff
+  async ionViewDidEnter(){
+    if(this.navParams.data['goalIDs']){ // Came from setting a goal up.  todo: notification stuff
       this.events.publish('configSeen');
-      console.log(this.navParams.data)
+      console.log(this.navParams.data);
       this.activeGoals = this.couchDbService.addGoalFromSetup(this.navParams.data);
       this.setupTrackers();
     }
     else{
-      this.loggedIn() // TODO: skips auth step.  Remove!!
-      // this.couchDbService.userLoggedIn().subscribe(
-      //   resp => {
-      //     this.loggedIn();
-      //   }, error => {
-      //     this.login();
-      //   });
+      // Fetch the credentials from the cache
+      var credentials = await this.storage.get('credentials').then((val) => {
+        return val;
+      });
+      if (credentials != null) {
+        this.couchDbService.userInSession(credentials).then((userInSession) => {
+          if (!userInSession) {
+            this.couchDbService.login(credentials);
+          }
+        });
+        // this.couchDbService.loadUserInfoDoc();
+        this.loggedIn();
+      } else {
+        this.login();
+      }
     }
   }
 
   login() {
-    // this.loggedIn(); migraineTest; test
     let customDataModal = this.modalCtrl.create(LoginPage);
     customDataModal.onDidDismiss(() => {
       this.loggedIn();
@@ -68,16 +79,21 @@ export class HomePage {
     customDataModal.present();
   }
 
-  loggedIn(){
-    if(this.skipConfig) this.events.publish('configSeen'); // just jumps to ex goals
-    this.activeGoals = this.couchDbService.getActiveGoals();
-    if(this.activeGoals !== null) this.setupTrackers();
+  async loggedIn(){
+    // if (this.skipConfig) {
+    //   this.events.publish('configSeen');
+    // } // just jumps to ex goals
+    this.activeGoals = await this.couchDbService.getConfiguredRoutine().then((val) => {
+      return val;
+    });
+    if (this.activeGoals !== null) {
+      this.setupTrackers();
+    }
   }
 
   addFirstGoal() {  // only if they don't have a goal setup yet
     this.navCtrl.push(GoalTypePage);
   }
-
 
   setupTrackers(){
     console.log(this.activeGoals);
@@ -120,8 +136,6 @@ export class HomePage {
     this.somethingTracked = true;
     // TODO: push to couch?!?!  When???
   }
-
-
 
   formatForCalendar(event){ // call when we push to couch ...
     let startAndEndDates = this.dateFunctionsProvider.getStartAndEndDatesForCalendar();
@@ -189,7 +203,7 @@ export class HomePage {
       this.dataList[dataType] = this.dataToTrack[dataType].filter(function(x){
         if(!x.quickTrack) return x;
       }).map(x => x.name).join(", ");
-      console.log(this.dataList[dataType])
+      console.log(this.dataList[dataType]);
       for(let j=0; j<this.dataToTrack[dataType].length; j++){
         let data = this.dataToTrack[dataType][j];
         if(data.id === 'frequentMedUse'){
@@ -203,17 +217,4 @@ export class HomePage {
       }
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

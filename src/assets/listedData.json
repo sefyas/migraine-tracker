@@ -6,26 +6,19 @@
                 "id": "migraineToday",
                 "explanation": "Migraine experienced",
                 "fieldDescription": "Whether you had a migraine (yes/no)",
-                "recommendedField": "binary",
                 "field": "binary",
+                "recommendedField": "binary",
                 "recommendingGoals": ["2a", "2b", "2c", "3", "1a", "1b", "1c"],
                 "quickTrack": true,
                 "alwaysQuickTrack": true,
                 "fieldSet": true
             },
             {
-                "name": "Headache",
-                "id": "headacheToday",
-                "explanation": "(Non-migraine) headache experienced",
-                "fieldDescription": "Whether you had a headache (yes/no)",
-                "recommendedField": "binary",
-                "recommendingGoals": ["1b", "1c"]
-            },
-            {
                 "name": "Peak Migraine Severity",
                 "id": "peakMigraineSeverity",
                 "explanation": "How bad the migraine was at its worst point",
-                "fieldDescription": "10-point Pain level (1=mild, 10=terrible)",
+                "fieldDescription": "10-point pain level (1=mild, 10=terrible)",
+                "fieldsAllowed": ["numeric scale", "category scale", "note"],
                 "recommendedField": "numeric scale",
                 "recommendingGoals": ["1b", "1c"]
             },
@@ -34,14 +27,60 @@
                 "id": "migraineDuration",
                 "explanation": "How long the migraine lasted",
                 "fieldDescription": "the number of hours the migraine lasted",
+                "fieldsAllowed": ["number", "category scale", "note"],
                 "recommendedField": "number",
                 "recommendingGoals": ["1b"]
+            },
+            {
+                "name": "Migraine Impact on Disability",
+                "id": "impactOnDisability",
+                "explanation": "Whether the migraine prevented you from doing the things you wanted or needed to do",
+                "fieldDescription": "3-category disability rating",
+                "recommendedField": "category scale",
+                "recommendingGoals": ["1c"]
+            },
+            {
+                "name": "Migraine Location",
+                "id": "migraineLocation",
+                "explanation": "Where the pain was (right or left side, eyes, forehead, temples, face, back of head, neck, all over)",
+                "fieldDescription": "text box where you can describe the location",
+                "field": "note",
+                "recommendedField": "note",
+                "recommendingGoals": ["1b"],
+                "fieldSet": true
+            },
+            {
+                "name": "Quality of the Migraine Pain",
+                "id": "painQuality",
+                "explanation": "What the pain was like (pulsating/throbbing, pressure, tension, stabbing, sharp, dull, burning, other)",
+                "fieldDescription": "text box where you can describe the pain",
+                "field": "note",
+                "recommendedField": "note",
+                "recommendingGoals": ["1b"],
+                "fieldSet": true
+            },
+            {
+                "name": "Migraine Start Time",
+                "id": "migraineStartTime",
+                "explanation": "The time the migraine started",
+                "fieldDescription": "start time",
+                "fieldsAllowed": ["time", "note"],
+                "recommendedField": "time",
+                "recommendingGoals": []
+            },
+            {
+                "name": "Headache",
+                "id": "headacheToday",
+                "explanation": "(Non-migraine) headache experienced",
+                "fieldDescription": "whether you had a headache (yes/no)",
+                "recommendedField": "binary",
+                "recommendingGoals": ["1b", "1c"]
             },
             {
                 "name": "Fatigue",
                 "id": "whetherFatigue",
                 "explanation": "Fatigue experienced",
-                "fieldDescription": "3-point fatigue rating",
+                "fieldDescription": "3-category fatigue rating",
                 "recommendedField": "category scale",
                 "recommendingGoals": ["1b"]
             },
@@ -49,7 +88,7 @@
                 "name": "Aura",
                 "id": "hadAura",
                 "explanation": "Aura experienced",
-                "fieldDescription": "Whether you experienced aura (yes/no)",
+                "fieldDescription": "whether you experienced aura (yes/no)",
                 "recommendedField": "binary",
                 "recommendingGoals": []
             },
@@ -57,7 +96,7 @@
                 "name": "Nausea",
                 "id": "hadNausea",
                 "explanation": "Nausea experienced",
-                "fieldDescription": "Whether you experienced nausea (yes/no)",
+                "fieldDescription": "whether you experienced nausea (yes/no)",
                 "recommendedField": "binary",
                 "recommendingGoals": []
             },
@@ -65,7 +104,7 @@
                 "name": "Lightheadedness or Dizziness",
                 "id": "hadLightheadednessOrDizziness",
                 "explanation": "Lightheadedness or dizziness experienced",
-                "fieldDescription": "Whether you were lightheaded/dizzy (yes/no)",
+                "fieldDescription": "whether you were lightheaded/dizzy (yes/no)",
                 "recommendedField": "binary",
                 "recommendingGoals": []
             },
@@ -73,7 +112,7 @@
                 "name": "Brain Fog",
                 "id": "brainFog",
                 "explanation": "\"Brain fog\" experienced",
-                "fieldDescription": "Whether you had brain fog (yes/no)",
+                "fieldDescription": "whether you had brain fog (yes/no)",
                 "recommendedField": "binary",
                 "recommendingGoals": []
             },
@@ -81,7 +120,7 @@
                 "name": "Light Sensitivity",
                 "id": "lightSensitivity",
                 "explanation": "Light sensitivity experienced",
-                "fieldDescription": "Whether you experienced light sensitivity (yes/no)",
+                "fieldDescription": "whether you experienced light sensitivity (yes/no)",
                 "recommendedField": "binary",
                 "recommendingGoals": []
             },
@@ -89,50 +128,19 @@
                 "name": "Sound Sensitivity",
                 "id": "soundSensitivity",
                 "explanation": "Sound sensitivity experienced",
-                "fieldDescription": "Whether you experienced sound sensitivity (yes/no)",
+                "fieldDescription": "whether you experienced sound sensitivity (yes/no)",
                 "recommendedField": "binary",
-                "recommendingGoals": []
-            },
-            {
-                "name": "Migraine Impact on Disability",
-                "id": "impactOnDisability",
-                "explanation": "Whether the migraine prevented you from doing the things you wanted or needed to do",
-                "fieldDescription": "3-point disability rating",
-                "recommendedField": "category scale",
-                "recommendingGoals": ["1c"]
-            },
-            {
-                "name": "Location",
-                "id": "migraineLocation",
-                "explanation": "Where the pain was (right or left side, eyes, forehead, temples, face, back of head, neck, all over)",
-                "fieldDescription": "Text box where you can describe the location",
-                "recommendedField": "note",
-                "recommendingGoals": ["1b"]
-            },
-            {
-                "name": "Quality of the Pain",
-                "id": "painQuality",
-                "explanation": "What the pain was like (pulsating/throbbing, pressure, tension, stabbing, sharp, dull, burning, other)",
-                "fieldDescription": "Text box where you can describe the pain",
-                "recommendedField": "note",
-                "recommendingGoals": ["1b"]
-            },
-            {
-                "name": "Start time",
-                "id": "migraineStartTime",
-                "explanation": "The time the migraine started",
-                "fieldDescription": "time",
-                "recommendedField": "time",
                 "recommendingGoals": []
             }
         ],
-    "Treatment": 
+    "Treatment":
         [
             {
                 "name": "As-needed medications",
                 "id": "asNeededMeds",
                 "explanation": "Medication taken in response to symptoms (for example, Advil, Excedrin, prescription rescue)",
                 "fieldDescription": "Whether you took any as-needed medication",
+                "fieldsAllowed": ["binary", "number", "note", "time"],
                 "recommendedField": "binary",
                 "recommendingGoals": ["2a", "2b", "2c", "3", "1a", "1b", "1c"],
                 "suggestedGoal": {
@@ -141,14 +149,14 @@
                     "timespan": "Month"
                 },
                 "quickTrack": true,
-                "isMed": true,
-                "fieldsAllowed": ["binary", "number", "time"]
+                "isMed": true
             },
             {
                 "name": "Routine Medication Use",
                 "id": "routineMeds",
                 "explanation": "Routine (for example, daily) medication taken",
-                "fieldDescription": "Whether you took any routine medication",
+                "fieldDescription": "whether you took any routine medication",
+                "fieldsAllowed": ["binary", "number", "category scale", "note", "time"],
                 "recommendedField": "binary",
                 "recommendingGoals": ["1b"]
             },
@@ -159,6 +167,7 @@
                 "skipIfGoals": ["2c"],
                 "explanation": "How much you exercised",
                 "fieldDescription": "Number of minutes of exercise",
+                "fieldsAllowed": ["binary", "number", "category scale", "note", "time"],
                 "recommendedField": "number",
                 "suggestedGoal": {
                     "freq": "More",
@@ -174,6 +183,7 @@
                 "skipIfGoals": ["2c"],
                 "explanation": "Migraine prevention supplements taken (for example, magnesium, riboflavin, vitamin B12, vitamin D)",
                 "fieldDescription": "Whether you took supplements (yes/no)",
+                "fieldsAllowed": ["binary", "number", "category scale", "note", "time"],
                 "recommendedField": "binary",
                 "recommendingGoals": ["2b", "1b"]
             },
@@ -182,6 +192,7 @@
                 "id": "stressManagement",
                 "explanation": "Stress management practiced (for example, yoga, meditation)",
                 "fieldDescription": "Whether you did any stress management (yes/no)",
+                "fieldsAllowed": ["binary", "number", "category scale", "note", "time"],
                 "recommendedField": "binary",
                 "suggestedGoal": {
                     "freq": "More",
@@ -196,7 +207,8 @@
                 "condition": true,
                 "skipIfGoals": ["2c"],
                 "explanation": "Whether you ate healthily. For example, we recommend 4-5 servings of veggies, eating regular meals, avoiding sugar",
-                "fieldDescription": "Whether you ate healthily (yes/no)",
+                "fieldDescription": "whether you ate healthily (yes/no)",
+                "fieldsAllowed": ["binary", "number", "category scale", "note", "time"],
                 "recommendedField": "binary",
                 "recommendingGoals": ["2b", "1b"]
             },
@@ -204,7 +216,8 @@
                 "name": "Warm/cold Compress on Head/Neck",
                 "id": "usedCompress",
                 "explanation": "Whether you used a warm/cold compress on your head or neck to treat symptoms",
-                "fieldDescription": "Whether you used a warm/cold compress (yes/no)",
+                "fieldDescription": "whether you used a warm/cold compress (yes/no)",
+                "fieldsAllowed": ["binary", "number", "category scale", "note", "time"],
                 "recommendedField": "binary",
                 "recommendingGoals": []
             },
@@ -212,7 +225,8 @@
                 "name": "Warm/Cold shower",
                 "id": "tookShower",
                 "explanation": "Whether you took a warm/cold shower to treat symptoms",
-                "fieldDescription": "Whether you took a warm/cold shower (yes/no)",
+                "fieldDescription": "whether you took a warm/cold shower (yes/no)",
+                "fieldsAllowed": ["binary", "number", "category scale", "note", "time"],
                 "recommendedField": "binary",
                 "recommendingGoals": []
             },
@@ -220,12 +234,13 @@
                 "name": "Relax in a Dark Room",
                 "id": "darkRoom",
                 "explanation": "Whether you relaxed in a dark room to treat symptoms",
-                "fieldDescription": "Whether you relaxed in a dark room (yes/no)",
+                "fieldDescription": "whether you relaxed in a dark room (yes/no)",
+                "fieldsAllowed": ["binary", "number", "category scale", "note", "time"],
                 "recommendedField": "binary",
                 "recommendingGoals": []
             }
         ],
-    "Contributor": 
+    "Contributor":
         [
             {
                 "name": "Frequent Use of Medications",
@@ -375,7 +390,7 @@
                 "recommendingGoals": []
             }
         ],
-    "Change": 
+    "Change":
         [
             {
                 "name": "Starting to Exercise Regularly",
@@ -452,7 +467,7 @@
                 "recommendingGoals": ["2c"]
             }
         ],
-    "Other": 
+    "Other":
         [
             {
                     "name": "Whether as-needed medication worked",

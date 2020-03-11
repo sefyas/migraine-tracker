@@ -21,7 +21,14 @@ export class DateFunctionServiceProvider {
       date = date.utc()
     }
     return date.format("MM/DD/YYYY");
-    // return date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear();
+  }
+
+  dateMatch(dateString1, dateString2) {
+    let prettyDate1 = this.dateToPrettyDate(dateString1);
+    let prettyDate2 = this.dateToPrettyDate(dateString2);
+    console.log(prettyDate1);
+    console.log(prettyDate2);
+    return (prettyDate1 === prettyDate2)
   }
 
   getMonthAgo(date){
@@ -32,7 +39,6 @@ export class DateFunctionServiceProvider {
     return moment(time, 'hh:mm');
   }
 
-
   getDate(date){
     return moment(date);
   }
@@ -40,8 +46,6 @@ export class DateFunctionServiceProvider {
   compareToToday(date, granularity){
     return moment().isSame(date, granularity)
   }
-
-
 
   dateArithmatic(date, manipulation, amount, unit){
     if(manipulation === 'add'){
@@ -51,9 +55,6 @@ export class DateFunctionServiceProvider {
       return moment(date).subtract(amount, unit);
     }
   }
-
-
-
 
   getDayOfWeek(date){
     return moment(date).format('ddd');
@@ -81,7 +82,6 @@ export class DateFunctionServiceProvider {
     return moment(d1) >= moment(d2);
   }
 
-
   milisecondsToPrettyTime(durationInMS){
     let duration = moment.duration(durationInMS);
     let hours = duration.hours();
@@ -98,10 +98,6 @@ export class DateFunctionServiceProvider {
     return t2.diff(t1);
   }
 
-
-
-
-
   getUTCDate(date){
     // is sometimes the wrong date?
     if(!date) date = new Date();
@@ -112,7 +108,6 @@ export class DateFunctionServiceProvider {
     return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
   }
 
-
   getStartAndEndDatesForCalendar(date=null){
     let dateTracked = date ? new Date(date) : new Date();
     let startDate = new Date(Date.UTC(dateTracked.getFullYear(), dateTracked.getMonth(), dateTracked.getDate()));
@@ -121,8 +116,4 @@ export class DateFunctionServiceProvider {
     let endDate = new Date(Date.UTC(nextDay.getFullYear(), nextDay.getMonth(), nextDay.getDate()));
     return [startDate, endDate]
   }
-
-
-
-
 }

@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import {ModalController, NavController, NavParams, ViewController} from 'ionic-angular';
-import {DataDetailsServiceProvider} from "../../../providers/data-details-service/data-details-service";
-import {SelectTrackingFrequencyPage} from "../select-tracking-frequency/select-tracking-frequency";
-import {EditDataPage} from "../edit-data/edit-data";
-import {CouchDbServiceProvider} from "../../../providers/couch-db-service/couch-db-service";
+import { ModalController, NavController, NavParams, ViewController } from 'ionic-angular';
+import { DataDetailsServiceProvider } from "../../../providers/data-details-service/data-details-service";
+import { SelectTrackingFrequencyPage } from "../select-tracking-frequency/select-tracking-frequency";
+import { EditDataPage } from "../edit-data/edit-data";
+import { CouchDbServiceProvider } from "../../../providers/couch-db-service/couch-db-service";
 import * as moment from 'moment';
-import {DataElement, DataType} from "../../../interfaces/customTypes";
+import { DataElement, DataType } from "../../../interfaces/customTypes";
 
 
 @Component({
@@ -13,7 +13,6 @@ import {DataElement, DataType} from "../../../interfaces/customTypes";
   templateUrl: 'data-config.html',
 })
 export class DataConfigPage {
-
   private recommendTracking : boolean = false; // as in, recommend for a goal despite no specific recommendations
   private allGoals : string[] = [];
   private dataObject : DataType;
@@ -28,22 +27,23 @@ export class DataConfigPage {
   private commonExpanded : boolean = false;
   private alwaysQuickTrack : DataElement[] = [];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,
+  constructor(public navCtrl: NavController,
+              public navParams: NavParams,
               public viewCtrl: ViewController,
               public dataDetailsServiceProvider: DataDetailsServiceProvider,
               public modalCtrl: ModalController,
-              private couchDBService: CouchDbServiceProvider) {
+              private couchDbService: CouchDbServiceProvider) {
   }
 
   ionViewDidLoad() {
-    let activeGoals = this.couchDBService.getActiveGoals();
+    let activeGoals = this.couchDbService.getConfiguredRoutine();
     let alreadyTracking = {};
     if(activeGoals !== null){
       alreadyTracking = activeGoals['dataToTrack'] ? activeGoals['dataToTrack'] : {};
       this.allGoals = activeGoals['goals'] ? activeGoals['goals'] : [];
     }
 
-    if(this.navParams.data['goalIDs']){ // got here via adding a goal
+    if (this.navParams.data['goalIDs']) { // got here via adding a goal
       this.allGoals = this.allGoals.concat(this.navParams.data['goalIDs']);
       this.dataObject = this.navParams.data['dataPage'];
       alreadyTracking = this.combineTracking(alreadyTracking, this.navParams.data['selectedData']);
@@ -74,7 +74,6 @@ export class DataConfigPage {
     return dict1;
   }
 
-
   recordTracking(trackingOfDatatype : DataElement[]){
     // put everything already being tracked into their correct lists so we can modify them accurately
     if(trackingOfDatatype){
@@ -85,14 +84,12 @@ export class DataConfigPage {
     }
   }
 
-
-
   getAllRecs(alreadyTracking : {[dataType:string]:DataElement[]}) {
     let dataInfo = this.dataDetailsServiceProvider.getDataLists(alreadyTracking, this.dataObject.dataType, this.allGoals);
     this.recommendedData = dataInfo['recData'];
     this.otherData = dataInfo['otherData'];
     this.commonExpanded = dataInfo['expandOther'];
-    if(dataInfo['alwaysQuickTrack']) this.alwaysQuickTrack = dataInfo['alwaysQuickTrack'];
+    if (dataInfo['alwaysQuickTrack']) this.alwaysQuickTrack = dataInfo['alwaysQuickTrack'];
     this.recordTracking(alreadyTracking[this.dataObject.dataType]);
 
     if(this.dataObject.recommendForGoals){ // for ex we need them to track personalized contributors to predict
@@ -105,15 +102,12 @@ export class DataConfigPage {
     }
   }
 
-
-
   replaceData(list : DataElement[], oldData : DataElement, newData : DataElement){
     // kinda dumb but ionic can't iterate dicts and we need all the data details somewhere, so eh
     let oldIndex = list.indexOf(oldData);
-    if(oldIndex > -1){
+    if (oldIndex > -1) {
       list.splice(oldIndex, 1, newData);
-    }
-    else{
+    } else {
       list.push(newData);
     }
   }
@@ -159,71 +153,58 @@ export class DataConfigPage {
   remove(data : DataElement, category : string){
     if(category === "custom") {
       this.customData.splice(this.customData.indexOf(data), 1);
-    }
-    else{
+    } else {
       this.selectedFromList.splice(this.selectedFromList.indexOf(data), 1);
       data.selected = false;
     }
   }
 
-
-  getQuickTrackers() : DataElement[]{
+  getQuickTrackers(selectedData) : DataElement[]{
     let quickTrackers = this.alwaysQuickTrack;
-    for(let i=0; i<this.selectedFromList.length; i++){
-      if(this.selectedFromList[i].quickTrack){
-        this.selectedFromList[i].dataType = this.dataObject.dataType;
-        quickTrackers.push(this.selectedFromList[i]);
+    for (let i=0; i<selectedData.length; i++) {
+      if (selectedData[i].quickTrack) {
+        selectedData[i].dataType = this.dataObject.dataType;
+        quickTrackers.push(selectedData[i]);
       }
     }
     return quickTrackers;
   }
 
-
   continueSetup() {
-    let quickTrackers : DataElement[] = this.getQuickTrackers();
+    let selectedData : DataElement[] = this.dataDetailsServiceProvider.getWhetherSelected(
+      this.recommendedData, this.otherData, this.customData);
+    let quickTrackers : DataElement[] = this.getQuickTrackers(selectedData);
 
-    let selectedData : DataElement[] = this.selectedFromList.concat(this.customData);
-
-    if(this.navParams.data['goalIDs']){
-      if(selectedData.length > 0){
-        if (!this.navParams.data['selectedData']) this.navParams.data['selectedData'] = {};
-
-        if(this.startDate){
-          for(let i=0; i< selectedData.length; i++){        // specify for every change so if they add different ones
+    if (this.navParams.data['goalIDs']) {
+      if (selectedData.length > 0) {
+        if (!this.navParams.data['selectedData']) {
+          this.navParams.data['selectedData'] = {};
+        }
+        if (this.startDate) {
+          for (let i=0; i< selectedData.length; i++) {        // specify for every change so if they add different ones
             selectedData[i]['startDate'] = this.startDate;  // at different days we still know how to filter
           }
         }
-
         this.navParams.data['selectedData'][this.dataObject.dataType] = selectedData;
-
-        if(quickTrackers.length > 0){
-          if(this.navParams.data['quickTrackers']){
+        if (quickTrackers.length > 0) {
+          if (this.navParams.data['quickTrackers']) {
             this.navParams.data['quickTrackers'] = this.navParams.data['quickTrackers'].concat(quickTrackers);
+          } else {
+            this.navParams.data['quickTrackers'] = quickTrackers;
           }
-          else this.navParams.data['quickTrackers'] = quickTrackers;
         }
-
       }
-
-
       let configData = this.dataDetailsServiceProvider.findNextConfigData(this.navParams.data['goalIDs'], this.dataObject);
-
-      if (configData !== null){
+      if (configData !== null) {
         this.navParams.data['dataPage'] = configData;
         this.navCtrl.push(DataConfigPage, this.navParams.data);
-      }
-
-      else {
+      } else {
         delete this.navParams.data['dataPage'];
         this.navCtrl.push(SelectTrackingFrequencyPage, this.navParams.data);
       }
-
-    }
-
-    else{
+    } else {
       this.viewCtrl.dismiss({'selected': selectedData, 'quickTrackers': quickTrackers});
     }
-
   }
 
 }

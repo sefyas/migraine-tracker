@@ -1,75 +1,227 @@
-import {HttpClient} from '@angular/common/http';
+import PouchDB from 'pouchdb';
+import PouchDBAuthentication from 'pouchdb-authentication';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {Events} from "ionic-angular";
+import { Events } from "ionic-angular";
+import { HomePage } from "../../pages/home/home";
+import {ConfiguredRoutine, DataElement, Notification} from "../../interfaces/customTypes";
+import { DataReport } from "../../interfaces/customTypes";
+import { Break } from "../../interfaces/customTypes";
+import { Storage } from '@ionic/storage';
+import { DateFunctionServiceProvider } from "../date-function-service/date-function-service";
 
-import {ConfiguredRoutine} from "../../interfaces/customTypes";
-import {DataReport} from "../../interfaces/customTypes";
-import {Break} from "../../interfaces/customTypes";
+let options = {
+  live: true,
+  retry: true,
+  continuous: true
+};
 
 
 @Injectable()
 export class CouchDbServiceProvider {
+  private seenConfig: boolean = false; // set to false for configuration mode
+  // private seenConfig : boolean = true; // set to true for tracking mode
+  // private currentConfiguredRoutine: ; // only ONE entry is active at a given time; "goals" lists all current goals
+  private trackedData: DataReport[] = [];
 
-  private seenConfig : boolean = false; // for demo-ing
+  // private baseUrl: string = 'http://127.0.0.1:5984/';
+  private baseUrl: string = 'https://migraine-tracker.com:6984/';
+  // private baseUrl: string = 'http://migraine-tracker.com:5984/';
+  private db: any;
+  private remote: any;
+  private username: any;
+  private currentConfiguredRoutine : ConfiguredRoutine;
 
-  private baseUrl : string = 'https://tractdb.org/api';
-  private activeUserGoals : ConfiguredRoutine; // only ONE entry is active at a given time; "goals" lists all current goals
-  private trackedData : DataReport[] = [];
-  private options : {[optionName:string]: any;} = {withCredentials: true};
+  constructor(private storage: Storage,
+              private dateFunctionsProvider: DateFunctionServiceProvider) {
+    PouchDB.plugin(PouchDBAuthentication);
+    this.db = new PouchDB('migraine-tracker', {skip_setup: true});
+    this.remote = new PouchDB(this.baseUrl);
+    // this.currentConfiguredRoutine = {goals: null, dataToTrack: {}, quickTrackers: null, textGoals: null, dateAdded: null, notifications: null};
+  }
 
-  constructor(public http: HttpClient,
-              public events: Events) {
-    let actualThis = this; // just for testing!
-    events.subscribe('configSeen', () => {
-      actualThis.seenConfig = true;
+  // Sign up a new user with the given credential info
+  // Report errors if the credential info is incorrect or invalid
+  signUp(credentials) {
+    // log in as the admin temporarily for the permission to create a separate database for the user
+    this.remote.logOut(function (err, response) {
+      console.log("Log out the existing account.");
+    });
+    this.remote.logIn("migraine-tracker-admin", "migraine-tracker-admin", function (err, response) {
+      console.log("Log in as an admin to create a new database.");
+    });
+    this.remote = new PouchDB(this.baseUrl + 'migraine-tracker-' + credentials.username);
+    this.remote.logOut(function (err, response) {
+      console.log("Log out the admin account.");
+    });
+    this.db.sync(this.remote, options).on('error', console.log.bind(console));
+    // sign up as a new user
+    return this.remote.signUp(credentials.username, credentials.password,
+      {metadata : {register_time : new Date()}}, function (err, response) {});
+  }
+
+  // Log a registered user into the system given the credential info
+  // Report errors if the credential info is incorrect or invalid
+  login(credentials) {
+    this.remote = new PouchDB(this.baseUrl + 'migraine-tracker-' + credentials.username);
+    this.db.sync(this.remote, options).on('error', console.log.bind(console));
+    return this.remote.logIn(credentials.username, credentials.password, function (err, response) {});
+  }
+
+  // Check whether a user is in the login session
+  async userInSession(credentials) {
+    var current_session = await this.remote.getSession(function (err, response) {
+      return response
+    });
+    return current_session.userCtx.name === credentials['username'];
+  }
+
+  // Initialize the user info document for the new user
+  initializeUserInfoDoc(username) {
+    this.db.put({_id: "user-info", register_time: new Date(), username: username, current_configured_routine_id: 0, break: 0}, function(err, response) {
+      if (err) { return console.log(err); }
     });
   }
 
-  getCurrentBreak() : Break {
-    // todo: pull from db, make sure it's current
+  // Load the user info document
+  // async loadUserInfoDoc() {
+  //   var currentConfiguredRoutineID = await this.getCurrentConfiguredRoutineID();
+  //   if (currentConfiguredRoutineID != 0) {
+  //     try {
+  //       console.log("$$$$$$ getConfiguredRoutine");
+  //       this.currentConfiguredRoutine = await this.db.get("configured-routine-" + currentConfiguredRoutineID);
+  //       console.log(this.currentConfiguredRoutine);
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   }
+  // }
+
+  // Get the current configured routine id from the user info doc
+  async getCurrentConfiguredRoutineID() {
+    try {
+      var doc = await this.db.get('user-info');
+      return doc['current_configured_routine_id'];
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  // Set the current configured routine id
+  async setCurrentConfiguredRoutineID(current_configured_routine_id) {
+    try {
+      var doc = await this.db.get('user-info');
+      var response = await this.db.put({
+        _id: 'user-info',
+        _rev: doc._rev,
+        register_time: doc.register_time,
+        username: doc.username,
+        current_configured_routine_id: current_configured_routine_id,
+        break: doc.break,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  // Log the configured routine
+  async logConfiguredRoutine(data) {
+    var dataToTrack = data["selectedData"];
+    var quickTrackers = [];
+    var dataTypes = ['Symptom', 'Treatment', 'Contributor', 'Change', 'Other'];
+    // Append the quick tracker data to a list
+    for (let i=0; i < dataTypes.length; i++) {
+      var data_tracked = dataToTrack[dataTypes[i]];
+      if (data_tracked) {
+        for (let j=0; j<data_tracked.length; j++) {
+          if (data_tracked[j]['quickTrack']) {
+            quickTrackers.push(data_tracked[j]);
+          }
+        }
+      }
+    }
+    // Construct the configured routine
+    var currentConfiguredRoutine = {
+      dateAdded: new Date(),
+      goals: data["goalIDs"],
+      dataToTrack: data["selectedData"],
+      quickTrackers: quickTrackers,
+      textGoals: data["textGoals"],
+      notifications: data["notifications"]
+    };
+    var currentConfiguredRoutineID = await this.getCurrentConfiguredRoutineID();
+    currentConfiguredRoutineID = currentConfiguredRoutineID + 1;
+    this.setCurrentConfiguredRoutineID(currentConfiguredRoutineID);
+    this.db.put({_id: "configured-routine-" + currentConfiguredRoutineID, configured_routine: currentConfiguredRoutine}, function(err, response) {
+      if (err) { return console.log(err); }
+      // handle response
+    });
+  }
+
+
+  // Get the current configured routine
+  async getConfiguredRoutine() {
+    var currentConfiguredRoutineID = await this.getCurrentConfiguredRoutineID();
+    if (currentConfiguredRoutineID != 0) {
+      try {
+        this.currentConfiguredRoutine = await this.db.get("configured-routine-" + currentConfiguredRoutineID);
+        this.currentConfiguredRoutine = this.currentConfiguredRoutine['configured_routine'];
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    if (this.currentConfiguredRoutine) {
+      return this.currentConfiguredRoutine;
+    }
     return null;
-    // return {
-    //   "reasonForBreak": "I want to",
-    //   "notifyDate": "2020-02-28",
-    //   "started": "2019-02-27T01:07:42.495Z"
-    // }
-  }
-
-  updateBreak(currentBreak : Break){
-    // todo: push to db
-    console.log(currentBreak);
-  }
-
-  setBreak(newBreak : Break){
-    //todo: push to db
-    console.log(newBreak);
   }
 
 
-  login(credentials : {[login: string] : string}) {
-    console.log(credentials);
-    // log the user in based on the credentials
-    return this.http.post(this.baseUrl + '/login', JSON.stringify(credentials), this.options);
+
+
+
+
+
+
+
+
+
+  addGoalFromSetup(setupDict : {[configInfo: string] : any}) : ConfiguredRoutine{
+    console.log("!!!!!!!!!!!!!! addGoalFromSetup !!!!!!!!!!!!!");
+    // todo: actually push to database; make sure it's doing the right thing when we JUST modify goals!!!!
+    let newGoals = setupDict['goalIDs'];
+    if(this.currentConfiguredRoutine) { // we need to deactivate the previous goals
+      this.currentConfiguredRoutine['deactivated'] = new Date(); // todo: push
+      this.currentConfiguredRoutine = null; // since we're creating a new one
+    }
+    this.currentConfiguredRoutine = {'goals': newGoals,
+                            'dataToTrack': setupDict.selectedData,
+                            'quickTrackers': setupDict.quickTrackers,
+                            'textGoals': setupDict.textGoals,
+                            'dateAdded': new Date(),
+                            'notifications': setupDict.notifications}; // todo: push
+
+    console.log(this.currentConfiguredRoutine);
+    return this.currentConfiguredRoutine;
   }
 
-  userLoggedIn() {
-    // see if we're logged in; response gives account
-    return this.http.get(this.baseUrl + '/authenticated', this.options);
-  }
 
 
   trackData(newData : DataReport) {
+    console.log("!!!!!!!!!!!!!! trackData !!!!!!!!!!!!!");
+    console.log(newData); // push to db
+
     // todo: should store a datapoint in couch as a new object
-    // console.log(newData); // push to db
     // todo: needs to append start and end time!!!
-    this.trackedData.push(newData);
-    console.log(this.trackedData);
+    // this.trackedData.push(newData);
+    // console.log(this.trackedData);
   }
 
 
 
   combineDataToTrack(oldDataToTrack : {[dataType:string]: any;},
-                     newDataToTrack : {[dataType:string]: any;}) : {[dataType:string]: any;}{
+                     newDataToTrack : {[dataType:string]: any;}) : {[dataType:string]: any;} {
+    console.log("!!!!!!!!!!!!!! combineDataToTrack !!!!!!!!!!!!!");
     // should return all data to track
     if(newDataToTrack) {
       // @ts-ignore
@@ -85,76 +237,77 @@ export class CouchDbServiceProvider {
     return oldDataToTrack;
   }
 
-  addGoalFromSetup(setupDict : {[configInfo: string] : any}) : ConfiguredRoutine{
-    // todo: actually push to database; make sure it's doing the right thing when we JUST modify goals!!!!
-    let newGoals = setupDict['goalIDs'];
-    if(this.activeUserGoals) { // we need to deactivate the previous goals
-      this.activeUserGoals['deactivated'] = new Date(); // todo: push
-      this.activeUserGoals = null; // since we're creating a new one
-    }
-    this.activeUserGoals = {'goals': newGoals,
-                            'dataToTrack': setupDict.selectedData,
-                            'quickTrackers': setupDict.quickTrackers,
-                            'textGoals': setupDict.textGoals,
-                            'dateAdded': new Date(),
-                            'notifications': setupDict.notifications}; // todo: push
-    console.log(this.activeUserGoals);
-    return this.activeUserGoals;
-  }
+
 
   modifyQuickTrackers(quickTrackers){
+    console.log("!!!!!!!!!!!!!! modifyQuickTrackers !!!!!!!!!!!!!");
     // todo: push!
-    this.activeUserGoals.quickTrackers = quickTrackers;
+
+    console.log(quickTrackers);
+    this.currentConfiguredRoutine.quickTrackers = quickTrackers;
   }
 
-  modifyTrackingRoutine(dataType, newRoutine){
+  modifyTrackingRoutine(dataType, newRoutine) {
+    console.log("!!!!!!!!!!!!!! modifyTrackingRoutine !!!!!!!!!!!!!");
     // todo: push!  And maybe change date added??
-    this.activeUserGoals.dataToTrack[dataType] = newRoutine;
+    console.log(dataType);
+    console.log(newRoutine);
+    this.currentConfiguredRoutine.dataToTrack[dataType] = newRoutine;
   }
 
-  modifyFrequency(newNotifications){
+  modifyFrequency(newNotifications) {
+    console.log("!!!!!!!!!!!!!! modifyFrequency !!!!!!!!!!!!!");
     // todo: push!  And maybe change date added??
-    this.activeUserGoals.notifications = newNotifications;
+    console.log(newNotifications);
+    this.currentConfiguredRoutine.notifications = newNotifications;
   }
 
-  modifyGoals(newGoalsObject){
+  modifyGoals(newGoalsObject) {
+    console.log("!!!!!!!!!!!!!! modifyGoals !!!!!!!!!!!!!");
     // todo: push!  And maybe change date added??
-    this.activeUserGoals.goals = newGoalsObject['goalIDs'];
-    this.activeUserGoals.textGoals = newGoalsObject['textGoals'];
+    this.currentConfiguredRoutine.goals = newGoalsObject['goalIDs'];
+    this.currentConfiguredRoutine.textGoals = newGoalsObject['textGoals'];
   }
 
-  removeGoal(goal : string) { //todo: dunno if we need this
+  removeGoal(goal: string) {
+    console.log("!!!!!!!!!!!!!! removeGoal !!!!!!!!!!!!!");
+    //todo: dunno if we need this
     // todo: push to database
     if(goal === 'textGoal'){
-      this.activeUserGoals['textGoals'] = undefined;
+      this.currentConfiguredRoutine['textGoals'] = undefined;
     }
     else{
       // TODO: nope; we want to make a copy and make the old one the active one
-      this.activeUserGoals['goals'].splice(this.activeUserGoals['goals'].indexOf(goal), 1);
+      this.currentConfiguredRoutine['goals'].splice(this.currentConfiguredRoutine['goals'].indexOf(goal), 1);
     }
   }
 
-  editTextGoal(newGoal : string){ // todo: again, dunno if needed
+  editTextGoal(newGoal: string) {
+    console.log("!!!!!!!!!!!!!! editTextGoal !!!!!!!!!!!!!");
+    // todo: again, dunno if needed
     // todo: push to database
-    this.activeUserGoals['textGoals'] = newGoal;
+    this.currentConfiguredRoutine['textGoals'] = newGoal;
   }
 
 
 
-  getActiveGoals() : ConfiguredRoutine {
-    if(!this.seenConfig){
-      return null;
-    }
-    if(this.activeUserGoals){
-      return this.activeUserGoals;
-    }
-    return this.getExampleGoal(); //todo: remove, use db
-   // return {};
-  }
 
 
-  getTrackedData() : DataReport[]{
+  getTrackedData(): DataReport[] {
+    console.log("!!!!!!!!!!!!!! getTrackedData !!!!!!!!!!!!!");
     // todo!
+
+    // console.log("---------- getTrackedData ----------");
+    //
+    // console.log("seenConfig =====>");
+    // console.log(this.seenConfig);
+    //
+    // console.log("trackedData =====>");
+    // console.log(this.trackedData);
+    //
+    // console.log("getExamplePreviouslyTracked =====>");
+    // console.log(this.getExamplePreviouslyTracked());
+
     if(!this.seenConfig){
       return [];
     }
@@ -168,334 +321,356 @@ export class CouchDbServiceProvider {
     }
   }
 
-
-
-
-
-  getExampleGoal()  : ConfiguredRoutine{
-    let exGoal = {
-      "quickTrackers": [
-        {
-          "name": "Migraine",
-          "id": "migraineToday",
-          "explanation": "Migraine experienced",
-          "fieldDescription": "Whether you had a migraine (yes/no)",
-          "recommendedField": "binary",
-          "recommendingGoals": ["2a", "2b", "2c", "3", "1a", "1b", "1c"],
-          "quickTrack": true,
-          "alwaysQuickTrack": true,
-          "field": "binary",
-          "fieldSet": true,
-          "dataType": "Symptom"
-        },
-        {
-          "name": "As-needed medications today",
-          "id": "asNeededMeds",
-          "isMed": true,
-          "explanation": "Any medication you take on an as-needed basis (in response to symptoms).  For example: Advil, Excedrin, Tylenol, prescription medications you don't take regularly.",
-          "fieldDescription": "Whether you took any as-needed medication today",
-          "field": "binary",
-          "recommendingGoals": [
-            "1a",
-            "1b",
-            "1c",
-            "2a",
-            "2b",
-            "2c",
-            "3"
-          ],
-          "goal": {
-            "freq": "Less",
-            "threshold": 4,
-            "timespan": "Month"
-          },
-          "opts": {
-            "showBackdrop": true,
-            "enableBackdropDismiss": true
-          },
-          "selected": true,
-          "quickTrack": true,
-          "dataType": "Treatment"
-        }
-      ],
-        "goals": [
-          "1",
-          "2",
-          "3",
-          "2a",
-          "2b",
-          "2c",
-          "1a",
-          "1b",
-          "1c"
-        ],
-        "dataToTrack": {
-          "Change": [
-            {
-              "name": "Healthy Sleep Schedule",
-              "id": "sleepChange",
-              "explanation": "How much sleep you got today",
-              "fieldDescription": "Hours of sleep",
-              "field": "number",
-              "goal": {
-                "freq": "More",
-                "threshold": 8,
-                "timespan": "Day"
-              },
-              "recommendingGoals": [
-                "1c"
-              ],
-              "startDate": "2019-04-11T16:22:17.264Z",
-              "opts": {
-                "showBackdrop": true,
-                "enableBackdropDismiss": true
-              },
-              "selected": true
-            }
-          ],
-          "Symptom": [
-            {
-              "name": "Migraine today",
-              "id": "migraineToday",
-              "explanation": "Migraine experienced today",
-              "fieldDescription": "Whether you had a migraine (yes/no)",
-              "field": "binary",
-              "recommendingGoals": [
-                "1a",
-                "1b",
-                "1c",
-                "2a",
-                "2b",
-                "2c",
-                "3"
-              ],
-              "opts": {
-                "showBackdrop": true,
-                "enableBackdropDismiss": true
-              },
-              "selected": true,
-              "quickTrack": true,
-              "fieldSet": true
-            },
-            {
-              "name": "Peak Migraine Severity",
-              "id": "peakMigraineSeverity",
-              "explanation": "How bad the migraine was at its worst point",
-              "fieldDescription": "10-point Pain level (1=mild, 10=terrible)",
-              "recommendedField": "numeric scale",
-              "field": "numeric scale",
-              "recommendingGoals": ["1b", "1c"],
-              "selected": true
-            },
-            {
-              "name": "Quality of the Pain",
-              "id": "painQuality",
-              "explanation": "What the pain was like (pulsating/throbbing, pressure, tension, stabbing, sharp, dull, burning, other)",
-              "fieldDescription": "Text box where you can describe the pain",
-              "field": "note",
-              "recommendingGoals": [
-                "1b"
-              ],
-              "opts": {
-                "showBackdrop": true,
-                "enableBackdropDismiss": true
-              },
-              "selected": true
-            },
-            {
-              "name": "Start time",
-              "id": "migraineStartTime",
-              "explanation": "The time your migraine started",
-              "fieldDescription": "time",
-              "field": "time",
-              "recommendingGoals": [],
-              "opts": {
-                "showBackdrop": true,
-                "enableBackdropDismiss": true
-              },
-              "selected": true
-            },
-            {
-              "name": "Migraine duration",
-              "field": "time range",
-              "id": "custom_migraineduration",
-              "custom": true
-            }
-          ],
-          "Treatment": [
-            {
-              "name": "As-needed medications today",
-              "id": "asNeededMeds",
-              "isMed": true,
-              "fieldsAllowed": ["binary", "number", "time"],
-              "explanation": "Any medication you take on an as-needed basis (in response to symptoms).  For example: Advil, Excedrin, Tylenol, prescription medications you don't take regularly.",
-              "fieldDescription": "Whether you took any as-needed medication today",
-              "field": "binary",
-              "recommendingGoals": [
-                "1a",
-                "1b",
-                "1c",
-                "2a",
-                "2b",
-                "2c",
-                "3"
-              ],
-              "goal": {
-                "freq": "Less",
-                "threshold": 4,
-                "timespan": "Month"
-              },
-              "opts": {
-                "showBackdrop": true,
-                "enableBackdropDismiss": true
-              },
-              "selected": true,
-              "quickTrack": true
-            },
-            {
-              "name": "Exercise",
-              "id": "exerciseToday",
-              "explanation": "How much you exercised today",
-              "fieldDescription": "Number of minutes of exercise",
-              "field": "number",
-              "goal": {
-                "freq": "More",
-                "threshold": 180,
-                "timespan": "Week"
-              },
-              "recommendingGoals": [
-                "1b",
-                "2b"
-              ],
-              "opts": {
-                "showBackdrop": true,
-                "enableBackdropDismiss": true
-              },
-              "selected": true
-            },
-            {
-              "name": "Nutrition Today",
-              "id": "nutritionToday",
-              "explanation": "Whether you ate healthily today. For example, we recommend 4-5 servings of veggies, eating regular meals, avoiding sugar",
-              "fieldDescription": "Whether you ate healthily (yes/no)",
-              "field": "binary",
-              "recommendingGoals": [
-                "1b",
-                "2b"
-              ],
-              "opts": {
-                "showBackdrop": true,
-                "enableBackdropDismiss": true
-              },
-              "selected": true
-            },
-            {
-              "name": "Time took advil",
-              "field": "time",
-              "id": "custom_timetookadvil",
-              "custom": true
-            }
-          ],
-          "Contributor": [
-            {
-              "name": "Stress",
-              "id": "stressToday",
-              "explanation": "How stressed you were today",
-              "fieldDescription": "3-point stress rating",
-              "significance": "High stress levels can lead to more migraines",
-              "field": "category scale",
-              "recommendingGoals": [
-                "1b",
-                "2b"
-              ],
-              "opts": {
-                "showBackdrop": true,
-                "enableBackdropDismiss": true
-              },
-              "selected": true
-            },
-            {
-              "name": "Frequent Use of Medications",
-              "id": "frequentMedUse",
-              "explanation": "Calculated medication use, to let you know if you might want to think about cutting back.",
-              "fieldDescription": "Number of pills you took",
-              "field": "calculated medication use",
-              "condition": true,
-              "recommendingGoals": [
-                "1a",
-                "1b",
-                "1c",
-                "2a",
-                "2b",
-                "2c",
-                "3"
-              ],
-              "goal": {
-                "freq": "Less",
-                "threshold": 4,
-                "timespan": "Month"
-              },
-              "significance": "If you use as-needed medications too frequently, they can start causing more migraines.",
-              "opts": {
-                "showBackdrop": true,
-                "enableBackdropDismiss": true
-              },
-              "selected": true
-            },
-            {
-              "name": "Alcohol",
-              "id": "alcoholToday",
-              "explanation": "How much alcohol you had today",
-              "fieldDescription": "3-point alcohol rating",
-              "field": "category scale",
-              "recommendingGoals": [
-                "1b",
-                "2b"
-              ],
-              "opts": {
-                "showBackdrop": true,
-                "enableBackdropDismiss": true
-              },
-              "selected": true
-            }
-          ],
-          "Other": [
-            {
-              "name": "Other notes",
-              "id": "otherNotes",
-              "explanation": "Anything else you want to note about today ",
-              "fieldDescription": "Text box where you can record any notes",
-              "field": "note",
-              "recommendingGoals": [
-                "1a",
-                "1b",
-                "1c",
-                "2a",
-                "2b",
-                "2c",
-                "3"
-              ],
-              "opts": {
-                "showBackdrop": true,
-                "enableBackdropDismiss": true
-              },
-              "selected": true
-            }
-          ]
-        },
-        "textGoals":
-          "Get <1 migraine per week",
-        "dateAdded": "2019-04-11T16:22:17.264Z",
-        "notifications": {
-          "retroactive": {
-            "delayScale": "Day",
-            "delayNum": 1
-          }
-        },
-      };
-    this.activeUserGoals = exGoal;
-    return exGoal;
+  getCurrentBreak(): Break {
+    console.log("!!!!!!!!!!!!!! getCurrentBreak !!!!!!!!!!!!!");
+    // todo: pull from db, make sure it's current
+    return null;
+    // return {
+    //   "reasonForBreak": "I want to",
+    //   "notifyDate": "2020-02-28",
+    //   "started": "2019-02-27T01:07:42.495Z"
+    // }
   }
+
+
+  updateBreak(currentBreak: Break) {
+    console.log("!!!!!!!!!!!!!! updateBreak !!!!!!!!!!!!!");
+    // todo: push to db
+    console.log(currentBreak);
+  }
+
+  setBreak(newBreak: Break) {
+    console.log("!!!!!!!!!!!!!! setBreak !!!!!!!!!!!!!");
+    //todo: push to db
+    console.log(newBreak);
+  }
+
+
+
+  // getExampleGoal()  : ConfiguredRoutine {
+  //   let exGoal = {
+  //     "quickTrackers": [
+  //       {
+  //         "name": "Migraine",
+  //         "id": "migraineToday",
+  //         "explanation": "Migraine experienced",
+  //         "fieldDescription": "Whether you had a migraine (yes/no)",
+  //         "recommendedField": "binary",
+  //         "recommendingGoals": ["2a", "2b", "2c", "3", "1a", "1b", "1c"],
+  //         "quickTrack": true,
+  //         "alwaysQuickTrack": true,
+  //         "field": "binary",
+  //         "fieldSet": true,
+  //         "dataType": "Symptom"
+  //       },
+  //       {
+  //         "name": "As-needed medications today",
+  //         "id": "asNeededMeds",
+  //         "isMed": true,
+  //         "explanation": "Any medication you take on an as-needed basis (in response to symptoms).  For example: Advil, Excedrin, Tylenol, prescription medications you don't take regularly.",
+  //         "fieldDescription": "Whether you took any as-needed medication today",
+  //         "field": "binary",
+  //         "recommendingGoals": [
+  //           "1a",
+  //           "1b",
+  //           "1c",
+  //           "2a",
+  //           "2b",
+  //           "2c",
+  //           "3"
+  //         ],
+  //         "goal": {
+  //           "freq": "Less",
+  //           "threshold": 4,
+  //           "timespan": "Month"
+  //         },
+  //         "opts": {
+  //           "showBackdrop": true,
+  //           "enableBackdropDismiss": true
+  //         },
+  //         "selected": true,
+  //         "quickTrack": true,
+  //         "dataType": "Treatment"
+  //       }
+  //     ],
+  //       "goals": [
+  //         "1",
+  //         "2",
+  //         "3",
+  //         "2a",
+  //         "2b",
+  //         "2c",
+  //         "1a",
+  //         "1b",
+  //         "1c"
+  //       ],
+  //       "dataToTrack": {
+  //         "Change": [
+  //           {
+  //             "name": "Healthy Sleep Schedule",
+  //             "id": "sleepChange",
+  //             "explanation": "How much sleep you got today",
+  //             "fieldDescription": "Hours of sleep",
+  //             "field": "number",
+  //             "goal": {
+  //               "freq": "More",
+  //               "threshold": 8,
+  //               "timespan": "Day"
+  //             },
+  //             "recommendingGoals": [
+  //               "1c"
+  //             ],
+  //             "startDate": "2019-04-11T16:22:17.264Z",
+  //             "opts": {
+  //               "showBackdrop": true,
+  //               "enableBackdropDismiss": true
+  //             },
+  //             "selected": true
+  //           }
+  //         ],
+  //         "Symptom": [
+  //           {
+  //             "name": "Migraine today",
+  //             "id": "migraineToday",
+  //             "explanation": "Migraine experienced today",
+  //             "fieldDescription": "Whether you had a migraine (yes/no)",
+  //             "field": "binary",
+  //             "recommendingGoals": [
+  //               "1a",
+  //               "1b",
+  //               "1c",
+  //               "2a",
+  //               "2b",
+  //               "2c",
+  //               "3"
+  //             ],
+  //             "opts": {
+  //               "showBackdrop": true,
+  //               "enableBackdropDismiss": true
+  //             },
+  //             "selected": true,
+  //             "quickTrack": true,
+  //             "fieldSet": true
+  //           },
+  //           {
+  //             "name": "Peak Migraine Severity",
+  //             "id": "peakMigraineSeverity",
+  //             "explanation": "How bad the migraine was at its worst point",
+  //             "fieldDescription": "10-point Pain level (1=mild, 10=terrible)",
+  //             "recommendedField": "numeric scale",
+  //             "field": "numeric scale",
+  //             "recommendingGoals": ["1b", "1c"],
+  //             "selected": true
+  //           },
+  //           {
+  //             "name": "Quality of the Pain",
+  //             "id": "painQuality",
+  //             "explanation": "What the pain was like (pulsating/throbbing, pressure, tension, stabbing, sharp, dull, burning, other)",
+  //             "fieldDescription": "Text box where you can describe the pain",
+  //             "field": "note",
+  //             "recommendingGoals": [
+  //               "1b"
+  //             ],
+  //             "opts": {
+  //               "showBackdrop": true,
+  //               "enableBackdropDismiss": true
+  //             },
+  //             "selected": true
+  //           },
+  //           {
+  //             "name": "Start time",
+  //             "id": "migraineStartTime",
+  //             "explanation": "The time your migraine started",
+  //             "fieldDescription": "time",
+  //             "field": "time",
+  //             "recommendingGoals": [],
+  //             "opts": {
+  //               "showBackdrop": true,
+  //               "enableBackdropDismiss": true
+  //             },
+  //             "selected": true
+  //           },
+  //           {
+  //             "name": "Migraine duration",
+  //             "field": "time range",
+  //             "id": "custom_migraineduration",
+  //             "custom": true
+  //           }
+  //         ],
+  //         "Treatment": [
+  //           {
+  //             "name": "As-needed medications today",
+  //             "id": "asNeededMeds",
+  //             "isMed": true,
+  //             "fieldsAllowed": ["binary", "number", "time"],
+  //             "explanation": "Any medication you take on an as-needed basis (in response to symptoms).  For example: Advil, Excedrin, Tylenol, prescription medications you don't take regularly.",
+  //             "fieldDescription": "Whether you took any as-needed medication today",
+  //             "field": "binary",
+  //             "recommendingGoals": [
+  //               "1a",
+  //               "1b",
+  //               "1c",
+  //               "2a",
+  //               "2b",
+  //               "2c",
+  //               "3"
+  //             ],
+  //             "goal": {
+  //               "freq": "Less",
+  //               "threshold": 4,
+  //               "timespan": "Month"
+  //             },
+  //             "opts": {
+  //               "showBackdrop": true,
+  //               "enableBackdropDismiss": true
+  //             },
+  //             "selected": true,
+  //             "quickTrack": true
+  //           },
+  //           {
+  //             "name": "Exercise",
+  //             "id": "exerciseToday",
+  //             "explanation": "How much you exercised today",
+  //             "fieldDescription": "Number of minutes of exercise",
+  //             "field": "number",
+  //             "goal": {
+  //               "freq": "More",
+  //               "threshold": 180,
+  //               "timespan": "Week"
+  //             },
+  //             "recommendingGoals": [
+  //               "1b",
+  //               "2b"
+  //             ],
+  //             "opts": {
+  //               "showBackdrop": true,
+  //               "enableBackdropDismiss": true
+  //             },
+  //             "selected": true
+  //           },
+  //           {
+  //             "name": "Nutrition Today",
+  //             "id": "nutritionToday",
+  //             "explanation": "Whether you ate healthily today. For example, we recommend 4-5 servings of veggies, eating regular meals, avoiding sugar",
+  //             "fieldDescription": "Whether you ate healthily (yes/no)",
+  //             "field": "binary",
+  //             "recommendingGoals": [
+  //               "1b",
+  //               "2b"
+  //             ],
+  //             "opts": {
+  //               "showBackdrop": true,
+  //               "enableBackdropDismiss": true
+  //             },
+  //             "selected": true
+  //           },
+  //           {
+  //             "name": "Time took advil",
+  //             "field": "time",
+  //             "id": "custom_timetookadvil",
+  //             "custom": true
+  //           }
+  //         ],
+  //         "Contributor": [
+  //           {
+  //             "name": "Stress",
+  //             "id": "stressToday",
+  //             "explanation": "How stressed you were today",
+  //             "fieldDescription": "3-point stress rating",
+  //             "significance": "High stress levels can lead to more migraines",
+  //             "field": "category scale",
+  //             "recommendingGoals": [
+  //               "1b",
+  //               "2b"
+  //             ],
+  //             "opts": {
+  //               "showBackdrop": true,
+  //               "enableBackdropDismiss": true
+  //             },
+  //             "selected": true
+  //           },
+  //           {
+  //             "name": "Frequent Use of Medications",
+  //             "id": "frequentMedUse",
+  //             "explanation": "Calculated medication use, to let you know if you might want to think about cutting back.",
+  //             "fieldDescription": "Number of pills you took",
+  //             "field": "calculated medication use",
+  //             "condition": true,
+  //             "recommendingGoals": [
+  //               "1a",
+  //               "1b",
+  //               "1c",
+  //               "2a",
+  //               "2b",
+  //               "2c",
+  //               "3"
+  //             ],
+  //             "goal": {
+  //               "freq": "Less",
+  //               "threshold": 4,
+  //               "timespan": "Month"
+  //             },
+  //             "significance": "If you use as-needed medications too frequently, they can start causing more migraines.",
+  //             "opts": {
+  //               "showBackdrop": true,
+  //               "enableBackdropDismiss": true
+  //             },
+  //             "selected": true
+  //           },
+  //           {
+  //             "name": "Alcohol",
+  //             "id": "alcoholToday",
+  //             "explanation": "How much alcohol you had today",
+  //             "fieldDescription": "3-point alcohol rating",
+  //             "field": "category scale",
+  //             "recommendingGoals": [
+  //               "1b",
+  //               "2b"
+  //             ],
+  //             "opts": {
+  //               "showBackdrop": true,
+  //               "enableBackdropDismiss": true
+  //             },
+  //             "selected": true
+  //           }
+  //         ],
+  //         "Other": [
+  //           {
+  //             "name": "Other notes",
+  //             "id": "otherNotes",
+  //             "explanation": "Anything else you want to note about today ",
+  //             "fieldDescription": "Text box where you can record any notes",
+  //             "field": "note",
+  //             "recommendingGoals": [
+  //               "1a",
+  //               "1b",
+  //               "1c",
+  //               "2a",
+  //               "2b",
+  //               "2c",
+  //               "3"
+  //             ],
+  //             "opts": {
+  //               "showBackdrop": true,
+  //               "enableBackdropDismiss": true
+  //             },
+  //             "selected": true
+  //           }
+  //         ]
+  //       },
+  //       "textGoals":
+  //         "Get <1 migraine per week",
+  //       "dateAdded": "2019-04-11T16:22:17.264Z",
+  //       "notifications": {
+  //         "retroactive": {
+  //           "delayScale": "Day",
+  //           "delayNum": 1
+  //         }
+  //       },
+  //     };
+  //   this.currentConfiguredRoutine = exGoal;
+  //   return exGoal;
+  // }
 
 
 

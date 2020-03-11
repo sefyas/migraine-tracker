@@ -51,7 +51,7 @@ export class BreakFromTrackingPage {
     }
   }
 
-  takeBrake(){
+  takeBreak(){
     //todo: push to couch, deal with notifications, etc
     let newBreak = {'started': new Date()};
     newBreak['reasonForBreak'] = this.reasonForBreak;

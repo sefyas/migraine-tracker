@@ -1,45 +1,58 @@
 import { Component } from '@angular/core';
-import { ViewController, NavController, NavParams } from 'ionic-angular';
-import {CouchDbServiceProvider} from "../../providers/couch-db-service/couch-db-service";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {GlobalFunctionsServiceProvider} from "../../providers/global-functions-service/global-functions-service";
-
+import { HttpClient } from '@angular/common/http';
+import { NavController } from 'ionic-angular';
+import { SignUpPage } from "../signup/signup";
+import { HomePage } from "../home/home";
+import { CouchDbServiceProvider } from "../../providers/couch-db-service/couch-db-service";
+import { GlobalFunctionsServiceProvider } from "../../providers/global-functions-service/global-functions-service";
+import { Storage } from '@ionic/storage';
 
 @Component({
   selector: 'page-login',
   templateUrl: 'login.html',
 })
 export class LoginPage {
-
-  private loginInfo: FormGroup;
+  private username: string;
+  private password: string;
+  private usernameError: any;
   private contactEmail : string = "";
-  // private credentials = {
-  //   'account': 'migraineTest',
-  //   'password': 'test'
-  // };
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,
-              public couchDbService: CouchDbServiceProvider, private globalFuns: GlobalFunctionsServiceProvider,
-              private formBuilder: FormBuilder, public viewCtrl: ViewController) {
-    this.contactEmail =globalFuns.getContactEmail();
-    this.loginInfo = this.formBuilder.group({
-      account: ['', Validators.required],
-      password: ['', Validators.required],
+  constructor(public nav: NavController,
+              public http: HttpClient,
+              private globalFuns: GlobalFunctionsServiceProvider,
+              public couchDbService: CouchDbServiceProvider,
+              private storage: Storage) {
+    this.contactEmail = globalFuns.getContactEmail();
+  }
+
+  login() {
+    let credentials = {
+      username: this.username,
+      password: this.password
+    };
+    this.couchDbService.login(credentials).then(response => {
+      console.log("Log in as " + credentials['username']);
+      this.storage.set('credentials', credentials);
+      this.nav.push(HomePage);
+    }).catch(err => {
+      if (err) {
+        if (err.name === 'unauthorized' || err.name === 'forbidden') {
+          this.usernameError = "Username or password is incorrect!";
+          if (err.message === 'You are not a server admin.') {
+            this.usernameError = "Please sign up an account!";
+          }
+        } else {
+          this.usernameError = "Error requesting!";
+        }
+      }
     });
   }
 
-
-  login() {
-    this.couchDbService.login(this.loginInfo.value).subscribe(() => {
-        console.log("logged in");
-        this.viewCtrl.dismiss();
-      },
-      error => {
-        console.log(error);
-      });
+  launchSignup(){
+    this.nav.push(SignUpPage);
   }
 
-
-
-
+  typeUsername() {
+    this.usernameError = null;
+  }
 }

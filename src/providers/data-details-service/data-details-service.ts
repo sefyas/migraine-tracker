@@ -1,44 +1,44 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {DataElement, DataField, DataType} from "../../interfaces/customTypes";
+import {DataElement, DataField, DataType, Goal} from "../../interfaces/customTypes";
 
 
 @Injectable()
 export class DataDetailsServiceProvider {
-
   private supportedFields : DataField[];
   private listedData : {[dataType: string] : DataElement[]};
   private configData : DataType[];
 
   constructor(public http: HttpClient) {
-    this.openListedData();
-    this.openDataConfig();
-    this.openSupportedFields();
+    this._openListedData();
+    this._openDataConfig();
+    this._openSupportedFields();
   }
 
-  openDataConfig() {
+  _openDataConfig() {
     this.http.get<DataType[]>('assets/dataConfig.json', {},).subscribe(configData => {
         this.configData = configData;
-      },
-      error => {
+      }, error => {
         console.log(error);
       });
   }
 
-  openSupportedFields() {
+  _openSupportedFields() {
     this.http.get<DataField[]>('assets/supportedFields.json', {},).subscribe(fieldList => {
         this.supportedFields = fieldList;
-      },
-      error => {
+        console.log("supportedFields");
+        console.log(this.supportedFields);
+      }, error => {
         console.log(error);
       });
   }
 
-  openListedData() {
+  _openListedData() {
     this.http.get<{[dataType: string] : DataElement[]}>('assets/listedData.json', {},).subscribe(listedData => {
         this.listedData = listedData;
-      },
-      error => {
+        console.log("listedData");
+        console.log(this.listedData);
+      }, error => {
         console.log(error);
       });
   }
@@ -128,17 +128,18 @@ export class DataDetailsServiceProvider {
 
 
   findNextConfigData(goalIDs : string[], currentlyConfiguring : DataType) {
+    console.log("!!!!!");
+    console.log(this.configData);
     let newDataIndex;
-    if(!currentlyConfiguring) newDataIndex = 0;
+    if (!currentlyConfiguring) newDataIndex = 0;
     else newDataIndex = this.configData.indexOf(currentlyConfiguring) + 1;
-    for(let i = newDataIndex; i < this.configData.length; i++) {
+    for (let i = newDataIndex; i < this.configData.length; i++) {
       let dataType = this.configData[i];
-      if(!(dataType.conditionalGoals)){
+      if (!(dataType.conditionalGoals)){
         return dataType;
-      }
-      else{
-        for(let j=0; j<dataType.conditionalGoals.length; j++){ // if it has ANY of the conditional goals, show the page
-          if(goalIDs.indexOf(dataType.conditionalGoals[j]) > -1){
+      } else {
+        for (let j=0; j<dataType.conditionalGoals.length; j++) { // if it has ANY of the conditional goals, show the page
+          if (goalIDs.indexOf(dataType.conditionalGoals[j]) > -1) {
             return dataType;
           }
         }
@@ -150,12 +151,33 @@ export class DataDetailsServiceProvider {
 
   getWhetherIsMed(dataType: string, id: string) : boolean{
     // uses the listed data to find the original data type
-    for(let i=0; i<this.listedData[dataType].length; i++) {
+    for (let i=0; i<this.listedData[dataType].length; i++) {
       if (this.listedData[dataType][i].id === id) {
         return this.listedData[dataType][i].isMed;
       }
       return null;
     }
+  }
+
+
+  getWhetherSelected(recommendedData, otherData, customData) {
+    var selectedData = [];
+    for (let i=0; i<recommendedData.length; i++) {
+      if (recommendedData[i]["selected"]) {
+        selectedData.push(recommendedData[i]);
+      }
+    }
+    for (let i=0; i<otherData.length; i++) {
+      if (otherData[i]["selected"]) {
+        selectedData.push(otherData[i]);
+      }
+    }
+    for (let i=0; i<customData.length; i++) {
+      if (customData[i]["selected"]) {
+        selectedData.push(customData[i]);
+      }
+    }
+    return selectedData;
   }
 
 

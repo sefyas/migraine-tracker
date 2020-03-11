@@ -33,7 +33,7 @@ export class GoalModificationPage {
         activeGoals = this.couchDBService.addGoalFromSetup(this.navParams.data);
       }
       else{ // we're just coming from the menu
-        activeGoals = this.couchDBService.getActiveGoals();
+        activeGoals = this.couchDBService.getConfiguredRoutine();
       }
       this.textGoals = activeGoals.textGoals;
       this.goalHierarchy = this.globalFunctionsService.getGoalHierarchy(activeGoals.goals);

@@ -1,3 +1,4 @@
+<!-- this is the menu side bar -->
 <ion-menu [content]="content">
   <ion-header>
     <ion-toolbar>
@@ -16,4 +17,6 @@
 </ion-menu>
 
 <!-- Disable swipe-to-go-back because it's poor UX to combine STGB with side menus -->
+<!-- [root] property binding sets what is essentially the first, or “root” page for the ion-nav component. -->
+<!-- When ion-nav loads, the component referenced by the variable rootPage will be the root page. -->
 <ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>
