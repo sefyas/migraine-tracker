@@ -13,7 +13,7 @@
   <ion-card *ngIf="activeGoals === null">
     <ion-card-header>No Goals Configured</ion-card-header>
     <ion-card-content>
-      <p> You have not configured any migraine tracking goals.  Add a goal to start tracking! </p>
+      <p> You have not configured any migraine tracking goals. Add a goal to start tracking! </p>
       <button class="button" ion-button full icon-start (click)="addFirstGoal()">
         <ion-icon name="add-circle"></ion-icon>
         Add a Goal
@@ -43,7 +43,7 @@
 
       <ion-card-content *ngIf="cardExpanded[dataType] || dataType === 'quickTracker'">
 
-        <ng-container *ngFor="let data of dataToTrack[dataType]">
+        <ng-container *ngFor=" let data of dataToTrack[dataType]">
 
           <div class="dataInfo" *ngIf="!data.quickTrack || dataType === 'quickTracker'">
 
@@ -77,12 +77,16 @@
                 You're at your limit!
               </div>
             </div>
+
           </div>
 
         </ng-container>
+
       </ion-card-content>
+
     </ion-card>
   </ng-container>
 
+  <button class="button" [disabled]="saved" ion-button full icon-start (click)="saveTrackedData()">Save</button>
 
 </ion-content>

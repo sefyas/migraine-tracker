@@ -26,10 +26,9 @@ export class CouchDbServiceProvider {
 
   // private baseUrl: string = 'http://127.0.0.1:5984/';
   private baseUrl: string = 'https://migraine-tracker.com:6984/';
-  // private baseUrl: string = 'http://migraine-tracker.com:5984/';
   private db: any;
   private remote: any;
-  private username: any;
+  // private username: any;
   private currentConfiguredRoutine : ConfiguredRoutine;
 
   constructor(private storage: Storage,
@@ -83,21 +82,7 @@ export class CouchDbServiceProvider {
     });
   }
 
-  // Load the user info document
-  // async loadUserInfoDoc() {
-  //   var currentConfiguredRoutineID = await this.getCurrentConfiguredRoutineID();
-  //   if (currentConfiguredRoutineID != 0) {
-  //     try {
-  //       console.log("$$$$$$ getConfiguredRoutine");
-  //       this.currentConfiguredRoutine = await this.db.get("configured-routine-" + currentConfiguredRoutineID);
-  //       console.log(this.currentConfiguredRoutine);
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   }
-  // }
-
-  // Get the current configured routine id from the user info doc
+  // Get the current configured routine id from the user info doc in the database
   async getCurrentConfiguredRoutineID() {
     try {
       var doc = await this.db.get('user-info');
@@ -158,7 +143,6 @@ export class CouchDbServiceProvider {
     });
   }
 
-
   // Get the current configured routine
   async getConfiguredRoutine() {
     var currentConfiguredRoutineID = await this.getCurrentConfiguredRoutineID();
@@ -176,11 +160,70 @@ export class CouchDbServiceProvider {
     return null;
   }
 
+  // get the current date
+  static getDate() {
+      var date = new Date();
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      var year = date.getFullYear();
+      return [day, month, year];
+  }
+
+  // get the tracked data doc id
+  static getTrackedDataDocID() {
+    var date = CouchDbServiceProvider.getDate();
+    return 'tracked-data-' + date[2] + "-" + date[1] + "-" + date[0];
+  }
+
+   // Log tracked data to the database
+  async logTrackedData(trackedData) {
+    var doc_id = CouchDbServiceProvider.getTrackedDataDocID();
+    try {
+      var doc = await this.db.get(doc_id);
+      var response = await this.db.put({
+        _id: doc_id,
+        _rev: doc._rev,
+        tracked_data: trackedData,
+      });
+      console.log("Tracked data saved!");
+    } catch (err) {
+      this.db.put({_id: doc_id, tracked_data: trackedData}, function(err, response) {
+        if (err) {
+          return console.log(err);
+        }
+
+      });
+    }
+  }
 
 
 
 
 
+
+
+
+
+
+  // ============================================= Old =============================================
+
+
+
+  getTrackedData(): DataReport[] {
+    console.log("!!!!!!!!!!!!!! getTrackedData !!!!!!!!!!!!!");
+
+    if(!this.seenConfig) {
+      return [];
+    }
+    console.log(this.trackedData);
+    if(this.trackedData.length > 0){
+      return this.trackedData;
+    }
+    else{
+      return this.getExamplePreviouslyTracked();
+      // return [];
+    }
+  }
 
 
 
@@ -207,15 +250,15 @@ export class CouchDbServiceProvider {
 
 
 
-  trackData(newData : DataReport) {
-    console.log("!!!!!!!!!!!!!! trackData !!!!!!!!!!!!!");
-    console.log(newData); // push to db
-
-    // todo: should store a datapoint in couch as a new object
-    // todo: needs to append start and end time!!!
-    // this.trackedData.push(newData);
-    // console.log(this.trackedData);
-  }
+  // trackData(newData : DataReport) {
+  //   console.log("!!!!!!!!!!!!!! trackData !!!!!!!!!!!!!");
+  //   console.log(newData); // push to db
+  //
+  //   // todo: should store a datapoint in couch as a new object
+  //   // todo: needs to append start and end time!!!
+  //   // this.trackedData.push(newData);
+  //   // console.log(this.trackedData);
+  // }
 
 
 
@@ -293,33 +336,7 @@ export class CouchDbServiceProvider {
 
 
 
-  getTrackedData(): DataReport[] {
-    console.log("!!!!!!!!!!!!!! getTrackedData !!!!!!!!!!!!!");
-    // todo!
 
-    // console.log("---------- getTrackedData ----------");
-    //
-    // console.log("seenConfig =====>");
-    // console.log(this.seenConfig);
-    //
-    // console.log("trackedData =====>");
-    // console.log(this.trackedData);
-    //
-    // console.log("getExamplePreviouslyTracked =====>");
-    // console.log(this.getExamplePreviouslyTracked());
-
-    if(!this.seenConfig){
-      return [];
-    }
-    console.log(this.trackedData);
-    if(this.trackedData.length > 0){
-      return this.trackedData;
-    }
-    else{
-      return this.getExamplePreviouslyTracked();
-      // return [];
-    }
-  }
 
   getCurrentBreak(): Break {
     console.log("!!!!!!!!!!!!!! getCurrentBreak !!!!!!!!!!!!!");

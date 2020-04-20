@@ -8,7 +8,7 @@ import { DataDetailsServiceProvider } from "../../providers/data-details-service
 import { DateFunctionServiceProvider } from "../../providers/date-function-service/date-function-service";
 import { GlobalFunctionsServiceProvider } from "../../providers/global-functions-service/global-functions-service";
 import { ConfiguredRoutine, DataElement } from "../../interfaces/customTypes";
-import {Storage} from "@ionic/storage";
+import { Storage } from "@ionic/storage";
 
 
 @Component({
@@ -28,10 +28,11 @@ export class HomePage {
   private dataList : {[dataType : string] : string} = {};
   private dataTypes : string[];
   private previouslyTracked : {[dataType : string] : any}[];
-  private somethingTracked : boolean;
+  // private somethingTracked : boolean;
   private durationItemStart : {[dataType : string] : any} = {};
   private durationItemEnd : {[dataType : string] : any} ={};
   private cardExpanded : {[dataType : string] : boolean} = {};
+  private saved : boolean;
 
 
   constructor(public navCtrl: NavController,
@@ -58,12 +59,7 @@ export class HomePage {
         return val;
       });
       if (credentials != null) {
-        this.couchDbService.userInSession(credentials).then((userInSession) => {
-          if (!userInSession) {
-            this.couchDbService.login(credentials);
-          }
-        });
-        // this.couchDbService.loadUserInfoDoc();
+        this.couchDbService.login(credentials);
         this.loggedIn();
       } else {
         this.login();
@@ -91,16 +87,22 @@ export class HomePage {
     }
   }
 
+  saveTrackedData() {
+    this.couchDbService.logTrackedData(this.tracked);
+    this.saved = true;
+  }
+
   addFirstGoal() {  // only if they don't have a goal setup yet
     this.navCtrl.push(GoalTypePage);
   }
 
   setupTrackers(){
-    console.log(this.activeGoals);
+    this.saved = true;
     if('dataToTrack' in this.activeGoals){
       this.previouslyTracked = this.couchDbService.getTrackedData(); // todo: only need to grab this month's
       this.quickTrackers = this.activeGoals.quickTrackers;
-      if(this.quickTrackers && this.quickTrackers.length >0){
+
+      if(this.quickTrackers && this.quickTrackers.length > 0){
         this.dataTypes = ['quickTracker'];
       }
       else{
@@ -109,7 +111,9 @@ export class HomePage {
       this.dataToTrack = Object.assign({}, this.activeGoals['dataToTrack']); // otherwise we modify it >.<
       this.dataTypes = this.dataTypes.concat(Object.keys(this.dataToTrack));
       this.dataToTrack["quickTracker"] = this.quickTrackers;
+
       this.calculateGoalProgresses();
+
     }
   }
 
@@ -122,7 +126,7 @@ export class HomePage {
     if(dataType === 'quickTracker') dataType = data.dataType; // SHOULD always work, given data config code ...
     // todo: schedule the notification if they say they had a migraine!
     if(componentEvent.dataVal){
-      if(!this.tracked.dataType) this.tracked[dataType] = {};
+      if(!this.tracked.hasOwnProperty(dataType)) this.tracked[dataType] = {};
       this.tracked[dataType][data.id] = componentEvent.dataVal;
     }
     if(componentEvent.dataStart){
@@ -133,8 +137,10 @@ export class HomePage {
       if(!this.durationItemEnd[dataType]) this.durationItemEnd[dataType] = {};
       this.durationItemEnd[dataType][data.id] = componentEvent.dataEnd;
     }
-    this.somethingTracked = true;
-    // TODO: push to couch?!?!  When???
+    this.saved = false;
+
+    console.log("!!!!!!!!!!!!!!");
+    console.log(this.dataToTrack);
   }
 
   formatForCalendar(event){ // call when we push to couch ...

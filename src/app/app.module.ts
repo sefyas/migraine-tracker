@@ -32,7 +32,6 @@ import { ViewDatapointPage } from "../pages/view-datapoint/view-datapoint";
 import { DataVisPage } from "../pages/data-vis/data-vis";
 import { ChartsModule } from 'ng2-charts-x';
 import { DataElementTrackingComponent } from "../components/data-element-tracking/data-element-tracking";
-import { DebugPage } from "../pages/debug-page/debug-page";
 
 
 @NgModule({
@@ -54,7 +53,6 @@ import { DebugPage } from "../pages/debug-page/debug-page";
     ViewDatapointPage,
     DataVisPage,
     DataElementTrackingComponent,
-    DebugPage
   ],
   imports: [
     BrowserModule,
@@ -82,7 +80,6 @@ import { DebugPage } from "../pages/debug-page/debug-page";
     BreakFromTrackingPage,
     ViewDatapointPage,
     DataVisPage,
-    DebugPage
   ],
   providers: [
     StatusBar,

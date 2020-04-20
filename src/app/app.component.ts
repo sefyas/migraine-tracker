@@ -13,7 +13,6 @@ import {DataSummaryPage} from "../pages/data-summary/data-summary";
 import {DataCalendarPage} from "../pages/data-calendar/data-calendar";
 import {BreakFromTrackingPage} from "../pages/break-from-tracking/break-from-tracking";
 import {DataVisPage} from "../pages/data-vis/data-vis";
-import {DebugPage} from "../pages/debug-page/debug-page";
 
 @Component({
   templateUrl: 'app.html'
@@ -40,7 +39,6 @@ export class MyApp {
         { title: 'Goals', component: GoalModificationPage},
         { title: 'Tracking Routine', component: TrackingModificationPage},
         { title: 'Take a Break from Tracking', component: BreakFromTrackingPage},
-        { title: 'Debug Page', component: DebugPage},
       ];
     });
 
@@ -63,7 +61,6 @@ export class MyApp {
         { title: 'Goals', component: GoalModificationPage},
         { title: 'Tracking Routine', component: TrackingModificationPage},
         { title: 'Take a Break from Tracking', component: BreakFromTrackingPage},
-        { title: 'Debug Page', component: DebugPage},
       ];
     }
 
