@@ -6,18 +6,15 @@ import {DateFunctionServiceProvider} from "../../providers/date-function-service
   selector: 'data-element-tracking',
   templateUrl: 'data-element-tracking.html'
 })
+
 export class DataElementTrackingComponent {
-
   private buttonColors : {[dataName : string] : string} = {};
-
-
   @Input() data : {[dataProps: string]: any};
   @Input() trackedMedsToday : boolean = false;
   @Input() dataVal : any = null;
   @Input() dataStart: any = null;
   @Input() dataEnd : any = null;
   @Output() valueChanged : EventEmitter<{[dataVals: string] : any}> = new EventEmitter<{[dataVals: string] : any}>();
-
 
   constructor(private dateFuns: DateFunctionServiceProvider) {
 
@@ -41,7 +38,6 @@ export class DataElementTrackingComponent {
     }
   }
 
-
   itemTracked(event, type) {
     let dataVal;
     let dataStart;
@@ -58,6 +54,7 @@ export class DataElementTrackingComponent {
     this.valueChanged.emit({dataVal : dataVal, dataStart: dataStart, dataEnd: dataEnd})
   }
 
+
   catScale(value : string) {
     if(this.dataVal){
       this.buttonColors[this.dataVal] = 'midgrey';
@@ -67,10 +64,11 @@ export class DataElementTrackingComponent {
     this.itemTracked(value, 'val');
   }
 
+
   getColor(value : string) : string {
-    if(this.buttonColors[value] === undefined){
-      this.buttonColors[value] = 'midgrey';
-      return 'midgrey';
+    if(this.buttonColors[value] === undefined) {
+      this.buttonColors[value] = 'light';
+      return 'light';
     }
     return this.buttonColors[value];
   }

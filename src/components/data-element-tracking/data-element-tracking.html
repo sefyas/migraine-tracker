@@ -1,21 +1,40 @@
  <!-- Generated template for the DataElementTrackingComponent component -->
 
 
-<ng-container class="binary trackItem" *ngIf="data.field === 'binary'">
+<!--<ng-container class="binary trackItem" *ngIf="data.field === 'binary'">-->
+<!--  <ion-row>-->
+<!--    <ion-col>-->
+<!--      <ion-icon class="binaryIcon" name="circle" [color]="getColor('No')" value="No" (click)="catScale('No')"></ion-icon>-->
+<!--    </ion-col>-->
+<!--    <ion-col>-->
+<!--      <ion-icon class="binaryIcon" name="circle" [color]="getColor('Yes')" value="Yes" (click)="catScale('Yes')"></ion-icon>-->
+<!--    </ion-col>-->
+<!--  </ion-row>-->
+<!--</ng-container>-->
+
+
+ <ng-container class="binary trackItem" *ngIf="data.field === 'binary'">
   <ion-row>
     <ion-col>
-      <ion-icon class="binaryIcon" name="close-circle" [color]="getColor('No')" value="No" (click)="catScale('No')"></ion-icon>
+      <button ion-button outline color="light" class="binaryBtn" (click)="catScale('No')">No</button>
     </ion-col>
     <ion-col>
-      <ion-icon class="binaryIcon" name="checkmark-circle" [color]="getColor('Yes')" value="Yes" (click)="catScale('Yes')"></ion-icon>
+      <button ion-button outline color="light" class="binaryBtn" (click)="catScale('Yes')">Yes</button>
     </ion-col>
   </ion-row>
 </ng-container>
+
+
+
+
+
+
 
 <ng-container class="number trackItem" text-wrap *ngIf="data.field === 'number'">
   <ion-input class="numberBox" type="number" text-right placeholder=" Enter number ... "
              (ngModelChange)="itemTracked($event,'val')" [(ngModel)]="dataVal"></ion-input>
 </ng-container>
+
 
 <ng-container class="numScale trackItem" text-wrap *ngIf="data.field === 'numeric scale'">
   <ion-item class="trackItem">
@@ -54,7 +73,6 @@
 </ng-container>
 
 
-
 <ng-container class="trackItem time" text-wrap *ngIf="data.field === 'time'">
   <ion-item class="datePicker trackItem">
     <ion-datetime displayFormat="h:mm a" placeholder="Select Time" pickerFormat="h:mm a"
@@ -62,7 +80,6 @@
     </ion-datetime>
   </ion-item>
 </ng-container>
-
 
 
 <ng-container class="timeRange trackItem" *ngIf="data.field === 'time range'">
