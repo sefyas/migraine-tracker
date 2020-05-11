@@ -24,25 +24,80 @@ $app-direction: ltr;
 
 :root {
   /* Set the background of the entire app */
-  --ion-background-color: #4a4a4a;
+  //--ion-background-color: #4a4a4a;
+  //
+  //--placeholder-color: white;
+  //
+  //--ion-text-color: #FFFFFF;
+  //
+  //--input-config-background: #bdbdbd;
+  //--input-config-text: black;
+  //--input-placeholder-text:  #3B3B3B;
+  //
+  //--blue-accent: #4A90E2;
+  //--lighter-grey: #979797;
+  //--sublist-color: #3B3B3B;
+  //
+  //
+  //--green-text: #5aa35a;
+  //--red-text: #b33636;
+
+
+  --ion-background-color: rgba(9, 17, 58, 1);
+  --navbar-background-color: rgba(45, 48, 90, 1);
 
   --placeholder-color: white;
-
-  --ion-text-color: #FFFFFF;
-
+  --ion-text-color: white;
   --input-config-background: #bdbdbd;
   --input-config-text: black;
   --input-placeholder-text:  #3B3B3B;
-
   --blue-accent: #4A90E2;
   --lighter-grey: #979797;
   --sublist-color: #3B3B3B;
-
-
   --green-text: #5aa35a;
   --red-text: #b33636;
 
+  --hint-text: #bdbdbd;
+  --warning-orange: orange;
+  --subtitle: #707070;
+  --goal-card-background: #151D50;
+
+  --change-theme: #542074;
+  --symptom-theme: #2A8CAA;
+  --treatment-theme: #E09845;
+  --contributor-theme: #30916C;
+  --other-theme: #D09595;
+  --goal-theme: #288686;
+  --info-theme: #FFD13B;
+
+
+
 }
+
+
+//ion-content {
+//  --padding-top: 1000px;
+//  --padding-bottom: 100px;
+//  --padding-start: 100px;
+//  --padding-end: 100px;
+//}
+
+//
+//:root {
+//  /* Set the background of the entire app */
+//  --ion-background-color: #4a4a4a;
+//  --placeholder-color: white;
+//  --ion-text-color: #FFFFFF;
+//  --input-config-background: #bdbdbd;
+//  --input-config-text: black;
+//  --input-placeholder-text:  #3B3B3B;
+//  --blue-accent: #4A90E2;
+//  --lighter-grey: #979797;
+//  --sublist-color: #3B3B3B;
+//  --green-text: #5aa35a;
+//  --red-text: #b33636;
+//}
+
 
 
 
@@ -64,6 +119,7 @@ $colors: (
   base:       #4a4a4a,
   midgrey:       #979797,
   mutedPrimary: #c8ddf6,
+  ionBackground: rgba(9, 17, 58, 1),
 );
 
 
@@ -96,14 +152,57 @@ $colors: (
 // default are overridden.
 
 
+//// see https://ionicframework.com/docs/v3/theming/overriding-ionic-variables/ to set!
+//@import "ionic.theme.dark";
+//$background-color: #4a4a4a;
+//$card-ios-background-color: #4a4a4a;
+//$action-sheet-md-title-color: #4a4a4a;
+//$card-md-background-color: #4a4a4a;
+//$card-wp-background-color: #4a4a4a;
+//$list-background-color: #3B3B3B;
+//$text-color:        #FFFFFF;
+//$card-ios-text-color: #FFFFFF;
+//$card-md-text-color: #FFFFFF;
+//$card-wp-text-color: #FFFFFF;
+//$card-ios-title-text-color: #FFFFFF;
+//$card-md-title-text-color: #FFFFFF;
+//$card-wp-title-text-color: #FFFFFF;
+////$button-ios-background-color: #4a4a4a;
+////$button-md-background-color: #4a4a4a;
+////$button-wp-background-color: #4a4a4a;
+////$font-size-base: 24px;
+//$card-ios-header-font-size: 2rem;
+//$card-ios-font-size: 1.5rem;
+//$h3-font-size: 2rem;
+//$h2-font-size:2rem;
+
+
 // see https://ionicframework.com/docs/v3/theming/overriding-ionic-variables/ to set!
 @import "ionic.theme.dark";
-$background-color: #4a4a4a;
-$card-ios-background-color: #4a4a4a;
-$action-sheet-md-title-color: #4a4a4a;
-$card-md-background-color: #4a4a4a;
-$card-wp-background-color: #4a4a4a;
-$list-background-color: #3B3B3B;
+$background-color: var(--ion-background-color);
+$card-ios-background-color: var(--ion-background-color);
+$action-sheet-md-title-color: var(--ion-background-color);
+$card-md-background-color: var(--ion-background-color);
+$card-wp-background-color: var(--ion-background-color);
+//$list-background-color: #3B3B3B;
+$list-background-color: var(--ion-background-color);
+$item-md-detail-push-show: true;
+$item-wp-detail-push-show: true;
+
+//$list-ios-activated-background-color: var(--goal-theme);
+//$list-md-activated-background-color: var(--goal-theme);
+//$list-wp-activated-background-color: var(--goal-theme);
+
+
+$list-ios-activated-background-color: none;
+$list-md-activated-background-color: none;
+$list-wp-activated-background-color: none;
+$fab-list-margin: 40px;
+
+$list-ios-margin-left: 25px;
+$list-md-margin-left: 25px;
+$list-wp-margin-left: 25px;
+
 $text-color:        #FFFFFF;
 $card-ios-text-color: #FFFFFF;
 $card-md-text-color: #FFFFFF;
@@ -119,6 +218,11 @@ $card-ios-header-font-size: 2rem;
 $card-ios-font-size: 1.5rem;
 $h3-font-size: 2rem;
 $h2-font-size:2rem;
+
+$datetime-ios-placeholder-color: white;
+
+//$navbar-wp-height: 100pt;
+
 
 
 // Ionicons

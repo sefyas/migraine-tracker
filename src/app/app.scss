@@ -25,12 +25,15 @@ html {
 
 .headerIcon{
   float:right;
+  //text-align: right;
 }
 
 .headerItem{
   background-color: var(--ion-background-color);
   font-size: 2rem;
+  //text-align: right;
 }
+
 
 ion-card{
   padding: 0 !important;
@@ -63,5 +66,180 @@ ion-card-content h3{
 
 .card-header{
   color:white;
+}
+
+
+.toolbar-background {
+  background-color: var(--navbar-background-color);
+}
+
+
+ion-navbar {
+  ion-title {
+    right: 1px;
+  }
+}
+
+.header-title-right {
+  padding-right: 8pt;
+  font-size: 12pt;
+  color: white;
+  font-weight: bold;
+}
+
+
+.menu-item:active {
+  font-weight: bold;
+  color: var(--goal-theme);
+}
+
+.menu-item {
+  font-weight: bold;
+}
+
+.highlight-menu-item {
+  font-weight: bold;
+  color: var(--goal-theme);
+}
+
+// ================= datetime picker START =================
+.picker-ios .picker-toolbar {
+  border-top: 2px solid var(--info-theme);
+  border-bottom: 0 solid #000;
+}
+
+.picker-opt-selected {
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.picker-opt.picker-opt-selected {
+    color: var(--info-theme);
+}
+
+.picker-above-highlight {
+  display: none;
+  visibility:hidden;
+}
+
+.picker-below-highlight {
+  display: none;
+  visibility:hidden;
+}
+
+.picker-toolbar-button .button-inner {
+  color: var(--info-theme) !important;
+  font-weight: bold;
+}
+
+.picker-toolbar-cancel .button-inner  {
+  color: white !important;
+  font-weight: bold;
+}
+
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}
+
+
+
+// ================= datetime picker END =================
+
+ion-icon {
+  &[class*="custom-"] {
+    mask-size: contain;
+    mask-position: 50% 50%;
+    mask-repeat: no-repeat;
+    background: currentColor;
+    width: 1em;
+    height: 1em;
+  }
+  &[class*="custom-calendar"] {
+    mask-image: url(../assets/pages/calendar_icon.svg);
+  }
+  &[class*="custom-add-outline"] {
+    mask-image: url(../assets/pages/add_icon.svg);
+  }
+  &[class*="custom-home"] {
+    mask-image: url(../assets/pages/home_icon.svg);
+  }
+  &[class*="custom-eraser"] {
+    mask-image: url(../assets/pages/eraser_icon.svg);
+  }
+  &[class*="custom-info"] {
+    mask-image: url(../assets/pages/info_icon.svg);
+  }
+  &[class*="custom-chevron-right"] {
+    mask-image: url(../assets/pages/chevron_right_icon.svg);
+  }
+  &[class*="custom-chevron-left"] {
+    mask-image: url(../assets/pages/chevron_left_icon.svg);
+  }
+  &[class*="custom-close"] {
+    mask-image: url(../assets/pages/close_icon.svg);
+  }
+  &[class*="custom-expand"] {
+    mask-image: url(../assets/pages/expand_icon.svg);
+  }
+  &[class*="custom-collapse"] {
+    mask-image: url(../assets/pages/collapse_icon.svg);
+  }
+  &[class*="custom-edit"] {
+    mask-image: url(../assets/pages/edit_icon.svg);
+  }
+
+
+  &[class*="colored-"] {
+    mask-size: contain;
+    mask-position: 50% 50%;
+    border-radius: 50%;
+    mask-repeat: no-repeat;
+    width: 1em;
+    height: 1em;
+  }
+  &[class*="colored-change"] {
+    background-size: 32px;
+    background-image: url(../assets/pages/change_icon.svg);
+  }
+  &[class*="colored-symptom"] {
+    background-size: 32px;
+    background-image: url(../assets/pages/symptom_icon.svg);
+  }
+  &[class*="colored-treatment"] {
+    background-size: 32px;
+    background-image: url(../assets/pages/treatment_icon.svg);
+  }
+  &[class*="colored-contributor"] {
+    background-size: 32px;
+    background-image: url(../assets/pages/contributor_icon.svg);
+  }
+  &[class*="colored-other"] {
+    background-size: 32px;
+    background-image: url(../assets/pages/other_icon.svg);
+  }
+  &[class*="colored-change-check"] {
+    background-size: 32px;
+    background-image: url(../assets/pages/change_check_icon.svg);
+  }
+  &[class*="colored-symptom-check"] {
+    background-size: 32px;
+    background-image: url(../assets/pages/symptom_check_icon.svg);
+  }
+  &[class*="colored-treatment-check"] {
+    background-size: 32px;
+    background-image: url(../assets/pages/treatment_check_icon.svg);
+  }
+  &[class*="colored-contributor-check"] {
+    background-size: 32px;
+    background-image: url(../assets/pages/contributor_check_icon.svg);
+  }
+  &[class*="colored-other-check"] {
+    background-size: 32px;
+    background-image: url(../assets/pages/other_check_icon.svg);
+  }
 }
 

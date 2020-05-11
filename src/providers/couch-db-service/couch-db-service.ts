@@ -339,16 +339,26 @@ export class CouchDbServiceProvider {
 
 
   getCurrentBreak(): Break {
-    console.log("!!!!!!!!!!!!!! getCurrentBreak !!!!!!!!!!!!!");
+    // console.log("!!!!!!!!!!!!!! getCurrentBreak !!!!!!!!!!!!!");
     // todo: pull from db, make sure it's current
-    return null;
-    // return {
-    //   "reasonForBreak": "I want to",
-    //   "notifyDate": "2020-02-28",
-    //   "started": "2019-02-27T01:07:42.495Z"
-    // }
+    // return null;
+    return {
+      "reasonForBreak": "I want to",
+      "started": "2019-02-27",
+      "ended": "2020-05-10",
+      "checkInDate": "2020-05-10",
+      "notifyDate" : "2020-05-10"
+    };
   }
 
+// export interface Break {
+//   notifyDate?: string,
+//   dateToCheckIn?: string,
+//   started: Date,
+//   ended?: Date,
+//   noDates?: boolean,
+//   reasonForBreak?: string
+// }
 
   updateBreak(currentBreak: Break) {
     console.log("!!!!!!!!!!!!!! updateBreak !!!!!!!!!!!!!");

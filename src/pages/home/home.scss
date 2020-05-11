@@ -1,22 +1,26 @@
 page-home {
-
-
   .dataInfo{
     padding-bottom: 2em;
   }
 
   .dataExamples{
-    color: var(--lighter-grey);
-    font-size: 1.5rem;
+    float: left;
+    color: rgba(255, 255, 255, 0.5);
+    padding-top: 3pt;
+    font-size: 9pt;
     max-height: 1.5em;
-    text-transform: lowercase;
+    font-style: italic;
+    //text-transform: lowercase;
     overflow: hidden;
     text-overflow: ellipsis !important;
-    max-width: 85%;
+    max-width: 70%;
   }
 
   .dataName{
-    font-size: 1.9rem !important;
+    font-size: 13pt !important;
+    font-weight: bold;
+    padding-bottom: 15pt;
+    padding-top: 15pt;
   }
 
 
@@ -27,7 +31,9 @@ page-home {
   }
 
   .trackingHeader{
-    font-size: 2.1rem;
+    font-size: 13pt;
+    background-color: var(--goal-card-background);
+    float: left;
   }
 
   .goalMet{
@@ -42,8 +48,6 @@ page-home {
     color: var(--blue-accent)
   }
 
-  .button {z-index: 9999}
-
   .quickTrackerButton{
     height: 25vh;
     display: inline-block
@@ -53,5 +57,71 @@ page-home {
     text-align: left;
   }
 
-}
+  .goal-icon {
+    float: right;
+    width: 32pt;
+  }
 
+  //ion-content.content {
+  //  .scroll-content {
+  //    padding-top: 8pt;
+  //    padding-bottom: 8pt;
+  //    padding-left: 10pt;
+  //    padding-right: 10pt;
+  //  }
+  //}
+
+  ion-card-header.goal-card {
+    padding: 15pt;
+    border: 0.03em solid rgba(255, 255, 255, 0.3);
+    border-radius: 8pt;
+    background-color: var(--goal-card-background);
+  }
+
+  .center {
+    display: inline-block;
+    justify-content: center;
+  }
+
+  .no-goal-card {
+    justify-content: left;
+  }
+
+  .no-goal-title {
+    padding-top: 15%;
+    padding-bottom: 10%;
+    padding-left: 4%;
+    padding-right: 4%;
+    font-weight: bold;
+    font-size: 24pt;
+    max-width: 100%;
+  }
+
+  .no-goal-subtitle {
+    padding-bottom: 15%;
+    padding-left: 4%;
+    padding-right: 4%;
+    font-size: 12pt;
+    max-width: 80%;
+  }
+
+  .add-goal-button {
+    z-index: 9999;
+    background: var(--goal-theme);
+    width: 60%;
+    margin-left: 4%;
+    color: white;
+    font-weight: bold;
+    font-size: 12pt;
+    justify-content: center;
+    padding-right: 2%;
+    padding-left: 2pt;
+    text-align: center;
+    border-radius: 8pt;
+  }
+
+  .add-goal-icon {
+    padding-right: 30pt;
+  }
+
+}

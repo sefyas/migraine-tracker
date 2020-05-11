@@ -4,8 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { LoginPage } from "../login/login";
 import { CouchDbServiceProvider } from "../../providers/couch-db-service/couch-db-service";
 import { Storage } from '@ionic/storage';
-import {GlobalFunctionsServiceProvider} from "../../providers/global-functions-service/global-functions-service";
-import {HomePage} from "../home/home";
+import { GlobalFunctionsServiceProvider } from "../../providers/global-functions-service/global-functions-service";
+import { HomePage } from "../home/home";
 
 
 @Component({
@@ -55,6 +55,10 @@ export class SignUpPage {
         }
       }
     });
+  }
+
+  onCloseClick() {
+    this.nav.popToRoot();
   }
 
   typeUsername() {

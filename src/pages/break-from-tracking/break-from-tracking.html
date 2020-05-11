@@ -5,127 +5,201 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-
-  <ion-navbar>
+  <ion-navbar text-right>
     <button ion-button menuToggle icon-only>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Take a Break</ion-title>
+    <span id="title" class="header-title-right">Take a Break</span>
   </ion-navbar>
-
 </ion-header>
 
+<ion-content class="container">
 
-<ion-content padding>
-
-  <ion-card>
-    <ion-card-header (click)="aboutExpanded = !aboutExpanded;" text-wrap>
-      <span class="headerItem">About Tracking Breaks</span>
-      <ion-icon class="headerIcon" item-right *ngIf="aboutExpanded" name="arrow-dropup"></ion-icon>
-      <ion-icon class="headerIcon" item-right *ngIf="!aboutExpanded" name="arrow-dropdown"></ion-icon>
-    </ion-card-header>
-    <ion-card-content *ngIf="aboutExpanded">
-      When you decide to take a break from tracking, we'll disable notifications.  You can still
-      interact with the app.  You can end a break early if you would like.
-    </ion-card-content>
-  </ion-card>
-
-
-  <ion-card *ngIf="currentBreak">
-    <ion-card-header text-wrap>You're currently on a break!</ion-card-header>
-    <ion-card-content>
-      <h2>Your break started on:</h2>
-      <div class="breakConfig">{{currentBreakStarted}}</div>
-
-      <ng-container *ngIf="currentBreak.reasonForBreak">
-        <h2>Your reason for the break:</h2>
-        <div class="breakConfig">{{currentBreak.reasonForBreak}}</div>
-      </ng-container>
-
-      <div class="datePickDiv">
-        <h2 *ngIf="currentBreak.notifyDate">Your break is ending on:</h2>
-        <h2 *ngIf="!currentBreak.notifyDate">Your break does not have a scheduled end.  Schedule one now:</h2>
-        <ion-item>
-          <ion-datetime [min]="today" [max]="nextYear" displayFormat="MMM DD, YYYY" pickerFormat="MMM DD, YYYY" placeholder="Select Date"
-                        [(ngModel)]="dateToSnoozeTo"  (ngModelChange)="breakChanged=true"></ion-datetime>
-        </ion-item>
-      </div>
-
-      <div class="datePickDiv" *ngIf="currentBreak.checkInDate">
-        <h2>We're planning to check in on the following date:</h2>
-        <ion-item>
-          <ion-datetime [min]="today" [max]="nextYear"  displayFormat="MMM DD, YYYY" pickerFormat="MMM DD, YYYY" placeholder="Select Date"
-                        [(ngModel)]="dateToCheckIn"  (ngModelChange)="breakChanged=true"></ion-datetime>
-        </ion-item>
-      </div>
-    </ion-card-content>
-  </ion-card>
-
-
-  <ion-card *ngIf="!currentBreak">
-    <ion-card-header text-wrap>Do you to schedule a date to return to tracking?</ion-card-header>
-    <ion-card-content>
-      <ion-item (click)="setSelected('No')">
-        <ion-icon item-left color="primary" *ngIf="selected !== 'No'" name="radio-button-off"></ion-icon>
-        <ion-icon item-left color="primary" *ngIf="selected === 'No'" name="checkmark-circle"></ion-icon>
-        <span>No</span>
-      </ion-item>
-
-      <ion-item (click)="setSelected('Yes')">
-        <ion-icon item-left color="primary" *ngIf="selected !== 'Yes'" name="radio-button-off"></ion-icon>
-        <ion-icon item-left color="primary" *ngIf="selected === 'Yes'" name="checkmark-circle"></ion-icon>
-        <span>Yes</span>
-      </ion-item>
-      <div class="subitem" *ngIf="selected=='Yes'">
-        When do you want your break to end?
-        <ion-item class="datePickerItem">
-          <ion-datetime class="datePicker" displayFormat="MMM DD, YYYY" pickerFormat="MMM DD, YYYY" placeholder="Select Date"
-                        [min]="today" [max]="nextYear"  [(ngModel)]="dateToSnoozeTo"></ion-datetime>
-        </ion-item>
-      </div>
-
-
-      <ion-item (click)="setSelected('Unsure')" text-wrap>
-        <ion-icon item-left color="primary" *ngIf="selected !== 'Unsure'" name="radio-button-off"></ion-icon>
-        <ion-icon item-left color="primary" *ngIf="selected === 'Unsure'" name="checkmark-circle"></ion-icon>
-        <span>Unsure</span>
-      </ion-item>
-      <div class="subitem" *ngIf="selected=='Unsure'">
-        We'll check in on:
-        <ion-item class="datePickerItem">
-          <ion-datetime class="datePicker" displayFormat="MMM DD, YYYY" pickerFormat="MMM DD, YYYY" placeholder="Select Date"
-                        [min]="today" [max]="nextYear"  [(ngModel)]="dateToCheckIn"></ion-datetime>
-        </ion-item>
-      </div>
-
-    </ion-card-content>
-  </ion-card>
-
-
-  <ng-container *ngIf="currentBreak">
-    <button float-left ion-button (click)="endBreak()">
-      End break now
-    </button>
-
-    <button float-right ion-button (click)="updateBreak()" [disabled]="!breakChanged">
-      Update break
-    </button>
-  </ng-container>
-
-
-  <ng-container *ngIf="!currentBreak">
-    <ion-card text-wrap>
-      <ion-card-header  text-wrap>Why are you taking a break? (Optional)</ion-card-header>
+  <div *ngIf="currentBreak && currentBreak.started">
+    <ion-card text-left class="current-break-card" [class.transparent]="displayBreakInfo || displayReasonInfo">
+  <!--    <ion-card-header text-wrap class="current-break-title">You're currently on a break!</ion-card-header>-->
       <ion-card-content>
-        Record here if you want to remind yourself or share with a doctor later.
-        <ion-textarea [(ngModel)]="reasonForBreak" rows="4"
-                      placeholder="I'm taking a break because ... "></ion-textarea>
+        <div class="break-wrapper">
+
+          <div class="break-item-wrapper" *ngIf="currentBreak.started">
+            <button class="align-right break-info-button edit-info-button" icon-only (click)="onClickDisplayBreakInfo()">
+              <img [src]="'../../assets/pages/info_icon.svg' " alt="">
+            </button>
+            <p class="break-item-title"> Current break started</p>
+            <p class="break-item-date break-start-date">{{formatDateString(currentBreakStarted, "/")}}</p>
+          </div>
+
+          <div class="break-item-wrapper" *ngIf="currentBreak.notifyDate">
+            <p class="break-item-title">
+              Current break ends
+            </p>
+            <p class="break-item-date" (click)="updateBreakDate()" [class.color-info-theme]="!displayBreakEditBtn"
+               [class.color-white]="displayBreakEditBtn">{{formatDateString(dateToSnoozeTo, "-")}}
+            </p>
+            <button *ngIf="displayBreakEditBtn" class="align-right break-reason-edit-button" (click)="updateBreakDate()" icon-only>
+              <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
+            </button>
+            <ion-item hidden>
+              <ion-datetime #updateBreakDatePicker [min]="today" [max]="nextYear"
+                            displayFormat="MMM DD, YYYY" pickerFormat="MMM DD, YYYY"
+                            placeholder="Select Date" cancelText="Cancel" doneText="Update"
+                            (ionFocus)="onEditBreakFocus()" (ionBlur)="onEditBreakBlur()"
+                            [(ngModel)]="dateToSnoozeTo"  (ngModelChange)="breakChanged=true"></ion-datetime>
+            </ion-item>
+          </div>
+
+          <div class="break-item-wrapper" *ngIf="!currentBreak.notifyDate">
+            <p class="break-item-title">
+              Schedule end date
+            </p>
+            <p *ngIf="!dateToSnoozeTo" class="break-item-date" (click)="scheduleBreakDate()"
+               [class.color-info-theme]="!displayBreakEditBtn" [class.color-white]="displayBreakEditBtn">
+              Select date
+            </p>
+            <p *ngIf="dateToSnoozeTo" class="break-item-date" (click)="scheduleBreakDate()"
+               [class.color-info-theme]="!displayBreakEditBtn" [class.color-white]="displayBreakEditBtn">
+              {{formatDateString(dateToSnoozeTo, "-")}}
+            </p>
+            <button *ngIf="displayBreakEditBtn" class="align-right break-reason-edit-button" (click)="scheduleBreakDate()" icon-only>
+              <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
+            </button>
+            <ion-item hidden>
+              <ion-datetime #scheduleBreakDatePicker [min]="today" [max]="nextYear"
+                            displayFormat="MMM DD, YYYY" pickerFormat="MMM DD, YYYY"
+                            placeholder="Select Date" cancelText="Cancel" doneText="Done"
+                            (ionFocus)="onEditBreakFocus()" (ionBlur)="onEditBreakBlur()"
+                            [(ngModel)]="dateToSnoozeTo"  (ngModelChange)="breakChanged=true"></ion-datetime>
+            </ion-item>
+          </div>
+
+          <div class="break-item-wrapper last-break-item" *ngIf="currentBreak.reasonForBreak">
+            <button class="align-right reason-info-button edit-info-button" icon-only (click)="onClickDisplayReasonInfo()">
+              <img [src]="'../../assets/pages/info_icon.svg' " alt="">
+            </button>
+            <p class="break-item-title">Reason for current break</p>
+            <ion-textarea class="break-reason-update-entry" [(ngModel)]="reasonForBreak" rows="3"
+                          [class.color-info-theme]="!displayReasonEditBtn" [class.color-white]="displayReasonEditBtn"
+                          placeholder="I'm taking a break because ... " (ionFocus)="onEditBreakReasonFocus()"
+                          (ionBlur)="onEditBreakReasonBlur()" value="{{currentBreak.reasonForBreak}}"></ion-textarea>
+            <button *ngIf="displayReasonEditBtn" class="align-right break-reason-edit-button" icon-only>
+              <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
+            </button>
+          </div>
+        </div>
+        </ion-card-content>
+    </ion-card>
+
+    <ion-footer text-center [class.transparent]="displayBreakInfo || displayReasonInfo">
+      <button ion-button class="break-button" (click)="endBreak()">
+        End Break Now
+      </button>
+    </ion-footer>
+  </div>
+
+  <div *ngIf="!currentBreak || !currentBreak.started">
+    <ion-card class="break-card" [class.transparent]="displayBreakInfo || displayReasonInfo">
+      <ion-card-header text-wrap>
+        <p class="break-title">
+          Do you want to take a break from tracking?
+        </p>
+        <button class="align-right break-info-button" icon-only (click)="onClickDisplayBreakInfo()">
+          <img [src]="'../../assets/pages/info_icon.svg' " alt="">
+        </button>
+      </ion-card-header>
+
+      <ion-card-content class="break-options-card">
+
+        <ion-item  class="goal-card-background" (click)="setSelected('No')">
+          <ion-icon item-left *ngIf="selected !== 'No'" name="radio-button-off"></ion-icon>
+          <ion-icon item-left *ngIf="selected === 'No'" name="checkmark-circle"></ion-icon>
+          <span>No</span>
+        </ion-item>
+
+        <ion-item  class="goal-card-background">
+          <ion-icon item-left *ngIf="selected !== 'Yes'" name="radio-button-off" (click)="setSelected('Yes')"></ion-icon>
+          <ion-icon item-left *ngIf="selected === 'Yes'" name="checkmark-circle" (click)="setSelected('')"></ion-icon>
+          <span (click)="setSelected('Yes')">Yes</span>
+          <ion-item class="date-picker-wrapper" no-lines hidden>
+            <ion-datetime #breakDatePicker class="date-picker" cancelText="Skip"
+                          pickerFormat="MMM DD, YYYY" [min]="today" [max]="nextYear"
+                          [(ngModel)]="dateToSnoozeTo" (ionCancel)="onBreakDatePickerCancel()"></ion-datetime>
+          </ion-item>
+          <p class="subtitle inline-block" *ngIf="dateToSnoozeTo === '' && selected === 'Yes' && !breakSkip">
+            When to end the break?
+          </p>
+          <p class="subtitle inline-block" *ngIf="dateToSnoozeTo !== '' && selected === 'Yes' && !breakSkip" (click)="editDateToSnoozeTo()">
+            break until {{formatDateString(dateToSnoozeTo)}}
+          </p>
+          <p class="subtitle inline-block" *ngIf="dateToSnoozeTo === '' && selected === 'Yes' && breakSkip" (click)="editDateToSnoozeTo()">
+            set end break date later
+          </p>
+          <button *ngIf="(dateToSnoozeTo !== '' && selected === 'Yes' && !breakSkip) || (dateToSnoozeTo === '' &&
+          selected === 'Yes' && breakSkip)" class="align-right break-option-edit-button" (click)="editDateToSnoozeTo()" icon-only>
+            <ion-icon class="edit-icon break-option-edit-icon" name="custom-edit"></ion-icon>
+          </button>
+        </ion-item>
+
+        <ion-item  class="goal-card-background">
+          <ion-icon item-left *ngIf="selected !== 'Unsure'" name="radio-button-off" (click)="setSelected('Unsure')"></ion-icon>
+          <ion-icon item-left *ngIf="selected === 'Unsure'" name="checkmark-circle" (click)="setSelected('')"></ion-icon>
+          <span (click)="setSelected('Unsure')">Unsure</span>
+          <ion-item class="date-picker-wrapper" no-lines hidden>
+            <ion-datetime #reminderDatePicker class="date-picker"
+                          pickerFormat="MMM DD, YYYY" [min]="today" [max]="nextYear"
+                          [(ngModel)]="selectedDateToCheckIn" (ionCancel)="onReminderDatePickerCancel()"></ion-datetime>
+          </ion-item>
+          <p class="subtitle inline-block" *ngIf="selectedDateToCheckIn === '' && selected === 'Unsure'">
+            When to check in?
+          </p>
+          <p class="subtitle inline-block" *ngIf="selectedDateToCheckIn !== '' && selected === 'Unsure'" (click)="editDateToCheckIn()">
+            check in {{formatDateString(selectedDateToCheckIn)}}
+          </p>
+          <button *ngIf="selectedDateToCheckIn !== '' && selected === 'Unsure'" (click)="editDateToCheckIn()"
+                  class="align-right break-option-edit-button" icon-only>
+            <ion-icon class="edit-icon break-option-edit-icon" name="custom-edit"></ion-icon>
+          </button>
+        </ion-item>
+
       </ion-card-content>
     </ion-card>
-    <button float-right ion-button (click)="takeBreak()"
-            [disabled]="((selected!=='Yes' || !dateToSnoozeTo) && selected!=='No' && selected!=='Unsure')">
-      Start Break
-    </button>
-  </ng-container>
 
+    <ion-card class="reason-card" *ngIf="selected === 'Yes'" [class.transparent]="displayBreakInfo || displayReasonInfo">
+      <ion-card-header text-wrap>
+        <p class="reason-title">
+          Why are you taking a break from tracking?
+        </p>
+        <button class="align-right reason-info-button" icon-only (click)="onClickDisplayReasonInfo()">
+          <img [src]="'../../assets/pages/info_icon.svg' " alt="">
+        </button>
+      </ion-card-header>
+
+      <ion-card-content class="reason-entry-card">
+        <ion-textarea class="reason-entry" [(ngModel)]="reasonForBreak" rows="3"
+                      placeholder="I'm taking a break because ... ">
+        </ion-textarea>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-footer text-center [class.transparent]="displayBreakInfo || displayReasonInfo">
+      <button ion-button class="break-button" (click)="takeBreak()"
+              [disabled]="((selected!=='Yes' || !dateToSnoozeTo) && selected!=='No' && selected!=='Unsure')">
+        Submit
+      </button>
+    </ion-footer>
+  </div>
+
+  <div class="info-card" *ngIf="displayBreakInfo || displayReasonInfo">
+    <ion-card-content class="reason-entry-card">
+      <button class="close-button" (click)="onClickCloseInfo()" icon-only>
+        <ion-icon name="custom-close"></ion-icon>
+      </button>
+      <p class="info-title" *ngIf="displayBreakInfo">
+        When you decide to take a break from tracking, we'll disable notifications.
+        You can still interact with the app.  You can end a break early if you would like.
+      </p>
+      <p class="info-title" *ngIf="displayReasonInfo">
+        Optionally record the reason here if you want to remind yourself or share with a doctor later.
+      </p>
+    </ion-card-content>
+  </div>
 </ion-content>

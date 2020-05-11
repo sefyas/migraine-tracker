@@ -1,0 +1,89 @@
+page-tracking {
+  .align-left {
+    float: left;
+    margin-left: 4%;
+  }
+
+  .align-right {
+    float: right;
+    margin-right: 4%;
+  }
+
+  .header-button {
+    background: none;
+    margin-top: 4pt;
+    margin-left: 7%;
+    margin-right: 7%;
+    font-size: 10pt;
+    color: white;
+  }
+
+  .date-title {
+    color: white;
+    font-weight: bold;
+    font-size: 10pt;
+    position: absolute;
+    background-color: var(--goal-card-background);
+  }
+
+  .header {
+    background-color: var(--goal-card-background);
+  }
+
+  .goal-card-header {
+    justify-content: center;
+    vertical-align: center;
+  }
+
+  .goal-text-wrapper {
+    position: absolute;
+    left: 35%;
+    right: 23%;
+    top: 95pt;
+  }
+
+  .goal-text {
+    font-size: 15pt;
+    font-weight: bold;
+    max-width: 40%;
+  }
+
+  .goal-icon {
+    position: absolute;
+    left: 7%;
+    width: 65pt;
+    top: 80pt;
+    float: left;
+  }
+
+  .info-button {
+    background: none;
+    position: absolute;
+    right: 12px;
+    width: 12%;
+    top: 110pt;
+    float: right;
+  }
+
+  .footer-button {
+    background: none;
+    margin-bottom: 15pt;
+    font-size: 8pt;
+    color: white;
+  }
+
+  .footer-text {
+    color: white;
+    font-size: 10pt;
+    position: relative;
+    bottom: 8pt;
+  }
+
+  .text-left {
+    left: -10pt;
+  }
+
+  .text-right {
+    right: -10pt;
+  }
+}

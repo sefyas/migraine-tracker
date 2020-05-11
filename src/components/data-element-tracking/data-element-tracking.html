@@ -1,6 +1,6 @@
  <!-- Generated template for the DataElementTrackingComponent component -->
 
-
+<!--old-->
 <!--<ng-container class="binary trackItem" *ngIf="data.field === 'binary'">-->
 <!--  <ion-row>-->
 <!--    <ion-col>-->
@@ -13,7 +13,27 @@
 <!--</ng-container>-->
 
 
- <ng-container class="binary trackItem" *ngIf="data.field === 'binary'">
+<!-- old-->
+<!-- <ng-container class="number trackItem" text-wrap *ngIf="data.field === 'number'">-->
+<!--  <ion-input class="numberBox" type="number" text-right placeholder=" Enter number ... "-->
+<!--             (ngModelChange)="itemTracked($event,'val')" [(ngModel)]="dataVal"></ion-input>-->
+<!--</ng-container>-->
+
+
+
+ <!-- <ng-container *ngIf="data.field === 'binary'">-->
+<!--   <div class="row">-->
+<!--    <div class="col" text-center>-->
+<!--      <button ion-button outline color="light" class="binaryBtn" (click)="catScale('No')">No</button>-->
+<!--    </div>-->
+<!--    <div class="col" text-center>-->
+<!--      <button ion-button outline color="light" class="binaryBtn" (click)="catScale('Yes')">Yes</button>-->
+<!--    </div>-->
+<!--   </div>-->
+<!--</ng-container>-->
+
+
+ <ng-container *ngIf="data.field === 'binary'">
   <ion-row>
     <ion-col>
       <button ion-button outline color="light" class="binaryBtn" (click)="catScale('No')">No</button>
@@ -26,14 +46,14 @@
 
 
 
-
-
-
-
 <ng-container class="number trackItem" text-wrap *ngIf="data.field === 'number'">
-  <ion-input class="numberBox" type="number" text-right placeholder=" Enter number ... "
-             (ngModelChange)="itemTracked($event,'val')" [(ngModel)]="dataVal"></ion-input>
+  <div class="center">
+    <ion-input class="numberBox" type="number" text-left placeholder=" Enter number"
+               (ngModelChange)="itemTracked($event,'val')" [(ngModel)]="dataVal"></ion-input>
+  </div>
 </ng-container>
+
+
 
 
 <ng-container class="numScale trackItem" text-wrap *ngIf="data.field === 'numeric scale'">

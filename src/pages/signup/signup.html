@@ -5,40 +5,29 @@
   Ionic pages and navigation.
 -->
 
-<ion-header>
-  <ion-navbar>
-    <ion-title>Create an Account</ion-title>
-  </ion-navbar>
-</ion-header>
-
 
 <ion-content padding>
+  <div>
+    <button class="close-button" (click)="onCloseClick()" icon-only>
+      <ion-icon name="custom-close"></ion-icon>
+    </button>
+    <p class="signup-title">Create Your</p>
+    <p class="signup-title-2">Account</p>
+    <ion-input class="username-input credential-input" [(ngModel)]="username" (click)="typeUsername()"
+               placeholder="Username" type="text"></ion-input>
+    <ion-input class="password-input credential-input" [(ngModel)]="password" placeholder="Password"
+               type="password"></ion-input>
+    <ion-input class="repassword-input credential-input" [(ngModel)]="confirmPassword"
+               placeholder="Confirm Password" type="password"></ion-input>
+    <p ion-text class="warning-text" *ngIf="password !== confirmPassword && password !== ''
+    && password != null && confirmPassword !== '' && confirmPassword != null">Passwords don't match!</p>
+<!--    <p ion-text class="warning-text" *ngIf="password === confirmPassword && password !== '' && password != null">Password is valid!</p>-->
+    <p ion-text class="warning-text" id="username-warning" *ngIf="usernameError">{{usernameError}}</p>
 
-  <ion-row class="account-form">
-    <ion-col>
-      <ion-list inset>
-        <ion-item>
-           <ion-label class="label">Username:</ion-label>
-          <ion-input [(ngModel)]="username" (click)="typeUsername()" placeholder="Username" type="text"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label class="label">Password:</ion-label>
-          <ion-input [(ngModel)]="password" placeholder="Password" type="password"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label class="label">Confirm:</ion-label>
-          <ion-input [(ngModel)]="confirmPassword" placeholder="Confirm Password" type="password"></ion-input>
-        </ion-item>
-
-        <p ion-text color="danger" *ngIf="password !== confirmPassword && password !== '' && password != null && confirmPassword !== '' && confirmPassword != null">Passwords don't match!</p>
-        <p ion-text color="secondary" *ngIf="password === confirmPassword && password !== '' && password != null">Password is valid!</p>
-        <p ion-text color="danger" id="username-warning" *ngIf="usernameError">{{usernameError}}</p>
-
-        <button ion-button float-end (click)="signUp()" class="continue-button" [disabled]="!(username !== '' && username != null && password !== '' && password != null && confirmPassword !== '' && confirmPassword != null)">Sign Up</button>
-      </ion-list>
-    </ion-col>
-  </ion-row>
-
+    <div>
+      <button class="signup-landing-button landing-button" type="submit" (click)="signUp()"
+              [disabled]="!(username !== '' && username != null && password !== '' &&
+              password != null && confirmPassword !== '' && confirmPassword != null)">CREATE ACCOUNT</button>
+    </div>
+  </div>
 </ion-content>

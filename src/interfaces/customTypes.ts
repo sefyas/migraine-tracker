@@ -15,7 +15,6 @@ export interface Goal {
   isTopGoal?: boolean // meaning not a subgoal
 }
 
-
 export interface DataType {
   dataType: string, // name of the data type (e.g., symptom)
   dataGoals: boolean, // whether you can set element-specific goals (e.g., "I want to exercise x hours")
@@ -26,7 +25,6 @@ export interface DataType {
   toDisplay?: string,
   visTypes?: string[] // "beforeAfter" | "overTime" | "correlation" [] "other" currently has no visualizations :-/
 }
-
 
 export interface DataElement {
   name: string,
@@ -49,7 +47,6 @@ export interface DataElement {
   opts?: any
 }
 
-
 export interface ElementGoal{
   freq: string, //"Less" | "More", <- that's supposed to work, but won't
   threshold: number,
@@ -61,7 +58,6 @@ export interface DataField {
   explanation: string
 }
 
-
 export interface Notification{
   delayNum?: number,
   delayScale?: string, //"Hour" | "Day"; <- that's supposed to work, but won't
@@ -70,7 +66,6 @@ export interface Notification{
   dayOfMonth?: string,
   timeOfDay?: string
 }
-
 
 export interface ConfiguredRoutine {
   goals: string[],
@@ -81,7 +76,6 @@ export interface ConfiguredRoutine {
   notifications: {[notificationType:string] : Notification}
 }
 
-
 export interface DataReport {
   [dataType: string] : any, // should be {[dataElementName: string] : any} but it won't let me
   allDay: string | Date, // horrible but it's not always parsing right; need to figure out with couch stuff
@@ -91,15 +85,14 @@ export interface DataReport {
   dateChanged?: string[]
 }
 
-
 export interface Break {
   notifyDate?: string,
-  dateToCheckIn?: string,
-  started: Date,
-  ended?: Date,
-  noDates?: boolean
+  checkInDate?: string,
+  started?: Date | string,
+  ended?: Date | string,
+  // noDates?: boolean,
+  reasonForBreak?: string
 }
-
 
 export interface MigraineQACategories {
   category: string,

@@ -5,15 +5,16 @@ import { HttpClientModule } from "@angular/common/http";
 import { MyApp } from './app.component';
 import { NgCalendarModule  } from 'ionic2-calendar';
 import { IonicStorageModule } from '@ionic/storage';
+import { Calendar } from '../components/calendar/calendar';
 
 import { HomePage } from '../pages/home/home';
-
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { CouchDbServiceProvider } from '../providers/couch-db-service/couch-db-service';
 import { GoalTypePage } from "../pages/addGoal/goal-type/goal-type";
 import { LoginPage } from "../pages/login/login";
 import { SignUpPage } from "../pages/signup/signup";
+import { TrackingPage } from '../pages/tracking/tracking';
 import { GoalDetailsServiceProvider } from '../providers/goal-details-service/goal-details-service';
 import { GlobalFunctionsServiceProvider } from '../providers/global-functions-service/global-functions-service';
 import { DataConfigPage } from "../pages/addGoal/data-config/data-config";
@@ -34,6 +35,7 @@ import { ChartsModule } from 'ng2-charts-x';
 import { DataElementTrackingComponent } from "../components/data-element-tracking/data-element-tracking";
 
 
+
 @NgModule({
   declarations: [
     MyApp,
@@ -41,6 +43,7 @@ import { DataElementTrackingComponent } from "../components/data-element-trackin
     GoalTypePage,
     LoginPage,
     SignUpPage,
+    TrackingPage,
     DataConfigPage,
     SelectTrackingFrequencyPage,
     EditDataPage,
@@ -53,6 +56,7 @@ import { DataElementTrackingComponent } from "../components/data-element-trackin
     ViewDatapointPage,
     DataVisPage,
     DataElementTrackingComponent,
+    Calendar,
   ],
   imports: [
     BrowserModule,
@@ -60,7 +64,7 @@ import { DataElementTrackingComponent } from "../components/data-element-trackin
     IonicModule.forRoot(MyApp),
     HttpClientModule,
     ChartsModule,
-    IonicStorageModule.forRoot()
+    IonicStorageModule.forRoot(),
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -69,6 +73,7 @@ import { DataElementTrackingComponent } from "../components/data-element-trackin
     GoalTypePage,
     LoginPage,
     SignUpPage,
+    TrackingPage,
     DataConfigPage,
     SelectTrackingFrequencyPage,
     EditDataPage,
@@ -91,6 +96,9 @@ import { DataElementTrackingComponent } from "../components/data-element-trackin
     DataDetailsServiceProvider,
     GeneralInfoServiceProvider,
     DateFunctionServiceProvider,
+  ],
+  exports: [
+    Calendar,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

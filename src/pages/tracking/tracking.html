@@ -1,0 +1,120 @@
+
+<ion-toolbar color="ionBackground">
+  <button class="align-left header-button" (click)="onHomeClick()" icon-only>
+    <ion-icon name="custom-home"></ion-icon>
+  </button>
+  <ion-title class="title">{{monthNames[dateSelected["month"]] + " " + dateSelected["date"] + ", " + dateSelected["year"]}}</ion-title>
+  <button class="align-right header-button" icon-only>
+    <ion-icon name="custom-eraser"></ion-icon>
+  </button>
+</ion-toolbar>
+
+<ion-content>
+
+<!--        <ion-card *ngIf="dataType !== 'quickTracker' && dataList[dataType] !== ''">-->
+  <ion-card>
+<!--    <ion-card-header class="goal-card" (click)="onClickTrackGoal(dataType)">-->
+    <ion-card-header class="goal-card-header">
+      <img class="goal-icon"  [src]="'../../assets/pages/' + goal.toLowerCase() + '_icon.svg' " alt="">
+      <div class="goal-text-wrapper">
+        <p class="goal-text">Track</p>
+        <p class="goal-text">{{goal}} Data</p>
+      </div>
+      <button class="align-right info-button" icon-only>
+        <img [src]="'../../assets/pages/info_icon.svg' " alt="">
+      </button>
+    </ion-card-header>
+  </ion-card>
+
+
+<!--  <ion-card class="no-goal-card" *ngIf="activeGoals === null">-->
+<!--    <ion-card-content>-->
+<!--      <p class="no-goal-title">Hello, configure your tracking goals to start!</p>-->
+<!--      <p class="no-goal-subtitle"> You have not configured any migraine tracking goals. Add a goal to start tracking!</p>-->
+<!--      <button class="add-goal-button" ion-button full icon-start (click)="addFirstGoal()">-->
+<!--        <ion-icon small class="add-goal-icon" name="custom-add-outline"></ion-icon>-->
+<!--        Add Goals-->
+<!--      </button>-->
+<!--    </ion-card-content>-->
+<!--  </ion-card>-->
+
+<!--  <ion-content padding text-center>-->
+<!--    <ion-calendar *ngIf="activeGoals !== null" #calendar (onDaySelect)="onDaySelect()"></ion-calendar>-->
+
+<!--    <ng-container *ngFor="let dataType of dataTypes">-->
+
+<!--      <ion-card *ngIf="dataType === 'quickTracker'">-->
+<!--        <div class="center">-->
+<!--          <ion-card-content *ngIf="cardExpanded[dataType] || dataType === 'quickTracker'">-->
+<!--            <ng-container *ngFor=" let data of dataToTrack[dataType]">-->
+<!--                <h2 class="dataName">{{data.name}}</h2>-->
+
+<!--                <data-element-tracking [data]="data" [trackedMedsToday] = trackedMeds() (valueChanged) = 'changeVals($event, data, dataType)'>-->
+<!--                </data-element-tracking>-->
+
+<!--                <div class="goalDiv" *ngIf="data.goal && data.goal.freq && dataType !== 'Symptom' ">-->
+<!--                  <div>-->
+<!--                    Goal: {{data.goal.freq}} than <span text-lowercase>{{data.goal.threshold}}-->
+<!--                    per {{data.goal.timespan}}</span>-->
+<!--                  </div>-->
+<!--                  <div *ngIf="data.goal.timespan!=='Day'">-->
+<!--                    Total this <span text-lowercase>{{data.goal.timespan}}</span> (including today):-->
+<!--                    {{totalTrackedTimes(data, dataType)}}-->
+<!--                  </div>-->
+
+<!--                  <div class="goalMet" *ngIf="goalProgress(data, dataType) === 'met'">-->
+<!--                    You met your goal!-->
+<!--                  </div>-->
+<!--                  <div class="goalMet" *ngIf="goalProgress(data, dataType) === 'below limit'">-->
+<!--                    You're under your limit!-->
+<!--                  </div>-->
+<!--                  <div class="goalOK" *ngIf="goalProgress(data, dataType) === 'under'">-->
+<!--                    Keep going!-->
+<!--                  </div>-->
+<!--                  <div class="overGoal" *ngIf="goalProgress(data, dataType) === 'over'">-->
+<!--                    Try to cut back!-->
+<!--                  </div>-->
+<!--                  <div class="goalOK" *ngIf="goalProgress(data, dataType) === 'at limit'">-->
+<!--                    You're at your limit!-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--            </ng-container>-->
+<!--          </ion-card-content>-->
+<!--        </div>-->
+<!--      </ion-card>-->
+
+<!--      <ion-card *ngIf="dataType !== 'quickTracker' && dataList[dataType] !== ''">-->
+<!--        <ion-card-header class="goal-card" (click)="onClickTrackGoal(dataType)">-->
+<!--          <span class="headerItem trackingHeader">Track {{dataType}} Data</span>-->
+<!--          <img class="goal-icon" [src]="'../../assets/pages/' + dataType.toLowerCase() + '_icon.svg' " alt="">-->
+<!--          <div class="dataExamples">-->
+<!--            <span>{{dataList[dataType]}}</span>-->
+<!--          </div>-->
+<!--        </ion-card-header>-->
+<!--      </ion-card>-->
+
+<!--    </ng-container>-->
+<!--  </ion-content>-->
+
+
+
+  <ion-footer>
+    <div *ngIf="neighborData[goal][0] !== ''" (click)="onPreviousClick()">
+      <button class="align-left footer-button" icon-only>
+        <ion-icon name="custom-chevron-left"></ion-icon>
+      </button><p class="align-left footer-text text-left">{{neighborData[goal][0]}}</p>
+
+    </div>
+
+    <div *ngIf="neighborData[goal][1] !== ''" (click)="onNextClick()">
+      <button class="align-right footer-button" icon-only>
+        <ion-icon name="custom-chevron-right"></ion-icon>
+      </button>
+      <p class="align-right footer-text text-right" >{{neighborData[goal][1]}}</p>
+    </div>
+  </ion-footer>
+
+</ion-content>
+
+
+

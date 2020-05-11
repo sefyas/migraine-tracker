@@ -24,6 +24,7 @@ export class MyApp {
   rootPage: any = HomePage;
 
   pages: Array<{title: string, component: any}>;
+  activePage: any;
 
   constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen,
               private couchDBService: CouchDbServiceProvider,
@@ -34,10 +35,10 @@ export class MyApp {
         { title: 'Home', component: HomePage},
         { title: 'About Migraine', component: FaqPage},
         { title: 'Data Summary', component: DataSummaryPage},
-        { title: 'Data Calendar', component: DataCalendarPage},
+        // { title: 'Data Calendar', component: DataCalendarPage},
         { title: 'Data Visualizations', component: DataVisPage},
         { title: 'Goals', component: GoalModificationPage},
-        { title: 'Tracking Routine', component: TrackingModificationPage},
+        { title: 'Tracking Routines', component: TrackingModificationPage},
         { title: 'Take a Break from Tracking', component: BreakFromTrackingPage},
       ];
     });
@@ -56,14 +57,15 @@ export class MyApp {
         { title: 'Home', component: HomePage},
         { title: 'About Migraine', component: FaqPage},
         { title: 'Data Summary', component: DataSummaryPage},
-        { title: 'Data Calendar', component: DataCalendarPage},
+        // { title: 'Data Calendar', component: DataCalendarPage},
         { title: 'Data Visualizations', component: DataVisPage},
         { title: 'Goals', component: GoalModificationPage},
-        { title: 'Tracking Routine', component: TrackingModificationPage},
+        { title: 'Tracking Routines', component: TrackingModificationPage},
         { title: 'Take a Break from Tracking', component: BreakFromTrackingPage},
       ];
     }
 
+    this.activePage = this.pages[0];
   }
 
 
@@ -76,10 +78,14 @@ export class MyApp {
     });
   }
 
+  checkActive(page) {
+    return page == this.activePage;
+  }
 
   openPage(page) {
     // Reset the content nav to have just this page
     // we wouldn't want the back button to show in this scenario
     this.nav.setRoot(page.component);
+    this.activePage = page;
   }
 }

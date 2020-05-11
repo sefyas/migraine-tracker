@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import {ModalController, NavController, NavParams} from 'ionic-angular';
-import {CouchDbServiceProvider} from "../../providers/couch-db-service/couch-db-service";
-import {DateFunctionServiceProvider} from "../../providers/date-function-service/date-function-service";
-import {ViewDatapointPage} from "../view-datapoint/view-datapoint";
-import {GlobalFunctionsServiceProvider} from "../../providers/global-functions-service/global-functions-service";
+import { ModalController, NavController, NavParams } from 'ionic-angular';
+import { CouchDbServiceProvider } from "../../providers/couch-db-service/couch-db-service";
+import { DateFunctionServiceProvider } from "../../providers/date-function-service/date-function-service";
+import { ViewDatapointPage } from "../view-datapoint/view-datapoint";
+import { GlobalFunctionsServiceProvider } from "../../providers/global-functions-service/global-functions-service";
 
 
 /**

@@ -4,42 +4,39 @@
   See http://ionicframework.com/docs/components/#navigation for more info on
   Ionic pages and navigation.
 -->
-<ion-header>
-  <ion-navbar>
-    <ion-title>Log In</ion-title>
-  </ion-navbar>
-</ion-header>
+<!--<ion-header *ngIf="displayLogin">-->
+<!--  <ion-navbar>-->
+<!--    <ion-title>Log In</ion-title>-->
+<!--  </ion-navbar>-->
+<!--</ion-header>-->
 
 
 <ion-content padding>
 
-  <ion-row class="account-form">
-    <ion-col>
-      <ion-list inset>
-        <ion-item>
-          <ion-label class="label">Username:</ion-label>
-          <ion-input [(ngModel)]="username" (click)="typeUsername()" placeholder="Username" type="text"></ion-input>
-        </ion-item>
+  <div text-center *ngIf="!displayLogin">
+    <p class="app-name">Migraine Tracker</p>
+    <p class="app-explanation">Personal migraine tracking tool</p>
+    <div>
+      <button class="signup-landing-button landing-button" (click)="launchSignup()">CREATE ACCOUNT</button>
+    </div>
 
-        <ion-item>
-          <ion-label class="label">Password:</ion-label>
-          <ion-input [(ngModel)]="password" placeholder="Password" type="password"></ion-input>
-        </ion-item>
+    <div>
+      <button class="login-landing-button landing-button" (click)="onDisplayLogin()">LOG IN</button>
+    </div>
+  </div>
 
-
-        <div class="text">Please email {{contactEmail}} if you need help!</div>
-
-        <p ion-text color="danger" id="username-warning" *ngIf="usernameError">{{usernameError}}</p>
-
-        <div class="signUpButton">
-          <button ion-button float-left (click)="launchSignup()" type="button">Create an Account</button>
-        </div>
-
-        <div class="loginButton">
-          <button ion-button float-end type="submit" (click)="login()" [disabled]="!(username !== '' && username != null && password !== '' && password != null)">Login</button>
-        </div>
-      </ion-list>
-    </ion-col>
-  </ion-row>
+  <div *ngIf="displayLogin">
+    <button class="close-button" (click)="closeDisplayLogin()" icon-only>
+      <ion-icon name="custom-close"></ion-icon>
+    </button>
+    <p class="login-title">Log In</p>
+    <ion-input class="username-input credential-input" [(ngModel)]="username" (click)="typeUsername()" placeholder="Username" type="text"></ion-input>
+    <ion-input class="password-input credential-input" [(ngModel)]="password" placeholder="Password" type="password"></ion-input>
+    <p ion-text class="warning-text" id="username-warning" *ngIf="usernameError">{{usernameError}}</p>
+    <div>
+      <button class="signup-landing-button landing-button" type="submit" (click)="login()"
+              [disabled]="!(username !== '' && username != null && password !== '' && password != null)">LOG IN</button>
+    </div>
+  </div>
 
 </ion-content>

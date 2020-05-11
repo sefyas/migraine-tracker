@@ -36,11 +36,13 @@ export class FaqPage {
       });
   }
 
-  // expandOrHide(question : MigraineQA){
-  //   question['expanded'] = false;
-  //   question['expanded'] = true;
-  //   if(!question['expanded']) question['expanded']= true;
-  //   else question['expanded'] = false;
-  // }
-
+  toggleCard(faqSection) {
+    // if collapse the card, also collapse all the questions inside the card
+    if (faqSection['expanded']) {
+      for (var i = 0; i < faqSection['questions'].length; i++) {
+        faqSection['questions'][i]['expanded'] = false;
+      }
+    }
+    faqSection['expanded'] = !faqSection['expanded'];
+  }
 }

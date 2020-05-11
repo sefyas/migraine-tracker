@@ -1,0 +1,39 @@
+<ion-card class="calendar-card">
+  <ion-card-content>
+    <button class="calendar-btn" (click)="expandCalendar()">
+      <ion-icon name="custom-calendar" class="calendar-icon"></ion-icon>
+      <label *ngIf="selectedDate.isToday">Today</label>
+      <label *ngIf="!selectedDate.isToday">{{selectedDateText}}</label>
+      <label *ngIf="!isExpandCalendar" class="calendar-label">Change Date</label>
+      <label *ngIf="isExpandCalendar" class="calendar-label">Hide Calendar</label>
+    </button>
+  </ion-card-content>
+</ion-card>
+
+<div *ngIf="isExpandCalendar" class="calendar-box">
+  <ion-grid>
+      <ion-row justify-content-center>
+          <ion-col col-auto (click)="back()">
+              <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
+          </ion-col>
+          <ion-col class="calendar-title" col-auto>
+              <div>{{monthNames[displayMonth]}} {{displayYear}}</div>
+          </ion-col>
+          <ion-col col-auto (click)="forward()">
+              <ion-icon ios="ios-arrow-forward" md="md-arrow-forward"></ion-icon>
+          </ion-col>
+      </ion-row>
+      <ion-row>
+          <ion-col class="center calendar-header-col" *ngFor="let head of weekHead">{{head}}</ion-col>
+      </ion-row>
+      <ion-row class="calendar-row" *ngFor="let week of weekArray; let i = index">
+        <ion-col class="center calendar-col" (click)="daySelect(day,i,j)"
+          *ngFor="let day of week; let j = index"
+          [ngClass]="[day['isThisMonth']?'this-month':'not-this-month',
+                      day['isToday']?'today':'',
+                      day['isSelect']?'select':'']">
+          {{day['date']}}
+        </ion-col>
+      </ion-row>
+  </ion-grid>
+</div>

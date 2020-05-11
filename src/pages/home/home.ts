@@ -4,11 +4,19 @@ import { ModalController, NavController, NavParams } from 'ionic-angular';
 import { CouchDbServiceProvider } from "../../providers/couch-db-service/couch-db-service";
 import { GoalTypePage } from "../addGoal/goal-type/goal-type";
 import { LoginPage } from "../login/login";
+import { TrackingPage } from '../tracking/tracking';
 import { DataDetailsServiceProvider } from "../../providers/data-details-service/data-details-service";
 import { DateFunctionServiceProvider } from "../../providers/date-function-service/date-function-service";
 import { GlobalFunctionsServiceProvider } from "../../providers/global-functions-service/global-functions-service";
 import { ConfiguredRoutine, DataElement } from "../../interfaces/customTypes";
 import { Storage } from "@ionic/storage";
+// import { Calendar } from '@ionic-native/calendar/ngx';
+import { NgCalendarModule  } from 'ionic2-calendar';
+import {SignUpPage} from "../signup/signup";
+import {c} from "@angular/core/src/render3";
+import {GoalModificationPage} from "../goal-modification/goal-modification";
+import {DataConfigPage} from "../addGoal/data-config/data-config";
+import * as moment from 'moment';
 
 
 @Component({
@@ -33,6 +41,7 @@ export class HomePage {
   private durationItemEnd : {[dataType : string] : any} ={};
   private cardExpanded : {[dataType : string] : boolean} = {};
   private saved : boolean;
+  private dateSelected : any;
 
 
   constructor(public navCtrl: NavController,
@@ -44,9 +53,11 @@ export class HomePage {
               private modalCtrl: ModalController,
               public events: Events,
               private storage: Storage) {
+    this.dateSelected = {"date": moment().date(), "month": moment().month(), "year": moment().year(),
+                         "isThisMonth" : true, "isSelect": true, "isToday": false}
   }
 
-  async ionViewDidEnter(){
+  async ionViewDidEnter() {
     if(this.navParams.data['goalIDs']){ // Came from setting a goal up.  todo: notification stuff
       this.events.publish('configSeen');
       console.log(this.navParams.data);
@@ -90,6 +101,44 @@ export class HomePage {
   saveTrackedData() {
     this.couchDbService.logTrackedData(this.tracked);
     this.saved = true;
+  }
+
+  onDaySelect(componentEvent : {[eventPossibilities: string] : any}) {
+    // console.log("##########");
+    // console.log(componentEvent);
+    this.dateSelected = componentEvent;
+  }
+
+  onClickTrackGoal(goal) {
+    console.log(this.dataToTrack[goal]);
+    // let customDataModal = this.modalCtrl.create(TrackingPage);
+    // // customDataModal.onDidDismiss(() => {
+    // //   this.loggedIn();
+    // // });
+    // customDataModal.present();
+    var nonEmptyDataTypes = [""];
+    for (var i = 0; i < this.dataTypes.length; i++) {
+      var dt = this.dataTypes[i];
+      if ((this.dataList[dt] !== "") && (dt !== "quickTracker")) {
+        nonEmptyDataTypes.push(dt);
+      }
+    }
+    nonEmptyDataTypes.push("");
+
+    var neighborData = {};
+    for (i = 1; i < (nonEmptyDataTypes.length - 1); i++) {
+      dt = nonEmptyDataTypes[i];
+      neighborData[dt] = [nonEmptyDataTypes[i-1], nonEmptyDataTypes[i+1]];
+    }
+
+    let dataToSend = {"goal": goal,
+                      "dataToTrack": this.dataToTrack,
+                      "dateSelected": this.dateSelected,
+                      "neighborData": neighborData};
+
+    // this.navCtrl.setRoot(GoalModificationPage, dataToSend);
+    this.navCtrl.setRoot(HomePage);
+    this.navCtrl.push(TrackingPage, dataToSend);
   }
 
   addFirstGoal() {  // only if they don't have a goal setup yet

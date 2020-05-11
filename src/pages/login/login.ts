@@ -12,6 +12,7 @@ import { Storage } from '@ionic/storage';
   templateUrl: 'login.html',
 })
 export class LoginPage {
+  private displayLogin: any = false;
   private username: string;
   private password: string;
   private usernameError: any;
@@ -51,6 +52,15 @@ export class LoginPage {
   launchSignup(){
     this.nav.push(SignUpPage);
   }
+
+  onDisplayLogin() {
+    this.displayLogin = true;
+  }
+
+  closeDisplayLogin() {
+    this.displayLogin = false;
+  }
+
 
   typeUsername() {
     this.usernameError = null;

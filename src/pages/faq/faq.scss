@@ -1,7 +1,62 @@
 page-faq {
-
-  .question{
-    background-color: var(--background-color);
+  .faq-header {
+    border-bottom: solid 1pt white;
+    height: 75px;
   }
 
+  .faq-header-no-bottom-border {
+    height: 75px;
+  }
+
+  .goal-icon {
+    width: 40pt;
+    position: absolute;
+    left: 40px;
+    margin-top: -15px;
+  }
+
+  .goal-text {
+    position: absolute;
+    left: 140px;
+  }
+
+  .goal-expanded-icon {
+    position: absolute;
+    right: 40px;
+    margin-top: 4px;
+    font-size: 14pt;
+  }
+
+  .faq-title-card {
+    margin-top: 40px;
+  }
+
+  .contact-card {
+    margin-left: 80px;
+    width: 250px;
+  }
+
+  .faq-card {
+    background: var(--goal-card-background);
+    border-radius: 10px;
+    padding-left: 0;
+  }
+
+  .answer {
+    background: var(--goal-card-background);
+    padding-left: 17pt;
+    font-size: 12pt;
+    line-height: 15pt;
+  }
+
+  .question{
+    background-color: var(--goal-card-background);
+    font-weight: bold;
+    font-size: 13pt;
+    padding-top: 15px;
+  }
+
+  .question-header{
+    background: none;
+  }
 }

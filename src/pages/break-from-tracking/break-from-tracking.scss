@@ -1,47 +1,276 @@
 page-break-from-tracking {
-
-  //.aboutDrowpdown{
-  //  float:right;
-  //  padding-left:0.2em;
-  //  padding-top:0.1em;
-  //  padding-bottom:0.1em;
-  //}
-
-  .breakConfig{
-    background-color: var(--sublist-color);
-    padding-top:0.45em;
-    padding-bottom:0.45em;
-    padding-left:2em;
-    margin-bottom:0.75em;
-    font-size: 1.8rem;
+  .break-title {
+    max-width: 240px;
+    font-size: 14pt;
+    font-weight: bold;
+    position: absolute;
+    left: 50px;
   }
 
-  .datePickDiv{
-    padding-bottom:0.75em;
+  .break-card {
+    width: 86%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    background: var(--goal-card-background);
+    border-radius: 10px;
+    min-height: 240px;
+    z-index: -1;
   }
 
-  //.aboutHeader{
-  //  padding-top:0.1em;
-  //  padding-bottom:0.1em;
-  //}
-
-  .subitem{
-    background-color: var(--sublist-color);
-    padding-left:3.75em;
-    padding-right:3.75em;
+  .container {
+    padding: 50px;
   }
 
-  .datePicker{
+  .break-info-button {
+    background: none;
+    position: absolute;
+    right: 45px;
+    top: 45px;
+    width: 40px;
+  }
+
+  .break-options-card {
+    position: relative;
+    top: 50px;
+  }
+
+  .reason-title {
+    max-width: 240px;
+    font-size: 14pt;
+    font-weight: bold;
+    position: absolute;
+    left: 50px;
+  }
+
+  .reason-card {
+    width: 86%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    background: var(--goal-card-background);
+    border-radius: 10px;
+    min-height: 240px;
+    z-index: -1;
+  }
+
+  .reason-info-button {
+    background: none;
+    position: absolute;
+    right: 45px;
+    top: 305px;
+    width: 40px;
+  }
+
+  .reason-entry {
+    margin-top: 60px;
+    border: solid 1pt white;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12pt;
+  }
+
+  .break-button {
+    background: var(--goal-theme);
+    bottom: 30px;
+    width: 300px;
+    height: 45px;
+    border-radius: 8px;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+    font-size: 12pt;
+    font-weight: bold;
+  }
+
+  .transparent {
+    opacity: 0.3;
+  }
+
+  .info-card {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 200px;
+    width: 86%;
+    margin: auto;
+    border: 1.5px solid var(--info-theme);
+    background: var(--goal-card-background);
+    border-radius: 10px;
+    min-height: 200px;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .info-title {
+    font-size: 12pt;
+    position: relative;
+    top: 30px;
+  }
+
+  .close-button {
+    background: none;
+    color: white;
+    float: right;
+    font-size: 10px;
+  }
+
+  .inline-block {
+    display: inline-block;
+  }
+
+  .display-none {
+    display: none;
+    visibility: hidden;
+  }
+
+  .goal-card-background {
+    background: var(--goal-card-background);
+  }
+
+  .subtitle {
+    color: var(--info-theme);
+    font-weight: bold;
+    font-size: 10.5pt;
+    float: right;
+    margin-top: 3px;
+    margin-right: 6px;
+  }
+  
+  .date-picker-wrapper {
+    display: inline-block;
+    left: 40px;
+    max-width: 100px;
+  }
+
+  .date-picker {
     margin-left:0 !important;
     padding-left:0 !important;
-
-
+    display: inline-block;
+    background: red;
   }
 
-  .datePickerItem{
-    margin-left:0 !important;
-    padding-left:0 !important;
+  // ====================== Current Break ======================
+  .break-wrapper {
+    border-radius: 10px;
+    margin-left: -5px;
+    margin-right: -5px;
+    background: var(--goal-card-background);
+    padding: 20px;
+  }
 
+  .break-item-wrapper {
+    margin-top: 10px;
+    margin-bottom: 40px;
+  }
 
+  .break-item-title {
+    font-size: 14pt;
+    display: block;
+    text-align: left;
+    font-weight: bold;
+  }
+
+  .break-item-date {
+    font-size: 12pt;
+    font-weight: bold;
+    color: white;
+    display: block;
+    text-align: left;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    border: 1px solid rgba(255, 255, 255, 1);
+    border-radius: 10px;
+    margin-top: 20px;
+  }
+
+  .color-info-theme {
+    color: var(--info-theme);
+  }
+
+  .color-white {
+    color: white;
+  }
+
+  .break-reason-update-entry {
+    margin-top: 20px;
+    border: 1px solid rgba(255, 255, 255, 1);
+    border-radius: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 10px;
+    font-size: 12pt;
+    font-weight: bold;
+    //color: var(--info-theme);
+  }
+
+  .break-reason-edit-button {
+    background: none;
+    float: right;
+    margin-top: -36px;
+    margin-right: 5px;
+  }
+
+  .edit-icon {
+    font-size: 18pt;
+    font-weight: bold;
+    color: white;
+  }
+
+  .break-edit-button {
+    background: none;
+    float: right;
+    margin-top: -35px;
+    margin-right: 5px;
+  }
+
+  .edit-info-button {
+    margin-top: 10px;
+  }
+
+  .last-break-item {
+    margin-bottom: 20px;
+  }
+
+  .break-option-edit-icon {
+    font-size: 12pt;
+  }
+
+  .break-option-edit-button {
+    background: none;
+    position: absolute;
+    right: -6px;
+    top: 15px;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

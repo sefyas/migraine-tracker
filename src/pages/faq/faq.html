@@ -5,28 +5,33 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-
-  <ion-navbar>
+  <ion-navbar text-right>
     <button ion-button menuToggle icon-only>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>About Migraine</ion-title>
+    <span id="title" class="header-title-right">About Migraine</span>
   </ion-navbar>
-
 </ion-header>
-
 
 <ion-content padding>
 
   <ion-card *ngFor="let faqSection of faqList">
-    <ion-card-header>{{faqSection['category']}}</ion-card-header>
-    <ion-card-content>
-      <ion-list>
+    <ion-card-header class="faq-title-card" [class.faq-header]="!faqSection['expanded']"
+                     [class.faq-header-no-bottom-border]="faqSection['expanded']"
+                     (click)="toggleCard(faqSection)">
+      <img class="goal-icon"  [src]="'../../assets/pages/' + faqSection['category'].slice(0, -1).toLowerCase() + '_icon.svg' " alt="">
+      <span class="goal-text" >{{faqSection['category']}}</span>
+      <ion-icon class="goal-expanded-icon" item-right *ngIf="faqSection['expanded']" name="custom-collapse"></ion-icon>
+      <ion-icon class="goal-expanded-icon" item-right *ngIf="!faqSection['expanded']" name="custom-expand"></ion-icon>
+    </ion-card-header>
+
+    <ion-card-content class="faq-card" *ngIf="faqSection['expanded']">
+      <ion-list no-lines>
         <ng-container *ngFor="let question of faqSection['questions']" >
           <ion-item class="question" (click)="question['expanded'] = !question['expanded']">
-            <span text-wrap class="headerItem">{{question.question}}</span>
-            <ion-icon class="headerIcon" item-right *ngIf="question.expanded" name="arrow-dropup"></ion-icon>
-            <ion-icon class="headerIcon" item-right *ngIf="!question.expanded" name="arrow-dropdown"></ion-icon>
+            <span text-wrap class="question-header">{{question.question}}</span>
+            <ion-icon item-right *ngIf="question.expanded" name="arrow-dropup"></ion-icon>
+            <ion-icon item-right *ngIf="!question.expanded" name="arrow-dropdown"></ion-icon>
           </ion-item>
           <ion-item class="answer" text-wrap [hidden]="!question.expanded">
             {{question.answer}}
@@ -36,11 +41,10 @@
     </ion-card-content>
   </ion-card>
 
-  <ion-card>
+  <ion-card class="contact-card">
     <ion-card-header>Other Questions</ion-card-header>
     <ion-card-content>
       Please email {{contactEmail}} if you have any other questions!
     </ion-card-content>
   </ion-card>
-
 </ion-content>
