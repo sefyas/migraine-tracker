@@ -470,7 +470,7 @@
     "Other":
         [
             {
-                    "name": "Whether as-needed medication worked",
+                    "name": "If as-needed medication worked",
                     "id": "whetherMedsWorked",
                     "explanation": "Whether your as-needed medication improved your symptoms",
                     "fieldDescription": "3-point symptoms improvement scale",

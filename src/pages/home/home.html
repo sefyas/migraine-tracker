@@ -8,26 +8,12 @@
 </ion-header>
 
 <ion-content>
-<!--  <h3 *ngIf="activeGoals === null">Hello!</h3>-->
-
-<!--  <ion-card *ngIf="activeGoals === null">-->
-<!--    <ion-card-header>No Goals Configured</ion-card-header>-->
-<!--    <ion-card-content>-->
-<!--      <p> You have not configured any migraine tracking goals. Add a goal to start tracking! </p>-->
-<!--      <button class="button" ion-button full icon-start (click)="addFirstGoal()">-->
-<!--        <ion-icon name="add-circle"></ion-icon>-->
-<!--        Add a Goal-->
-<!--      </button>-->
-<!--    </ion-card-content>-->
-<!--  </ion-card>-->
 
   <ion-card class="no-goal-card" *ngIf="activeGoals === null">
-<!--    <ion-card-header>Hello, configure your tracking goals to start</ion-card-header>-->
-
     <ion-card-content>
       <p class="no-goal-title">Hello, configure your tracking goals to start!</p>
       <p class="no-goal-subtitle"> You have not configured any migraine tracking goals. Add a goal to start tracking!</p>
-      <button class="add-goal-button" ion-button full icon-start (click)="addFirstGoal()">
+      <button class="add-goal-button" ion-button color="goalThemeDark" full icon-start (click)="addFirstGoal()">
         <ion-icon small class="add-goal-icon" name="custom-add-outline"></ion-icon>
         Add Goals
       </button>

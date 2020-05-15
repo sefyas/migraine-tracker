@@ -39,7 +39,7 @@ page-tracking {
     position: absolute;
     left: 35%;
     right: 23%;
-    top: 95pt;
+    top: 45pt;
   }
 
   .goal-text {
@@ -52,7 +52,7 @@ page-tracking {
     position: absolute;
     left: 7%;
     width: 65pt;
-    top: 80pt;
+    top: 30pt;
     float: left;
   }
 
@@ -61,22 +61,28 @@ page-tracking {
     position: absolute;
     right: 12px;
     width: 12%;
-    top: 110pt;
+    top: 60pt;
     float: right;
   }
 
   .footer-button {
     background: none;
-    margin-bottom: 15pt;
     font-size: 8pt;
     color: white;
+    position: relative;
+    bottom: -2px;
   }
 
   .footer-text {
     color: white;
     font-size: 10pt;
     position: relative;
-    bottom: 8pt;
+    bottom: 10px;
+    font-weight: bold;
+  }
+
+  .footer-wrapper {
+    padding-top: 10px;
   }
 
   .text-left {
@@ -86,4 +92,27 @@ page-tracking {
   .text-right {
     right: -10pt;
   }
+
+  .goal-card {
+    margin-top: 100px;
+    background: var(--goal-card-background);
+    border-radius: 10px;
+    width: 330px;
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .data-name {
+    text-align: left;
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 18px;
+    margin-bottom: 18px;
+  }
+
+  .center {
+    display: inline-block;
+    justify-content: center;
+  }
+
 }

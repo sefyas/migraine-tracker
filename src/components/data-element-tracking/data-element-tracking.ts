@@ -66,11 +66,12 @@ export class DataElementTrackingComponent {
 
 
   getColor(value : string) : string {
-    if(this.buttonColors[value] === undefined) {
-      this.buttonColors[value] = 'light';
-      return 'light';
-    }
-    return this.buttonColors[value];
+    // if(this.buttonColors[value] === undefined) {
+    //   this.buttonColors[value] = 'light';
+    //   return 'light';
+    // }
+    // return this.buttonColors[value];
+    return 'white';
   }
 
 }

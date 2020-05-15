@@ -98,14 +98,17 @@ export class HomePage {
     }
   }
 
+  // TODO
+  reset() {
+
+  }
+
   saveTrackedData() {
     this.couchDbService.logTrackedData(this.tracked);
     this.saved = true;
   }
 
   onDaySelect(componentEvent : {[eventPossibilities: string] : any}) {
-    // console.log("##########");
-    // console.log(componentEvent);
     this.dateSelected = componentEvent;
   }
 
@@ -132,6 +135,7 @@ export class HomePage {
     }
 
     let dataToSend = {"goal": goal,
+                      "dataTypes": this.dataTypes,
                       "dataToTrack": this.dataToTrack,
                       "dateSelected": this.dateSelected,
                       "neighborData": neighborData};
@@ -141,7 +145,8 @@ export class HomePage {
     this.navCtrl.push(TrackingPage, dataToSend);
   }
 
-  addFirstGoal() {  // only if they don't have a goal setup yet
+  // only if they don't have a goal setup yet
+  addFirstGoal() {
     this.navCtrl.push(GoalTypePage);
   }
 
@@ -160,9 +165,7 @@ export class HomePage {
       this.dataToTrack = Object.assign({}, this.activeGoals['dataToTrack']); // otherwise we modify it >.<
       this.dataTypes = this.dataTypes.concat(Object.keys(this.dataToTrack));
       this.dataToTrack["quickTracker"] = this.quickTrackers;
-
       this.calculateGoalProgresses();
-
     }
   }
 
@@ -187,9 +190,6 @@ export class HomePage {
       this.durationItemEnd[dataType][data.id] = componentEvent.dataEnd;
     }
     this.saved = false;
-
-    console.log("!!!!!!!!!!!!!!");
-    console.log(this.dataToTrack);
   }
 
   formatForCalendar(event){ // call when we push to couch ...

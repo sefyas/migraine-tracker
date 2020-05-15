@@ -19,6 +19,7 @@ export class GoalTypePage {
   private textGoals : string;
   private textGoalExpand : boolean = false;
   private goalsWithoutSubgoals : string[] = [];
+  public workoutProgress : string = '0' + '%';
 
   constructor(private navCtrl: NavController,
               public navParams: NavParams,
@@ -115,4 +116,20 @@ export class GoalTypePage {
       this.goalsWithoutSubgoals.splice(missingSubgoalIndex);
     }
   }
+
+  updateProgress(val) {
+   // Update percentage value where the above is a decimal
+    this.workoutProgress = Math.min( (val * 100), 100) + '%';
+  }
+
+
+
+
+
+
+
+
+
+
+
 }

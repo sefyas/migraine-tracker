@@ -1,54 +1,82 @@
 data-element-tracking {
-  .noteBox{
-    border: solid 1px var(--lighter-grey);
-    border-radius: 15px;
-    margin-bottom: 0.5em;
+  .binary-btn {
+    height: 90px;
+    width: 90px;
+    border-radius: 50%;
+    border: 1px solid white;
+    margin-left: 15pt;
+    margin-right: 15pt;
+    font-weight: bold;
   }
 
-
-
-  .numberBox{
-    //border: solid 1px var(--lighter-grey);
+  .number-box {
     border: solid 1px white;
     border-radius: 15px;
-    //max-width: 35vw;
-    width: 100%;
-    margin-top: 15pt;
-    margin-bottom: 15pt;
-    //margin-left: 10pt;
-    padding-left: 10pt;
-    padding-right: 10pt;
+    width: 180px;
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+    padding-left: 20pt;
+    padding-right: 20pt;
+    height: 45px;
+    font-size: 12pt;
+    font-weight: bold;
   }
 
-  .numRange{
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    width: 90%;
-  }
-
-  .trackItem{
+  .category-wrapper {
     background-color: var(--ion-background-color);
     color: var(--ion-text-color);
     padding: 0;
   }
 
-  .binaryIcon{
-    font-size: 7.75rem;
+  .category-btn {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    border: none;
+    height: 40px;
+    margin-left: 10px;
+    margin-right: 10px;
   }
 
-  .binaryBtn {
-    height: 80px;
-    width: 80px;
-    border-radius: 50%;
-    margin-left: 15pt;
-    margin-right: 15pt;
-    margin-bottom: 15pt;
+  .num-range {
+    margin-top: -20px;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 90%;
   }
 
-  .center {
-    justify-content: center;
+  .num-scale {
+    background: var(--goal-card-background);
+    font-weight: bold;
   }
 
+  .date-picker {
+    border: solid 1px white;
+    border-radius: 15px;
+    width: 180px;
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+    height: 45px;
+    font-size: 12pt;
+    background: none;
+    font-weight: bold;
+  }
+
+  .note-box {
+    border: solid 1px white;
+    border-radius: 15px;
+    padding-left: 20pt;
+    padding-right: 10pt;
+    font-weight: bold;
+    font-size: 12pt;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .calculated-text {
+    font-size: 12pt;
+    font-style: italic;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 10px;
+  }
 }
-
-

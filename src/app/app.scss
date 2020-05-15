@@ -191,7 +191,24 @@ ion-icon {
   &[class*="custom-edit"] {
     mask-image: url(../assets/pages/edit_icon.svg);
   }
-
+  &[class*="custom-monitor"] {
+    mask-image: url(../assets/pages/monitor_icon.svg);
+  }
+  &[class*="custom-predict"] {
+    mask-image: url(../assets/pages/predict_icon.svg);
+  }
+  &[class*="custom-learn"] {
+    mask-image: url(../assets/pages/learn_icon.svg);
+  }
+  &[class*="custom-other-note"] {
+    mask-image: url(../assets/pages/other_note_icon.svg);
+  }
+  &[class*="custom-add-radio"] {
+    mask-image: url(../assets/pages/add_radio_icon.svg);
+  }
+  &[class*="custom-check-radio"] {
+    mask-image: url(../assets/pages/check_radio_icon.svg);
+  }
 
   &[class*="colored-"] {
     mask-size: contain;

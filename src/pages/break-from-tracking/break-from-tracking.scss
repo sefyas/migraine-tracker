@@ -71,6 +71,23 @@ page-break-from-tracking {
   }
 
   .break-button {
+    background: var(--red-text);
+    bottom: 30px;
+    width: 300px;
+    height: 45px;
+    border-radius: 8px;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+    font-size: 12pt;
+    font-weight: bold;
+  }
+
+  .submit-button {
     background: var(--goal-theme);
     bottom: 30px;
     width: 300px;
@@ -216,12 +233,12 @@ page-break-from-tracking {
   .break-reason-edit-button {
     background: none;
     float: right;
-    margin-top: -36px;
+    margin-top: -43px;
     margin-right: 5px;
   }
 
   .edit-icon {
-    font-size: 18pt;
+    font-size: 25pt;
     font-weight: bold;
     color: white;
   }
@@ -242,14 +259,14 @@ page-break-from-tracking {
   }
 
   .break-option-edit-icon {
-    font-size: 12pt;
+    font-size: 16pt;
   }
 
   .break-option-edit-button {
     background: none;
     position: absolute;
-    right: -6px;
-    top: 15px;
+    right: -8px;
+    top: 11px;
   }
 }
 

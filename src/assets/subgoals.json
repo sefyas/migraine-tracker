@@ -2,6 +2,7 @@
     "1": [
         {
             "name": "Monitor for my own knowledge",
+            "goalPurpose": "my own knowledge",
             "goalID": "1a",
             "visType": "overTime",
             "suggestedFrequency": "retroactive",
@@ -9,6 +10,7 @@
         },
         {
             "name": "Monitor for my doctor",
+            "goalPurpose": "my doctor",
             "goalID": "1b",
             "visType": "overTime",
             "suggestedFrequency": "retroactive",
@@ -16,6 +18,7 @@
         },
         {
             "name": "Monitor for insurance",
+            "goalPurpose": "insurance",
             "goalID": "1c",
             "visType": "overTime",
             "suggestedFrequency": "retroactive",
@@ -25,6 +28,7 @@
     "2": [
         {
             "name": "Learn migraine frequency",
+            "goalPurpose": "migraine frequency",
             "suggestedFrequency": "retroactive",
             "goalID": "2a",
             "visType": "overTime",
@@ -32,6 +36,7 @@
         },
         {
             "name": "Learn what factors may contribute to symptoms",
+            "goalPurpose": "what factors may contribute to symptoms",
             "suggestedFrequency": "regular",
             "goalID": "2b",
             "visType": "correlation",
@@ -40,6 +45,7 @@
         
         {
             "name": "Learn whether a specific change affects symptoms",
+            "goalPurpose": "whether a specific change affects symptoms",
             "goalID": "2c",
             "visType": "beforeAfter",
             "suggestedFrequency": "retroactive",

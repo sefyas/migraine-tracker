@@ -56,6 +56,7 @@ $app-direction: ltr;
   --sublist-color: #3B3B3B;
   --green-text: #5aa35a;
   --red-text: #b33636;
+  --orange-text: #F57928;
 
   --hint-text: #bdbdbd;
   --warning-orange: orange;
@@ -120,6 +121,9 @@ $colors: (
   midgrey:       #979797,
   mutedPrimary: #c8ddf6,
   ionBackground: rgba(9, 17, 58, 1),
+  infoTheme: #FFD13B,
+  goalThemeDark: #105D5D,
+  darkRed: #88212D,
 );
 
 
@@ -184,45 +188,58 @@ $card-ios-background-color: var(--ion-background-color);
 $action-sheet-md-title-color: var(--ion-background-color);
 $card-md-background-color: var(--ion-background-color);
 $card-wp-background-color: var(--ion-background-color);
-//$list-background-color: #3B3B3B;
 $list-background-color: var(--ion-background-color);
+$text-color: #FFFFFF;
+$fab-list-margin: 40px;
+
 $item-md-detail-push-show: true;
 $item-wp-detail-push-show: true;
-
-//$list-ios-activated-background-color: var(--goal-theme);
-//$list-md-activated-background-color: var(--goal-theme);
-//$list-wp-activated-background-color: var(--goal-theme);
-
 
 $list-ios-activated-background-color: none;
 $list-md-activated-background-color: none;
 $list-wp-activated-background-color: none;
-$fab-list-margin: 40px;
 
 $list-ios-margin-left: 25px;
 $list-md-margin-left: 25px;
 $list-wp-margin-left: 25px;
 
-$text-color:        #FFFFFF;
 $card-ios-text-color: #FFFFFF;
 $card-md-text-color: #FFFFFF;
 $card-wp-text-color: #FFFFFF;
 $card-ios-title-text-color: #FFFFFF;
 $card-md-title-text-color: #FFFFFF;
 $card-wp-title-text-color: #FFFFFF;
-//$button-ios-background-color: #4a4a4a;
-//$button-md-background-color: #4a4a4a;
-//$button-wp-background-color: #4a4a4a;
-//$font-size-base: 24px;
 $card-ios-header-font-size: 2rem;
 $card-ios-font-size: 1.5rem;
+
 $h3-font-size: 2rem;
 $h2-font-size:2rem;
 
 $datetime-ios-placeholder-color: white;
 
-//$navbar-wp-height: 100pt;
+$range-ios-knob-width: 30px;
+$range-md-knob-width: 30px;
+$range-wp-knob-width: 30px;
 
+$range-ios-pin-font-size: 14pt;
+$range-md-pin-font-size: 14pt;
+$range-wp-pin-font-size: 14pt;
+
+$range-ios-bar-height: 4px;
+$range-md-bar-height: 4px;
+$range-wp-bar-height: 4px;
+
+$range-ios-slider-height: 52px;
+$range-md-slider-height: 52px;
+$range-wp-slider-height: 52px;
+
+$range-ios-tick-height: 0;
+$range-md-tick-height: 0;
+$range-wp-tick-height: 0;
+
+$range-ios-bar-background-color: rgba(255, 255, 255, 0.4);
+$range-md-bar-background-color: rgba(255, 255, 255, 0.4);
+$range-wp-bar-background-color: rgba(255, 255, 255, 0.4);
 
 
 // Ionicons

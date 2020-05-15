@@ -3,6 +3,8 @@
         "name": "Monitoring",
         "goalID": "1",
         "goodChoiceIf": "You just want to track frequency",
+        "chooseReason": "I want to monitor frequency",
+        "chooseReasonDetail": "I want to monitor frequency for",
         "iconName": "calendar",
         "hasSubgoals": true,
         "effort": "low",
@@ -10,10 +12,12 @@
         "visType": "overTime",
         "isTopGoal": true
     },
-    { 
+    {
         "name": "Learning",
         "goalID": "2",
         "goodChoiceIf": "You want to learn about symptoms or the factors that affect them",
+        "chooseReason": "I want to learn about symptoms or factors that affect them",
+        "chooseReasonDetail": "I want to learn",
         "iconName": "school",
         "hasSubgoals": true,
         "effort": "medium",
@@ -24,8 +28,9 @@
     {
         "name": "Predicting",
         "goalID": "3",
-        "goodChoiceIf":
-            "You know what factors lead to symptoms and you want to track to predict future symptoms",
+        "goodChoiceIf": "You know what factors lead to symptoms and you want to track to predict future symptoms",
+        "chooseReason": "I know what factors lead to symptoms and want to predict future symptoms",
+        "chooseReasonDetail": "I know what factors lead to symptoms and want to predict future symptoms",
         "iconName": "alarm",
         "hasSubgoals": false,
         "effort": "high",
