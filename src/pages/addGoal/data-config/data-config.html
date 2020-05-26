@@ -1,133 +1,221 @@
 
 
+<!--<ion-header>-->
+<!--  <ion-navbar>-->
+<!--    <ion-title> Add {{dataObject?.dataType}}</ion-title>-->
+<!--  </ion-navbar>-->
+<!--</ion-header>-->
+
+
 <ion-header>
-  <ion-navbar>
-    <ion-title> Add {{dataObject?.dataType}}</ion-title>
-  </ion-navbar>
+  <div class="progress-bar-wrapper">
+    <span class="progress-bar" [style.width]="workoutProgress"></span>
+  </div>
 </ion-header>
 
+<ion-content class="content vertical-center">
 
-<ion-content padding>
-
-  <h3 *ngIf="dataObject?.dataDesc !== undefined">{{dataObject?.dataDesc}}</h3>
-
-  <ng-container *ngIf="dataObject?.dataDesc === undefined">
-    <h3>
-      Do you want to add
-      <span text-lowercase>{{displayName}}</span> data?
-    </h3>
-  </ng-container>
-
-
-  <!-- ============================= 1. Recommended Tracking Data based on Goals ============================= -->
-  <ion-card>
-    <ion-card-header>Recommended</ion-card-header>
-    <ion-card-content>
-
-      <!-- If no data tracking is necessary based on the goals selected -->
-      <div *ngIf="recommendedData.length==0 && !recommendTracking">
-        Based on your goals, we do not recommend any specific
-        <span text-lowercase>{{dataObject?.dataType}}</span> data.
-        Unless you believe tracking <span text-lowercase>{{dataObject?.dataType}}</span> data will support your personal goals,
-            consider continuing without selecting any!
-      </div>
-
-      <!-- Recommend data to be tracked based on the goals selected -->
-      <div *ngIf="recommendedData.length==0 && recommendTracking">
-        Based on your goals, we recommend adding any known personal <span text-lowercase>{{dataObject?.dataType}}</span> data.
-      </div>
-
-
-      <ion-list *ngIf="recommendedData.length>0">
-        <ion-item *ngFor="let rec of recommendedData" text-wrap>
-          <ion-icon item-left color="primary" *ngIf="!rec['selected']" name="add-circle-outline" (click)="editData(rec, 'rec')"></ion-icon>
-          <ion-icon item-left color="primary" *ngIf="rec['selected']" name="checkmark-circle" (click)="remove(rec, 'rec')"></ion-icon>
-          <span (click)="rec['selected'] ? remove(rec, 'rec') : editData(rec, 'rec')"> {{rec.name}} </span>
-          <ion-icon item-right color="primary" *ngIf="rec['selected']" name="create" (click)="editData(rec, 'rec')"></ion-icon>
-        </ion-item>
-      </ion-list>
-
-    </ion-card-content>
-  </ion-card>
-
-
-  <!-- =============================== 2. Common Tracking Data =============================== -->
-  <ion-card *ngIf="otherData.length>0">
-
-    <ion-card-header (click)="commonExpanded = !commonExpanded;">
-      <span class="commonHeader">Common</span>
-      <ion-icon class="commonDropdown" item-right *ngIf="commonExpanded && !recommendTracking" name="arrow-dropup"></ion-icon>
-      <ion-icon class="commonDropdown" item-right *ngIf="!commonExpanded && !recommendTracking" name="arrow-dropdown"></ion-icon>
-    </ion-card-header>
-
-    <ion-card-content >
-      <h3 class="otherExplanation" *ngIf="!recommendTracking">Tracking this data may not be necessary for your selected goals.</h3>
-      <h3 class="otherExplanation" *ngIf="recommendTracking && recommendedData.length > 0">
-        Based on your goals, we recommend adding any known personal <span text-lowercase>{{dataObject?.dataType}}</span> data.</h3>
-
-      <ion-list *ngIf="commonExpanded || recommendTracking">
-        <ion-item  *ngFor="let data of otherData" text-wrap>
-          <ion-icon item-left color="primary" *ngIf="!data['selected']" name="add-circle-outline" (click)="editData(data, 'other')"></ion-icon>
-          <ion-icon item-left color="primary" *ngIf="data['selected']" name="checkmark-circle" (click)="remove(data, 'other')"></ion-icon>
-          <span (click)="data['selected'] ? remove(data, 'other') : editData(data, 'other')"> {{data.name}} </span>
-          <ion-icon item-right color="primary" *ngIf="data['selected']" name="create" (click)="editData(data, 'other')"></ion-icon>
-        </ion-item>
-      </ion-list>
-
-    </ion-card-content>
-
-  </ion-card>
-
-
-  <!-- =============================== 3. Customized Tracking Data =============================== -->
-  <ion-card>
-    <ion-card-header>Custom</ion-card-header>
-    <ion-card-content>
-
-      <ion-list *ngIf="customData.length>0">
-        <ion-item  *ngFor="let custom of customData" text-wrap>
-          <ion-icon item-left color="primary" name="checkmark-circle" (click)="remove(custom, 'custom')"></ion-icon>
-          <span (click)="remove(custom, 'custom')">{{custom.name}}</span>
-          <ion-icon item-right color="primary" name="create" (click)="editData(custom, 'custom')"></ion-icon>
-        </ion-item>
-      </ion-list>
-
-      <div class="addCustom">
-        <ion-item class="addItem" icon-left (click)="editData({'custom':true}, 'custom')" text-wrap>
-          <ion-icon class="addIcon" item-left color="primary" name="add-circle"></ion-icon>
-          <span *ngIf="dataObject?.dataType!=='Other'">Add Custom {{dataObject?.dataType}}</span>
-          <span *ngIf="dataObject?.dataType==='Other'">Add Other Data</span>
-        </ion-item>
-      </div>
-    </ion-card-content>
-  </ion-card>
-
-
-  <!-- =============================== 4. Set Tracking Start Time =============================== -->
-  <ng-container *ngIf="startDate">
-    <ion-card>
-      <ion-card-header text-wrap>
-        When do you want to start the change?
+  <div class="ion-content-wrapper">
+    <ion-card class="goal-title-card">
+      <ion-card-header class="goal-card-header">
+        <img class="goal-title-icon"  [src]="'../../assets/pages/' + dataObject['dataType'].toLowerCase() + '_icon.svg' " alt="">
+        <div class="goal-title-text-wrapper">
+          <p class="goal-title-text">Do you want to add</p>
+          <p class="goal-title-text">{{dataObject['dataType'].toLowerCase()}} data?</p>
+        </div>
+        <!--      <button class="align-right info-button" icon-only>-->
+        <!--        <img [src]="'../../assets/pages/info_icon.svg' " alt="">-->
+        <!--      </button>-->
       </ion-card-header>
+    </ion-card>
+
+
+
+    <!-- ============================= 1. Recommended Tracking Data based on Goals ============================= -->
+    <ion-card class="goal-card center">
+      <ion-card-header class="goal-header">
+        <div class="goal-name-wrapper">
+<!--            <ion-icon class="goal-icon" name="{{'custom-' + goal['name'].slice(0, -3).toLowerCase()}}"></ion-icon>-->
+          <p class="goal-name">Recommended</p>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content class="goal-card-content">
+        <p class="goal-reason-text" text-wrap>I want suggestions of relevant symptoms to track</p>
+
+        <!-- If no data tracking is necessary based on the goals selected -->
+<!--          <div *ngIf="recommendedData.length==0 && !recommendTracking">-->
+<!--            Based on your goals, we do not recommend any specific-->
+<!--            <span text-lowercase>{{dataObject?.dataType}}</span> data.-->
+<!--            Unless you believe tracking <span text-lowercase>{{dataObject?.dataType}}</span> data will support your personal goals,-->
+<!--            consider continuing without selecting any!-->
+<!--          </div>-->
+
+<!--         Recommend data to be tracked based on the goals selected -->
+<!--          <div *ngIf="recommendedData.length==0 && recommendTracking">-->
+<!--            Based on your goals, we recommend adding any known personal <span text-lowercase>{{dataObject?.dataType}}</span> data.-->
+<!--          </div>-->
+
+        <div class="sub-goal-chosen-wrapper" *ngIf="!recommendExpanded">
+          <ion-list no-lines class="sub-goal-chosen-list" *ngFor="let rec of recommendedData" text-wrap>
+            <ion-item class="sub-goal-chosen-list-item" *ngIf="rec['selected']">
+              <button item-left class="data-edit-button" (click)="editData(rec, 'rec')" icon-only>
+                <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
+              </button>
+              <p class="sub-goal-chosen-text">{{rec.name}}</p>
+            </ion-item>
+          </ion-list>
+        </div>
+
+        <div class="sub-goal-list-wrapper">
+          <ion-list no-lines class="sub-goal-list" *ngIf="recommendExpanded">
+            <ion-item class="sub-goal-list-item" *ngFor="let rec of recommendedData" text-wrap>
+
+              <button class="align-left subgoal-btn" *ngIf="!rec['selected']" (click)="editData(rec, 'rec')" icon-only>
+                <img [src]="'../../assets/pages/add_radio_icon.svg' " alt="">
+              </button>
+
+              <button class="align-left subgoal-btn" *ngIf="rec['selected']" (click)="remove(rec, 'rec')" icon-only>
+                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+              </button>
+
+              <p class="sub-goal-text" (click)="rec['selected'] ? remove(rec, 'rec') : editData(rec, 'rec')"> {{rec.name}} </p>
+
+              <button item-right class="data-edit-button"*ngIf="rec['selected']" (click)="editData(rec, 'rec')" icon-only>
+                <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
+              </button>
+
+            </ion-item>
+          </ion-list>
+        </div>
+
+        <button class="align-right goal-btn" *ngIf="recommendExpanded" (click)="expandRecommendCard()" icon-only>
+          <img [src]="'../../assets/pages/drop_up_icon.svg' " alt="">
+        </button>
+
+        <button class="align-right goal-btn" *ngIf="!recommendExpanded" (click)="expandRecommendCard()" icon-only>
+          <img [src]="'../../assets/pages/drop_down_icon.svg' " alt="">
+        </button>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- =============================== 2. Common Tracking Data =============================== -->
+    <ion-card class="goal-card center" *ngIf="otherData.length > 0">
+      <ion-card-header class="goal-header">
+        <div class="goal-name-wrapper">
+          <p class="goal-name">Recommended</p>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content class="goal-card-content">
+        <p class="goal-reason-text" text-wrap>This data may not be necessary for your selected goals</p>
+
+        <div class="sub-goal-chosen-wrapper" *ngIf="!commonExpanded">
+          <ion-list no-lines class="sub-goal-chosen-list" *ngFor="let data of otherData" text-wrap>
+            <ion-item class="sub-goal-chosen-list-item" *ngIf="data['selected']">
+              <button item-left class="data-edit-button" (click)="editData(data, 'other')" icon-only>
+                <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
+              </button>
+              <p class="sub-goal-chosen-text">{{data.name}}</p>
+            </ion-item>
+          </ion-list>
+        </div>
+
+        <div class="sub-goal-list-wrapper">
+          <ion-list no-lines class="sub-goal-list" *ngIf="commonExpanded">
+            <ion-item *ngFor="let data of otherData" text-wrap>
+
+              <button class="align-left subgoal-btn" *ngIf="!data['selected']" (click)="editData(data, 'other')" icon-only>
+                <img [src]="'../../assets/pages/add_radio_icon.svg' " alt="">
+              </button>
+
+              <button class="align-left subgoal-btn" *ngIf="data['selected']" (click)="remove(data, 'other')" icon-only>
+                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+              </button>
+
+              <p class="sub-goal-text" (click)="data['selected'] ? remove(data, 'other') : editData(data, 'other')"> {{data.name}} </p>
+
+              <button item-right class="data-edit-button"*ngIf="data['selected']" (click)="editData(data, 'other')" icon-only>
+                <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
+              </button>
+
+            </ion-item>
+          </ion-list>
+        </div>
+
+        <button class="align-right goal-btn" *ngIf="commonExpanded" (click)="expandCommonCard()" icon-only>
+          <img [src]="'../../assets/pages/drop_up_icon.svg' " alt="">
+        </button>
+
+        <button class="align-right goal-btn" *ngIf="!commonExpanded" (click)="expandCommonCard()" icon-only>
+          <img [src]="'../../assets/pages/drop_down_icon.svg' " alt="">
+        </button>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- =============================== 3. Customized Tracking Data =============================== -->
+    <ion-card class="goal-card center">
+      <ion-card-header class="goal-header">
+        <div class="goal-name-wrapper">
+          <p class="goal-name">Custom</p>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content class="custom-data-content">
+        <p class="goal-reason-text" text-wrap>{{'I want to add my own ' + dataObject['dataType'].toLowerCase() + 's'}}</p>
+
+        <div class="custom-data-wrapper" *ngIf="customData.length > 0">
+          <ion-list no-lines class="sub-goal-chosen-list" *ngFor="let data of customData" text-wrap>
+            <ion-item class="sub-goal-chosen-list-item" *ngIf="data['selected']">
+              <button item-left class="data-edit-button" (click)="editData(data, 'custom')" icon-only>
+                <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
+              </button>
+              <p class="sub-goal-chosen-text">{{data.name}}</p>
+            </ion-item>
+          </ion-list>
+        </div>
+
+        <button class="align-right goal-btn" (click)="editData({'custom': true}, 'custom')" icon-only>
+          <img [src]="'../../assets/pages/add_radio_icon.svg' " alt="">
+        </button>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- =============================== 4. Set Tracking Start Time =============================== -->
+    <ion-card class="goal-card start-time-wrapper center" *ngIf="startDate">
+      <ion-card-header class="goal-header">
+        <div class="goal-name-wrapper" text-wrap>
+          <p class="start-time-title">When do you want to start the change?</p>
+        </div>
+      </ion-card-header>
+
       <ion-card-content>
-        <h3>Defaults to today!</h3>
-        <ion-item>
-          <ion-label>Set start date:</ion-label>
-          <ion-datetime min="{{today}}" max='{{nextYear}}' displayFormat="MM/DD/YY"
-                        [(ngModel)]="startDate"></ion-datetime>
+        <ion-item class="date-picker-wrapper">
+          <ion-datetime class="date-picker" min="{{today}}" max='{{nextYear}}' displayFormat="MM/DD/YYYY" [(ngModel)]="startDate"></ion-datetime>
         </ion-item>
       </ion-card-content>
     </ion-card>
-  </ng-container>
-
-
-  <!-- =============================== 5. Buttons =============================== -->
-  <button float-right ion-button *ngIf="!navParams.data['goalIDs']" (click)="continueSetup()">
-    Save
-  </button>
-
-  <button float-right ion-button *ngIf="navParams.data['goalIDs']" (click)="continueSetup()">
-    Save and Continue
-  </button>
+  </div>
 
 </ion-content>
+
+
+<!--</div>-->
+
+<ion-footer class="footer-wrapper">
+  <div>
+    <button class="align-left footer-button" (click)="onClickPrevious()" icon-only>
+      <ion-icon name="custom-chevron-left"></ion-icon>
+    </button><p class="align-left footer-text text-left"></p>
+
+  </div>
+
+  <div>
+    <button class="align-right footer-button" (click)="continueSetup()" icon-only>
+      <ion-icon name="custom-chevron-right"></ion-icon>
+    </button>
+    <p class="align-right footer-text text-right" ></p>
+  </div>
+</ion-footer>

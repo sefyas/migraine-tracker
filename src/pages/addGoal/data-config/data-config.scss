@@ -1,49 +1,331 @@
 page-data-config {
-
-
-  .addCustom{
-    padding-top: 1em;
-    font-size: 2rem;
+  .progress-bar-wrapper {
+    background-color: rgba(112, 65, 177, 1);
+    height: 10px;
   }
 
-  .addIcon{
-    margin-right: 0.2em !important;
+  .progress-bar {
+    text-align: center;
+    display: inline-block;
+    background-color: color($colors, primary);
+    transition: width .4s ease-in-out;
   }
 
-  .addItem{
-    background-color: var(--ion-background-color);
-    font-size:1.8rem;
-    padding: 0 !important;
+  .align-left {
+    float: left;
+    margin-left: 4%;
   }
 
-
-  .otherExplanation{
-    padding-bottom:1em;
+  .align-right {
+    float: right;
+    margin-right: 4%;
   }
 
-  .addCustomIcon{
-    display:inline-block;
+  .goal-card-header {
+    justify-content: center;
+    vertical-align: center;
   }
 
-  .addCustomName{
-    //float:right;
+  .goal-title-text-wrapper {
+    position: absolute;
+    left: 35%;
+    right: 23%;
+    top: 45pt;
   }
 
-  .commonHeader{
-    padding-top:0.1em;
-    padding-bottom:0.1em;
+  .goal-card-content{
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: -5px;
+  }
+
+  .goal-title-text {
+    font-size: 15pt;
+    font-weight: bold;
+    max-width: 40%;
+  }
+
+  .goal-title-icon {
+    position: absolute;
+    left: 7%;
+    width: 65pt;
+    top: 30pt;
+    float: left;
+  }
+
+  .info-button {
+    background: none;
+    position: absolute;
+    right: 12px;
+    width: 12%;
+    top: 60pt;
+    float: right;
+  }
+
+  .goal-title-card {
+    margin-bottom: 25px;
+  }
+
+  .goal-card {
+    position: relative;
+    top: 70px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background: var(--goal-card-background);
+    border-radius: 15px;
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .goal-icon {
+    font-size: 30pt;
     display: inline-block;
   }
 
-  .commonDropdown{
-    float:right;
-    padding-left:0.2em;
-    padding-top:0.1em;
-    padding-bottom:0.1em;
+  .goal-name-wrapper {
+    float: left;
+    text-align: left;
+    display: inline-block;
+    padding: 20px 10px 0 10px;
   }
 
+  .goal-name {
+    font-size: 18pt;
+    font-weight: bold;
+    display: inline-block;
+    position: relative;
+    top: -10px;
+  }
 
+  .effort-text {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    display: block;
+  }
 
+  .effort-dot-fill {
+    background: var(--info-theme);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid var(--info-theme);
+  }
 
+  .effort-dot-outline {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid var(--info-theme);
+  }
 
+  .effort-wrapper {
+    display: inline-block;
+    position: relative;
+    top: -5px;
+    float: right;
+    text-align: right;
+  }
+
+  .text-goal-title {
+    text-align: left;
+    width: 230px;
+    font-style: italic;
+    //font-weight: bold;
+    font-size: 12pt;
+    padding-left: 5px;
+  }
+
+  .goal-reason-text {
+    text-align: left;
+    width: 230px;
+    font-style: italic;
+    //font-weight: bold;
+    font-size: 12pt;
+    padding-left: 5px;
+  }
+
+  .goal-btn {
+    background: none;
+    position: relative;
+    bottom: 15px;
+    right: -20px;
+    width: 45px;
+  }
+
+  .sub-goal-list {
+    margin-top: 20px;
+    margin-bottom: 30px;
+    margin-left: 0;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .sub-goal-list-item {
+    background: none;
+  }
+
+  .sub-goal-list-wrapper {
+    border-radius: 15px;
+    margin-top: 20px;
+    background: var(--ion-background-color);
+  }
+
+  .center {
+    display: inline-block;
+    justify-content: center;
+  }
+
+  .ion-content-wrapper {
+    padding: 10px;
+  }
+
+  .sub-goal-text {
+    font-size: 12pt;
+    font-weight: bold;
+    color: white;
+  }
+
+  .subgoal-btn {
+    background: none;
+    margin-right: 10px;
+    margin-left: -5px;
+    width: 35px;
+  }
+
+  .text-goal-entry {
+    margin-top: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    padding: 10px 10px 20px 20px;
+    font-size: 12pt;
+    background: var(--ion-background-color);
+  }
+
+  .data-edit-button {
+    background: none;
+  }
+
+  .edit-icon {
+    font-size: 20pt;
+    font-weight: bold;
+    color: white;
+  }
+
+  .color-info-theme {
+    color: var(--info-theme);
+    //font-weight: bold;
+  }
+
+  .color-white {
+    color: white;
+  }
+
+  .footer-button {
+    background: none;
+    font-size: 8pt;
+    color: white;
+  }
+
+  .footer-text {
+    color: white;
+    font-size: 10pt;
+    position: relative;
+    bottom: 10px;
+    font-weight: bold;
+  }
+
+  .footer-wrapper {
+    height: 5%;
+    vertical-align: center;
+    justify-content: center;
+    background: var(--ion-background-color);
+    overflow-y:auto;
+  }
+
+  .content {
+    height: 98%;
+  }
+
+  .vertical-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+
+  .text-goal-content {
+    padding: 8px 25px 20pt 25px;
+    font-size: 12pt;
+    color: var(--hint-text);
+  }
+
+  .sub-goal-chosen-wrapper {
+    background: none;
+    margin-top: 10px;
+  }
+
+  .sub-goal-chosen-list {
+    background: none;
+  }
+
+  .sub-goal-chosen-list-item {
+    background: none;
+    width: 300px;
+    margin-left: -40px;
+  }
+
+  .sub-goal-chosen-text {
+    font-size: 12pt;
+    color: var(--info-theme);
+    font-weight: bold;
+    line-height: 20px;
+  }
+
+  .custom-data-wrapper {
+    border-radius: 15px;
+    background: none;
+    margin-top: 20px;
+  }
+
+  .custom-data-content {
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: -5px;
+    margin-bottom: 20px;
+  }
+
+  .custom-data-wrapper {
+    background: none;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  .start-time-title {
+    font-size: 14pt;
+    font-weight: bold;
+  }
+
+  .start-time-wrapper {
+    padding-bottom: 10px;
+  }
+
+  .date-picker-wrapper {
+    display: inline-block;
+    background: none;
+  }
+
+  .date-picker {
+    border: solid 1px white;
+    border-radius: 10px;
+    width: 200px;
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+    height: 45px;
+    font-size: 12pt;
+    background: none;
+    font-weight: bold;
+  }
 }

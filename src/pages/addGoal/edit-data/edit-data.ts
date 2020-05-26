@@ -22,12 +22,7 @@ export class EditDataPage {
   private goalList = [];
   private fieldList : DataField[]= [];
   private allowsGoals: boolean;
-  private somethingEdited : boolean = false;
-  private fieldButtonsExpanded : boolean = false;
-  private goalFreqExpanded : boolean = false;
-  private goalTimeExpanded : boolean = false;
-  private isCustom : boolean = false;
-  private isNew : boolean = false;
+  private recLimit : any = {};
 
   constructor(public navParams: NavParams,
               public viewCtrl: ViewController,
@@ -36,19 +31,28 @@ export class EditDataPage {
     this.allowsGoals = navParams.data['allowsDataGoals'];
     this.dataType = navParams.data['dataType'];
     this.data = navParams.data['data'];
-    if(!this.data['name']) this.isNew = true;
-    if(this.data.recommendingGoals) this.getRecommendingGoals();
-    this.isCustom = this.data.custom;
-    if(!this.data.field && this.data.recommendedField) this.data.field = this.data.recommendedField;
-    if(!this.data.goal){
-      if(this.data.suggestedGoal) this.data.goal = this.data.suggestedGoal;
-      else this.data.goal = {'freq': null, 'threshold': null, 'timespan': null};
+
+    if (this.data.recommendingGoals) this.getRecommendingGoals();
+    if (!this.data.field && this.data.recommendedField) this.data.field = this.data.recommendedField;
+    if (!this.data.goal) {
+      if (this.data.suggestedGoal) {
+        this.data.goal = Object.assign({}, this.data.suggestedGoal);
+      } else{
+        this.data.goal = {'freq': null, 'threshold': null, 'timespan': null};
+      }
+    }
+    if (this.data.suggestedGoal) {
+      this.recLimit = Object.assign({}, this.data.suggestedGoal);
+    } else{
+      this.recLimit = {'freq': null, 'threshold': null, 'timespan': null};
     }
   }
+
 
   ionViewDidLoad() {
     this.fieldList = this.dataDetails.getSupportedFields();
   }
+
 
   getRecommendingGoals(){
     for(let i=0; i<this.data.recommendingGoals.length; i++){
@@ -60,51 +64,70 @@ export class EditDataPage {
   }
 
 
-  expandField(data : DataElement){
-    if(!data.fieldSet) this.fieldButtonsExpanded = !this.fieldButtonsExpanded;
-  }
-
-
-  editedField(field : DataField){
-    this.somethingEdited = true;
-    this.fieldButtonsExpanded = false;
+  setDataField(field : DataField) {
     this.data.field = field['name'];
 
-    if(this.data.field === this.data.recommendedField){
+    if (this.data.field === this.data.recommendedField) {
       this.data.explanation = this.data['fieldDescription'];
-      if(this.data.suggestedGoal && !this.data.goal['freq']){
+      if (this.data.suggestedGoal && !this.data.goal['freq']) {
         this.data.goal = this.data.suggestedGoal;
       }
     }
-    else{
+    else {
       this.data.explanation = field['explanation'];
       this.data.goal = {'freq': null, 'threshold': null, 'timespan': null}; // because they don't make sense across fields
     }
   }
 
-  editedGoal(goal : string, val : any=null){
-    this.somethingEdited = true;
-    this.goalTimeExpanded = false;
-    this.goalFreqExpanded = false;
-    if(goal==='remove'){
-      this.data.goal = {'freq': null, 'threshold': null, 'timespan': null};
+
+  removeDataField() {
+    this.data.field = null;
+    this.data.explanation = null;
+    this.data.goal = {'freq': null, 'threshold': null, 'timespan': null};
+  }
+
+
+  setLimit(freq : string=null, timespan : string=null) {
+    if (freq) {
+      if (this.data.goal.freq !== freq) {
+        this.data.goal.freq = freq;
+      }
+      else {
+        this.data.goal.freq = null;
+      }
     }
-    else{
-      this.data.goal[goal] = val;
+
+    if (timespan) {
+      if (this.data.goal.timespan !== timespan) {
+        this.data.goal.timespan = timespan;
+      }
+      else {
+        this.data.goal.timespan = null;
+      }
+    }
+  }
+
+
+  removeLimit() {
+    if (!this.data.goal.freq && !this.data.goal.threshold && !this.data.goal.timespan) {
+      this.data.goal.freq = this.recLimit.freq;
+      this.data.goal.threshold = this.recLimit.threshold;
+      this.data.goal.timespan = this.recLimit.timespan;
+    } else {
+      this.data.goal.freq = null;
+      this.data.goal.threshold = null;
+      this.data.goal.timespan = null;
     }
   }
 
 
   backToConfig(choice : string){
-    if(choice==='add') {
+    if (choice === 'add') {
       this.viewCtrl.dismiss(this.data);
-    }
-    else if(choice=='remove'){
+    } else if (choice === 'remove') {
       this.viewCtrl.dismiss('remove');
-    }
-    else {
+    } else {
       this.viewCtrl.dismiss();
     }
   }
-
 }

@@ -144,10 +144,27 @@ ion-navbar {
 .float-right {
   float: right;
 }
-
-
-
 // ================= datetime picker END =================
+
+
+
+// ================= ModalController START =================
+//.my-custom-modal-css .modal-wrapper {
+//  height: 20%;
+//  top: 80%;
+//  position: absolute;
+//  display: block;
+//}
+
+
+//.modal {
+//  height: 50%!important;
+//  width: 50%!important;
+//}
+// ================= ModalController END =================
+
+
+
 
 ion-icon {
   &[class*="custom-"] {
@@ -209,6 +226,11 @@ ion-icon {
   &[class*="custom-check-radio"] {
     mask-image: url(../assets/pages/check_radio_icon.svg);
   }
+  &[class*="custom-uncheck-radio"] {
+    mask-image: url(../assets/pages/uncheck_circle_icon.svg);
+  }
+
+
 
   &[class*="colored-"] {
     mask-size: contain;

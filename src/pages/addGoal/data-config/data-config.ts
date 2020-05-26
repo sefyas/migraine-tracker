@@ -6,6 +6,7 @@ import { EditDataPage } from "../edit-data/edit-data";
 import { CouchDbServiceProvider } from "../../../providers/couch-db-service/couch-db-service";
 import * as moment from 'moment';
 import { DataElement, DataType } from "../../../interfaces/customTypes";
+import {TrackingPage} from "../../tracking/tracking";
 
 
 @Component({
@@ -24,8 +25,11 @@ export class DataConfigPage {
   private startDate : any = null;
   private today = moment().toISOString();
   private nextYear = moment().add(1, "year").toISOString();
-  private commonExpanded : boolean = false;
   private alwaysQuickTrack : DataElement[] = [];
+
+  public workoutProgress : string = '0' + '%';
+  private recommendExpanded : boolean = true;
+  private commonExpanded : boolean = false;
 
   constructor(public navCtrl: NavController,
               public navParams: NavParams,
@@ -33,9 +37,6 @@ export class DataConfigPage {
               public dataDetailsServiceProvider: DataDetailsServiceProvider,
               public modalCtrl: ModalController,
               private couchDbService: CouchDbServiceProvider) {
-  }
-
-  ionViewDidLoad() {
     let activeGoals = this.couchDbService.getConfiguredRoutine();
     let alreadyTracking = {};
     if(activeGoals !== null){
@@ -58,6 +59,77 @@ export class DataConfigPage {
 
     this.getAllRecs(alreadyTracking);
   }
+
+  ionViewDidLoad() {
+
+  }
+
+  // // Update percentage value where the above is a decimal
+  // updateProgress(val) {
+  //   this.workoutProgress = Math.min( (val * 100), 100) + '%';
+  // }
+
+  onClickPrevious() {
+    this.navCtrl.pop();
+  }
+
+  continueSetup() {
+    let selectedData : DataElement[] = this.dataDetailsServiceProvider.getWhetherSelected(
+        this.recommendedData, this.otherData, this.customData);
+    let quickTrackers : DataElement[] = this.getQuickTrackers(selectedData);
+
+    if (this.navParams.data['goalIDs']) {
+      if (selectedData.length > 0) {
+        if (!this.navParams.data['selectedData']) {
+          this.navParams.data['selectedData'] = {};
+        }
+        if (this.startDate) {
+          for (let i=0; i< selectedData.length; i++) {        // specify for every change so if they add different ones
+            selectedData[i]['startDate'] = this.startDate;  // at different days we still know how to filter
+          }
+        }
+        this.navParams.data['selectedData'][this.dataObject.dataType] = selectedData;
+        if (quickTrackers.length > 0) {
+          if (this.navParams.data['quickTrackers']) {
+            this.navParams.data['quickTrackers'] = this.navParams.data['quickTrackers'].concat(quickTrackers);
+          } else {
+            this.navParams.data['quickTrackers'] = quickTrackers;
+          }
+        }
+      }
+      let configData = this.dataDetailsServiceProvider.findNextConfigData(this.navParams.data['goalIDs'], this.dataObject);
+      if (configData !== null) {
+        this.navParams.data['dataPage'] = configData;
+        this.navCtrl.push(DataConfigPage, this.navParams.data);
+      } else {
+        delete this.navParams.data['dataPage'];
+        this.navCtrl.push(SelectTrackingFrequencyPage, this.navParams.data);
+      }
+    } else {
+      this.viewCtrl.dismiss({'selected': selectedData, 'quickTrackers': quickTrackers});
+    }
+  }
+
+  expandRecommendCard() {
+    this.recommendExpanded = !this.recommendExpanded;
+  }
+
+  expandCommonCard() {
+    this.commonExpanded = !this.commonExpanded;
+  }
+
+
+  show() {
+    console.log("@@@@@@@");
+    console.log(this.recommendedData);
+  }
+
+
+
+
+
+
+
 
   combineTracking(dict1, dict2){
     if(!dict2) return dict1;
@@ -113,28 +185,35 @@ export class DataConfigPage {
   }
 
   editData(oldData : DataElement, type : string) {
-    let editDataModal = this.modalCtrl.create(EditDataPage, {'data': oldData,
-          'dataType': this.dataObject.dataType,
-          'selectedGoals': this.allGoals,
-          'allowsDataGoals': this.dataObject.dataGoals},{showBackdrop:true, cssClass: 'select-modal' });
+    let oldDataCopy = Object.assign({}, oldData);
+    if (oldData.goal) {
+      oldDataCopy.goal = Object.assign({}, oldData.goal);
+    }
+    if (oldData.suggestedGoal) {
+      oldDataCopy.suggestedGoal = Object.assign({}, oldData.suggestedGoal);
+    }
+
+    let dataToSend = {'data': oldDataCopy,
+        'dataType': this.dataObject.dataType,
+        'selectedGoals': this.allGoals,
+        'allowsDataGoals': this.dataObject.dataGoals};
+
+    let editDataModal = this.modalCtrl.create(EditDataPage, dataToSend,
+        {showBackdrop: true, cssClass: 'modal-fullscreen' });
 
     editDataModal.onDidDismiss(newData => {
-      if(newData){
+      if (newData) {
 
-        if(newData === 'remove'){
+        if (newData === 'remove') {
           this.remove(oldData, type);
-        }
-
-        else{
+        } else {
           newData.selected = true;
-          if(type=="custom"){
+          if (type === "custom") {
             this.replaceData(this.customData, oldData, newData);
-          }
-          else if(type==='rec'){
+          } else if (type === 'rec') {
             this.replaceData(this.recommendedData, oldData, newData);
             this.replaceData(this.selectedFromList, oldData, newData);
-          }
-          else if(type ==='other'){
+          } else if (type === 'other') {
             this.replaceData(this.otherData, oldData, newData);
             this.replaceData(this.selectedFromList, oldData, newData);
           }
@@ -170,41 +249,6 @@ export class DataConfigPage {
     return quickTrackers;
   }
 
-  continueSetup() {
-    let selectedData : DataElement[] = this.dataDetailsServiceProvider.getWhetherSelected(
-      this.recommendedData, this.otherData, this.customData);
-    let quickTrackers : DataElement[] = this.getQuickTrackers(selectedData);
 
-    if (this.navParams.data['goalIDs']) {
-      if (selectedData.length > 0) {
-        if (!this.navParams.data['selectedData']) {
-          this.navParams.data['selectedData'] = {};
-        }
-        if (this.startDate) {
-          for (let i=0; i< selectedData.length; i++) {        // specify for every change so if they add different ones
-            selectedData[i]['startDate'] = this.startDate;  // at different days we still know how to filter
-          }
-        }
-        this.navParams.data['selectedData'][this.dataObject.dataType] = selectedData;
-        if (quickTrackers.length > 0) {
-          if (this.navParams.data['quickTrackers']) {
-            this.navParams.data['quickTrackers'] = this.navParams.data['quickTrackers'].concat(quickTrackers);
-          } else {
-            this.navParams.data['quickTrackers'] = quickTrackers;
-          }
-        }
-      }
-      let configData = this.dataDetailsServiceProvider.findNextConfigData(this.navParams.data['goalIDs'], this.dataObject);
-      if (configData !== null) {
-        this.navParams.data['dataPage'] = configData;
-        this.navCtrl.push(DataConfigPage, this.navParams.data);
-      } else {
-        delete this.navParams.data['dataPage'];
-        this.navCtrl.push(SelectTrackingFrequencyPage, this.navParams.data);
-      }
-    } else {
-      this.viewCtrl.dismiss({'selected': selectedData, 'quickTrackers': quickTrackers});
-    }
-  }
 
 }

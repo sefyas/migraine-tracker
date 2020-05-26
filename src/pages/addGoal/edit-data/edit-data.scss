@@ -1,110 +1,214 @@
 page-edit-data {
 
-
-  .modal{
-    font-size: 1.9rem !important;
-    color:var(--ion-text-color) !important;
-    padding-bottom:1em;
-
+  .modal-fullscreen {
+    .modal-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
   }
 
-  .optionHeader{
-    font-size: 2rem !important;
+  .data-header-wrapper {
+    background: var(--goal-card-background);
+    padding: 10px 30px 0 30px;
   }
 
-  .dropdownIcon{
-    float:right;
-    padding-left:0.2em;
-    padding-top:0.1em;
-    padding-bottom:0.1em;
+  .data-header-title-text {
+    font-size: 16pt;
+    font-weight: bold;
   }
 
+  .data-header-explanation-text {
+    font-size: 12pt;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+  }
 
-  .optionName{
-    padding-top:0.1em;
-    padding-bottom:0.1em;
+  .recommended-goal-title {
+    font-size: 12pt;
+    font-weight: bold;
+    padding: 15px 0 0 0;
+  }
+
+  .recommended-goal-text {
+    font-size: 11pt;
+    padding: 0 15px 0 15px;
+    font-style: italic;
+    margin-top: -5px;
+  }
+
+  .data-content-wrapper {
+    padding: 10px 30px 0 30px;
+  }
+
+  .data-tracking-method-title {
+    font-size: 16pt;
+    font-weight: bold;
+    padding: 5px 0 0 0;
+  }
+
+  .data-tracking-method-option {
+    padding: 0 15px 0 15px;
+  }
+
+  .data-tracking-method-explanation {
+    color: white;
+    font-size: 10pt;
+    margin-top: 5px;
+  }
+
+  .data-tracking-method-name {
+    font-size: 14pt;
+    font-weight: bold;
+    margin-bottom: -5px;
+  }
+
+  .data-tracking-method-recommended{
+    font-style: italic;
+    color: orange;
+    margin-bottom: -20px;
+    font-size: 10pt;
+    font-weight: bold;
+  }
+
+  .add-btn {
+    background: none;
+    width: 40px;
+  }
+
+  .add-btn-wrapper {
+    display: inline-block;
+    padding: 0 15px 0 5px;
+  }
+
+  .add-text-wrapper {
     display: inline-block;
   }
 
-  .optionDetails{
-    font-size: 1.35rem !important;
-    color: var(--input-config-text) !important;
+  .content-wrapper {
+    text-align: center;
   }
 
-  .selectOption{
-    padding:0.5em !important;
+  .data-select-btn {
+    border-radius: 8px;
+    margin-bottom: 8px;
+    width: 310px;
+    height: 40px;
   }
 
-  .recommended{
+  .cancel-btn {
+    background: none;
+  }
+
+  .confirm-btn {
+    background: var(--goal-theme);
+  }
+
+  .remove-btn {
+    background: var(--red-text);
+  }
+
+  .button-wrapper {
+    padding-top: 20px;
+    display: inline-block;
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .confirm-btn-half {
+    background: var(--goal-theme);
+    width: 150px;
+    float: right;
+  }
+
+  .remove-btn-half {
+    background: var(--red-text);
+    width: 150px;
+    float: left;
+  }
+
+  // ==================== limit ====================
+  .limit-option-wrapper {
+    padding-top: 10px;
+    padding-left: 10px;
+    border-radius: 8px;
+  }
+
+  .limit-option {
+    margin-top: -12px;
+  }
+
+  .limit-btn {
+    display: inline-block;
+    background: none;
+    vertical-align: middle;
+    width: 35px;
+  }
+
+  .more-less-label {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 10pt;
+    font-weight: bold;
+    margin-left: -2px;
+    padding-bottom: 4px;
+  }
+
+  .more-less-option-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: -5px;
+  }
+
+  .limit-label {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 12pt;
+    font-weight: bold;
+    margin-left: 6px;
+    margin-bottom: 10px;
     font-style: italic;
-    color: var(--blue-accent);
   }
 
-  .goalSelects{
-    display: flex;
-    width: 101% !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+  .limit-number-textfield {
+    font-size: 10pt;
+    font-weight: bold;
+    border: solid 1.4px white;
+    width: 50px;
+    border-radius: 10px;
+    padding-left: 10px;
   }
 
-  .fullSelect{
-    max-width: 100% !important;
-    background-color: var(--input-config-background) !important;
-    color:black !important;
+  .limit-element-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 6px;
+    margin-bottom: 10px;
   }
 
-  .goalText{
-    font-size:1.6rem;
-    padding-left:0.3em;
-    padding-right:0.3em;
+  .no-limit {
+    margin-bottom: 10px;
+    margin-left: 5px;
   }
 
-  .miniSelect{
-    height: 1.8em;
-    width: 4.6em !important;
-    padding-right: 0.25em !important;
-    padding-left: 0.25em !important;
-    padding-bottom:0.1em !important;
-    background-color: var(--input-config-background);
-    color:var(--input-config-text);
-    font-size:1.8rem !important;
+  .name-textfield {
+    font-size: 10pt;
+    font-weight: bold;
+    border: solid 1.4px white;
+    width: 270px;
+    border-radius: 10px;
+    display: inline-block;
+    padding-left: 20px;
+    padding-right: 10px;
   }
 
-  .text-input{
-    padding-top: 0!important;
-    padding-right:0.1em !important;
-    padding-left:0 !important;
-    margin:0 !important;
+  .data-name-wrapper {
+    text-align: center;
   }
-
-  .removeGoal{
-    padding-left: 0.4em;
-    padding-top:0.25em;
-    padding-bottom:0.1em;
-  }
-
-  .textBox{
-    padding-top:0.1em !important;
-    padding-bottom:0.1em;
-    max-width: 2.2em !important;
-    height: 1.8em !important;
-    text-align:center;
-    background-color: var(--input-config-background);
-    color: var(--input-config-text);
-    font-size:1.8rem !important;
-  }
-
-  .inputText{
-    background-color: var(--input-config-background);
-    color: var(--input-config-text);
-  }
-
-  .listElement{
-    padding-bottom:1em !important;
-    font-size: 1.9rem !important;
-  }
-
-
-
 
 }

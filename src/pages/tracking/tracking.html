@@ -72,18 +72,18 @@
 </ion-content>
 
 
-  <ion-footer class="footer-wrapper">
-    <div *ngIf="neighborData[goal][0] !== ''" (click)="onPreviousClick()">
-      <button class="align-left footer-button" icon-only>
-        <ion-icon name="custom-chevron-left"></ion-icon>
-      </button><p class="align-left footer-text text-left">{{neighborData[goal][0]+ "s"}}</p>
+<ion-footer class="footer-wrapper">
+  <div *ngIf="neighborData[goal][0] !== ''" (click)="onPreviousClick()">
+    <button class="align-left footer-button" icon-only>
+      <ion-icon name="custom-chevron-left"></ion-icon>
+    </button><p class="align-left footer-text text-left">{{neighborData[goal][0]+ "s"}}</p>
 
-    </div>
+  </div>
 
-    <div *ngIf="neighborData[goal][1] !== ''" (click)="onNextClick()">
-      <button class="align-right footer-button" icon-only>
-        <ion-icon name="custom-chevron-right"></ion-icon>
-      </button>
-      <p class="align-right footer-text text-right" >{{neighborData[goal][1]+ "s"}}</p>
-    </div>
-  </ion-footer>
+  <div *ngIf="neighborData[goal][1] !== ''" (click)="onNextClick()">
+    <button class="align-right footer-button" icon-only>
+      <ion-icon name="custom-chevron-right"></ion-icon>
+    </button>
+    <p class="align-right footer-text text-right" >{{neighborData[goal][1]+ "s"}}</p>
+  </div>
+</ion-footer>

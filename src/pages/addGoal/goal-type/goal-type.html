@@ -10,11 +10,8 @@
   </div>
 </ion-header>
 
-
-
-
-
-<ion-content>
+<!--<div class="content">-->
+<ion-content class="content vertical-center">
   <div class="ion-content-wrapper">
     <ion-card class="goal-title-card">
       <ion-card-header class="goal-card-header">
@@ -31,7 +28,7 @@
 
     <ion-card class="goal-card center" *ngFor="let goal of goalList">
 
-      <ion-card-header class="goal-header" (click)="selectedGoals.indexOf(goal.goalID)===-1 ? addGoal(goal) :  removeGoal(goal)">
+      <ion-card-header class="goal-header">
         <div class="goal-name-wrapper">
           <ion-icon class="goal-icon" name="{{'custom-' + goal['name'].slice(0, -3).toLowerCase()}}"></ion-icon>
           <p class="goal-name">{{goal['name'].slice(0, -3)}}</p>
@@ -39,100 +36,143 @@
         <div class="effort-wrapper">
           <p class="effort-dot-fill"></p>
           <p class="effort-dot-outline" [class.effort-dot-fill]="goal['effort'] ==='medium' || goal['effort'] ==='high'"></p>
-          <p class="effort-dot-outline"[class.effort-dot-fill]="goal['effort'] ==='high'"></p>
+          <p class="effort-dot-outline" [class.effort-dot-fill]="goal['effort'] ==='high'"></p>
           <p class="effort-text">{{goal['effort']}} effort </p>
         </div>
       </ion-card-header>
 
-      <ion-card-content class="goal-card-content">
-        <p class="goal-reason-text" *ngIf="selectedGoals.indexOf(goal.goalID) === -1" text-wrap>{{goal['chooseReason']}}</p>
-        <p class="goal-reason-text" *ngIf="selectedGoals.indexOf(goal.goalID) > -1" text-wrap>{{goal['chooseReasonDetail']}}</p>
+      <ion-card-content class="goal-card-content" *ngIf="goal.goalID !== '3'">
+        <p class="goal-reason-text"
+           *ngIf="(goal['name'] === 'Monitoring' && !expandMonitor && selectedGoals.indexOf('1a') === -1 &&
+           selectedGoals.indexOf('1b') === -1 && selectedGoals.indexOf('1c') === -1) ||
+           (goal['name'] === 'Learning' && !expandLearn && selectedGoals.indexOf('2a') === -1 &&
+           selectedGoals.indexOf('2b') === -1 && selectedGoals.indexOf('2c') === -1)"
+           text-wrap>{{goal['chooseReason']}}</p>
+
+        <p class="goal-reason-text"
+           *ngIf="((goal['name'] === 'Monitoring' && expandMonitor) || (goal['name'] === 'Monitoring' && !expandMonitor
+           && (selectedGoals.indexOf('1a') > -1 ||
+           selectedGoals.indexOf('1b') > -1 || selectedGoals.indexOf('1c') > -1))) ||
+           ((goal['name'] === 'Learning' && expandLearn) || (goal['name'] === 'Learning' && !expandLearn
+           && (selectedGoals.indexOf('2a') > -1 ||
+           selectedGoals.indexOf('2b') > -1 || selectedGoals.indexOf('2c') > -1)))"
+           text-wrap>{{goal['chooseReasonDetail']}}</p>
+
+
+        <div class="sub-goal-chosen-wrapper" *ngIf="(!expandMonitor && goal.goalID == 1) || (!expandLearn && goal.goalID == 2)">
+          <ion-list no-lines class="sub-goal-chosen-list" *ngFor="let subgoal of goal['subgoals']">
+            <p class="sub-goal-chosen-text" *ngIf="selectedGoals.indexOf(subgoal.goalID) > -1">{{subgoal['goalPurpose']}}</p>
+          </ion-list>
+        </div>
 
         <div class="sub-goal-list-wrapper">
-          <ion-list no-lines class="sub-goal-list" *ngIf="goal['subgoals'] && selectedGoals.indexOf(goal.goalID) > -1">
+          <ion-list no-lines class="sub-goal-list" *ngIf="goal['subgoals'] &&
+          ((goal['name'] === 'Monitoring' && expandMonitor) || (goal['name'] === 'Learning' && expandLearn))">
             <ion-item class="sub-goal-list-item" *ngFor="let subgoal of goal['subgoals']" text-wrap>
 
-              <button class="align-left subgoal-btn" (click)="addGoal(goal, subgoal.goalID)" *ngIf="selectedGoals.indexOf(subgoal.goalID)===-1" icon-only>
+              <button class="align-left subgoal-btn" (click)="addGoal(subgoal)"
+                      *ngIf="selectedGoals.indexOf(subgoal.goalID)===-1" icon-only>
                 <img [src]="'../../assets/pages/add_radio_icon.svg' " alt="">
               </button>
 
-              <button class="align-left subgoal-btn" (click)="removeGoal(goal, subgoal.goalID)" *ngIf="selectedGoals.indexOf(subgoal.goalID)>-1" icon-only>
+              <button class="align-left subgoal-btn" (click)="removeGoal(subgoal)"
+                      *ngIf="selectedGoals.indexOf(subgoal.goalID)>-1" icon-only>
                 <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
               </button>
 
-              <p class="sub-goal-text" (click)="selectedGoals.indexOf(subgoal.goalID)===-1 ? addGoal(goal, subgoal.goalID) : removeGoal(goal, subgoal.goalID)">{{subgoal['goalPurpose']}}</p>
+              <p class="sub-goal-text" (click)="selectedGoals.indexOf(subgoal.goalID)===-1 ?
+              addGoal(subgoal) : removeGoal(subgoal)">{{subgoal['goalPurpose']}}</p>
             </ion-item>
           </ion-list>
         </div>
 
-        <button class="align-right goal-btn" *ngIf="selectedGoals.indexOf(goal.goalID) > -1" (click)="removeGoal(goal)" icon-only>
+        <button class="align-right goal-btn" *ngIf="(goal['name'] === 'Monitoring' && expandMonitor) ||
+        (goal['name'] === 'Learning' && expandLearn)" (click)="expandGoal(goal)" icon-only>
           <img [src]="'../../assets/pages/drop_up_icon.svg' " alt="">
         </button>
 
-        <button class="align-right goal-btn" *ngIf="selectedGoals.indexOf(goal.goalID) === -1" (click)="addGoal(goal)" icon-only>
+        <button class="align-right goal-btn" *ngIf="(goal['name'] === 'Monitoring' && !expandMonitor) ||
+        (goal['name'] === 'Learning' && !expandLearn)" (click)="expandGoal(goal)" icon-only>
           <img [src]="'../../assets/pages/drop_down_icon.svg' " alt="">
         </button>
+      </ion-card-content>
 
+      <ion-card-content class="goal-card-content" *ngIf="goal.goalID === '3'">
+        <p class="goal-reason-text" text-wrap>{{goal['chooseReason']}}</p>
 
+        <button class="align-right goal-btn" *ngIf="selectedGoals.indexOf('3') === -1" (click)="addGoal(goal)" icon-only>
+          <img [src]="'../../assets/pages/add_radio_icon.svg' " alt="">
+        </button>
 
-<!--        <button class="align-right goal-btn" *ngIf="selectedGoals.indexOf(goal.goalID) > -1" (click)="addGoal(goal)" icon-only>-->
-<!--          <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">-->
-<!--        </button>-->
-
-<!--        <button class="align-right goal-btn" *ngIf="selectedGoals.indexOf(goal.goalID) === -1" (click)="addGoal(goal)" icon-only>-->
-<!--          <img [src]="'../../assets/pages/add_radio_icon.svg' " alt="">-->
-<!--        </button>-->
-
-
-  <!--      <button class="align-right goal-btn" *ngIf="selectedGoals.indexOf(goal.goalID) > -1" (click)="addGoal(goal)" icon-only>-->
-  <!--        <ion-icon item-right color="light" name="arrow-dropup"></ion-icon>-->
-  <!--      </button>-->
-
-  <!--      <button class="align-right goal-btn" *ngIf="selectedGoals.indexOf(goal.goalID) === -1" (click)="addGoal(goal)" icon-only>-->
-  <!--        <ion-icon item-right color="light" name="arrow-dropdown"></ion-icon>-->
-  <!--      </button>-->
+        <button class="align-right goal-btn" *ngIf="selectedGoals.indexOf('3') > -1" (click)="removeGoal(goal)" icon-only>
+          <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+        </button>
 
       </ion-card-content>
 
     </ion-card>
 
-  <!--  <ion-card>-->
-  <!--    <ion-card-header>-->
-  <!--      Other Goals-->
-  <!--      <ion-icon class="goalIcon" item-left name="md-create"></ion-icon>-->
-  <!--    </ion-card-header>-->
-  <!--    <ion-card-content>-->
-  <!--      <div  class="dropdownText" text-wrap (click)="textGoalExpand = !textGoalExpand;">-->
-  <!--        <span class="dropdownName">Do you have any other goals you want to remember?</span>-->
-  <!--        <ion-icon item-right class="dropdownIcon" *ngIf="!textGoalExpand" name="arrow-dropdown"></ion-icon>-->
-  <!--        <ion-icon item-right class="dropdownIcon"  *ngIf="textGoalExpand" name="arrow-dropup"></ion-icon>-->
-  <!--      </div>-->
-  <!--      <div *ngIf="textGoalExpand">-->
-  <!--        <p>-->
-  <!--          Record any other migraine-related goals you want have so you can-->
-  <!--          reflect on them later or share them with your doctor!-->
-  <!--        </p>-->
-  <!--        <ion-textarea [(ngModel)]="textGoals" placeholder="Write any other goals you have here."></ion-textarea>-->
-  <!--      </div>-->
-  <!--    </ion-card-content>-->
-  <!--  </ion-card>-->
+    <ion-card class="goal-card center">
+
+      <ion-card-header class="goal-header">
+        <div class="goal-name-wrapper">
+          <ion-icon class="goal-icon" name="custom-other-note"></ion-icon>
+          <p class="goal-name">Other</p>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content class="goal-card-content">
+        <p class="text-goal-title" text-wrap>Do you have any other goals you want to remember?</p>
+        <p class="text-goal-content goal-reason-text" *ngIf="!textGoalExpand" text-wrap>{{textGoals}}</p>
+
+        <ion-textarea class="text-goal-entry" *ngIf="textGoalExpand" [(ngModel)]="textGoals" rows="5"
+                      [class.color-info-theme]="!displayTextGoalEditBtn" [class.color-white]="displayTextGoalEditBtn"
+                      (ionFocus)="onEditTextGoalFocus()" (ionBlur)="onEditTextGoalBlur()"
+                      placeholder="Write any other migraine-related goals you have so you can reflect on them later or share them with your doctor ...">
+        </ion-textarea>
+
+        <button class="align-right text-goal-edit-button" *ngIf="textGoalExpand && displayTextGoalEditBtn" (click)="onEditTextGoalFocus()" icon-only>
+          <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
+        </button>
+
+        <button class="align-right goal-btn" *ngIf="textGoalExpand" (click)="expandTextGoal()" icon-only>
+          <img [src]="'../../assets/pages/drop_up_icon.svg'" alt="">
+        </button>
+
+        <button class="align-right goal-btn" *ngIf="!textGoalExpand" (click)="expandTextGoal()" icon-only>
+          <img [src]="'../../assets/pages/drop_down_icon.svg'" alt="">
+        </button>
+      </ion-card-content>
+
+    </ion-card>
 
 
-  <!--  <button *ngIf="modifying" float-left ion-button (click)="continueSetup(true)" [color]="goalsWithoutSubgoals.length == 0 && selectedGoals.length > 0 ? 'primary': 'light' "-->
-  <!--          [disabled]="selectedGoals.length === 0 || goalsWithoutSubgoals.length > 0">-->
-  <!--    Save-->
-  <!--  </button>-->
+<!--    <button class="submit-button" *ngIf="modifying" float-left ion-button (click)="continueSetup(true)"-->
+<!--            [disabled]="selectedGoals.length === 0">Save</button>-->
 
+<!--    <button class="submit-button" *ngIf="!modifying" float-right ion-button (click)="continueSetup()"-->
+<!--            [disabled]="selectedGoals.length === 0">Continue</button>-->
 
-  <!--  <button *ngIf="!modifying" float-right ion-button (click)="continueSetup()" [color]="goalsWithoutSubgoals.length == 0 && selectedGoals.length > 0 ? 'primary': 'light' "-->
-  <!--          [disabled]="selectedGoals.length === 0 || goalsWithoutSubgoals.length > 0">-->
-  <!--    Continue-->
-  <!--  </button>-->
+<!--    <button class="submit-button" *ngIf="modifying" float-right ion-button (click)="continueSetup()"-->
+<!--            [disabled]="selectedGoals.length === 0">Modify Tracking</button>-->
 
-  <!--  <button *ngIf="modifying" float-right ion-button (click)="continueSetup()" [color]="goalsWithoutSubgoals.length == 0 && selectedGoals.length > 0 ? 'primary': 'light' "-->
-  <!--          [disabled]="selectedGoals.length === 0 || goalsWithoutSubgoals.length > 0">-->
-  <!--    Modify Tracking-->
-  <!--  </button>-->
   </div>
 
 </ion-content>
+<!--</div>-->
+
+<ion-footer class="footer-wrapper">
+  <div>
+    <button class="align-left footer-button" (click)="onClickPrevious()" icon-only>
+      <ion-icon name="custom-chevron-left"></ion-icon>
+    </button><p class="align-left footer-text text-left"></p>
+
+  </div>
+
+  <div>
+    <button class="align-right footer-button" (click)="continueSetup()" icon-only>
+      <ion-icon name="custom-chevron-right"></ion-icon>
+    </button>
+    <p class="align-right footer-text text-right" ></p>
+  </div>
+</ion-footer>

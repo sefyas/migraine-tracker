@@ -15,11 +15,13 @@ import { Goal } from "../../../interfaces/customTypes";
 export class GoalTypePage {
   private goalList : Goal[];
   private modifying : boolean = false;
-  private selectedGoals : string[]= [];
+  private selectedGoals : string[] = [];
   private textGoals : string;
   private textGoalExpand : boolean = false;
-  private goalsWithoutSubgoals : string[] = [];
   public workoutProgress : string = '0' + '%';
+  private expandMonitor : boolean = false;
+  private expandLearn : boolean = false;
+  private displayTextGoalEditBtn : boolean = true;
 
   constructor(private navCtrl: NavController,
               public navParams: NavParams,
@@ -40,30 +42,24 @@ export class GoalTypePage {
     this.goalList = this.goalDetailsServiceProvider.getGoalList();
   }
 
-  addGoal(goal : Goal, subgoalID : string = null) {
-    if (subgoalID) {
-      this.selectedGoals.push(subgoalID);
-      this._subgoalRequirementMet(goal['goalID']);
-    } else {
-      this.selectedGoals.push(goal['goalID']);
-      if (goal['subgoals']) {
-        this.goalsWithoutSubgoals.push(goal['goalID']);
-      }
-    }
+  addGoal(subgoal : Goal = null) {
+    this.selectedGoals.push(subgoal.goalID);
   }
 
-  removeGoal(goal : Goal, subgoalID : string = null) {
-    if (subgoalID) { // it's a subgoal; check if any of that goal's subgoals are still selected
-      this.selectedGoals.splice(this.selectedGoals.indexOf(subgoalID), 1);
-      this._checkForSubgoals(goal);
-    } else { // it's not a subgoal; remove all of its subgoals
-      this.selectedGoals.splice(this.selectedGoals.indexOf(goal['goalID']), 1);
-      this._subgoalRequirementMet(goal['goalID']);
-      if(goal['subgoals']) this._removeAllSubgoals(goal['subgoals']);
+  removeGoal(subgoal : Goal = null) {
+    this.selectedGoals.splice(this.selectedGoals.indexOf(subgoal.goalID), 1);
+  }
+
+  expandGoal(goal : Goal) {
+    if (goal.name === "Monitoring") {
+      this.expandMonitor = !this.expandMonitor;
+    } else if (goal.name === "Learning") {
+      this.expandLearn = !this.expandLearn;
     }
   }
 
   async continueSetup(exit=false) {
+    this.selectedGoals = ['1a', '1b', '1c', '2a', '2b', '2c', '3'];
     let dataToSend = {'goalIDs': this.selectedGoals, 'textGoals': this.textGoals};
     if (exit) {
       dataToSend['goalsOnly'] = true;
@@ -82,47 +78,111 @@ export class GoalTypePage {
     // this.couchDBService.addGoals(dataToSend["goalIDs"]);
   }
 
-  // print the given goal
-  showInfo(subgoal : Goal){
-    console.log(subgoal);
+  expandTextGoal() {
+      this.textGoalExpand = !this.textGoalExpand;
   }
 
-  // if someone unselects a goal we need to unselect all the subgoals as well
-  _removeAllSubgoals(subgoals : Goal[]){
-    for(let i=0; i<subgoals.length; i++){
-      const index = this.selectedGoals.indexOf(subgoals[i].goalID);
-      if(index > -1){
-        this.selectedGoals.splice(index, 1);
-      }
-    }
+  onEditTextGoalFocus() {
+    this.displayTextGoalEditBtn = false;
   }
 
-  // see if there's still at least one subgoal selected for the goal; if not don't let them continue
-  _checkForSubgoals(goal : Goal){
-    let subgoal = false;
-    for(let i=0; i<goal.subgoals.length; i++){
-      if(this.selectedGoals.indexOf(goal['goalID']) >-1){
-        subgoal = true;
-        break;
-      }
-    }
-    if(!subgoal) this.goalsWithoutSubgoals.push(goal.goalID);
+  onEditTextGoalBlur() {
+    this.displayTextGoalEditBtn = true;
   }
 
-  // check if there's at least one subgoal selected for each main goal selected
-  _subgoalRequirementMet(goalID : string){
-    const missingSubgoalIndex = this.goalsWithoutSubgoals.indexOf(goalID);
-    if(missingSubgoalIndex > -1){ // if you now have a subgoal for all goals that need it, you can continue
-      this.goalsWithoutSubgoals.splice(missingSubgoalIndex);
-    }
+  onClickPrevious() {
+    this.navCtrl.pop();
   }
 
-  updateProgress(val) {
-   // Update percentage value where the above is a decimal
-    this.workoutProgress = Math.min( (val * 100), 100) + '%';
+  onClickNext() {
+    this.navCtrl.push(GoalTypePage);
   }
 
+  // // see if there's still at least one subgoal selected for the goal; if not don't let them continue
+  // _checkForSubgoals(goal : Goal){
+  //   let subgoal = false;
+  //   for(let i=0; i<goal.subgoals.length; i++){
+  //     if(this.selectedGoals.indexOf(goal['goalID']) >-1){
+  //       subgoal = true;
+  //       break;
+  //     }
+  //   }
+  //   if(!subgoal) this.goalsWithoutSubgoals.push(goal.goalID);
+  // }
 
+
+
+  // addGoal(goal : Goal, subgoal : Goal = null) {
+  //   if (subgoal) {
+  //     this.selectedGoals.push(subgoal.goalID);
+  //     this._subgoalRequirementMet(goal['goalID']);
+  //   } else {
+  //     this.selectedGoals.push(goal['goalID']);
+  //     if (goal['subgoals']) {
+  //       this.goalsWithoutSubgoals.push(goal['goalID']);
+  //     }
+  //   }
+  // }
+  //
+
+  //
+
+  //
+  // async continueSetup(exit=false) {
+  //   let dataToSend = {'goalIDs': this.selectedGoals, 'textGoals': this.textGoals};
+  //   if (exit) {
+  //     dataToSend['goalsOnly'] = true;
+  //     this.navCtrl.setRoot(GoalModificationPage, dataToSend);
+  //   } else{
+  //     let configData = this.dataDetails.findNextConfigData(this.selectedGoals, null);
+  //
+  //     if (configData!== null) {
+  //       dataToSend['dataPage'] = configData;
+  //       this.navCtrl.push(DataConfigPage, dataToSend);
+  //     } else {
+  //       let error = new Error("All data conditional, no conditions met.");
+  //       throw(error);
+  //     }
+  //   }
+  //   // this.couchDBService.addGoals(dataToSend["goalIDs"]);
+  // }
+  //
+  // // if someone unselects a goal we need to unselect all the subgoals as well
+  // _removeAllSubgoals(subgoals : Goal[]){
+  //   for(let i=0; i<subgoals.length; i++){
+  //     const index = this.selectedGoals.indexOf(subgoals[i].goalID);
+  //     if(index > -1){
+  //       this.selectedGoals.splice(index, 1);
+  //     }
+  //   }
+  // }
+  //
+  // // see if there's still at least one subgoal selected for the goal; if not don't let them continue
+  // _checkForSubgoals(goal : Goal){
+  //   let subgoal = false;
+  //   for(let i=0; i<goal.subgoals.length; i++){
+  //     if(this.selectedGoals.indexOf(goal['goalID']) >-1){
+  //       subgoal = true;
+  //       break;
+  //     }
+  //   }
+  //   if(!subgoal) this.goalsWithoutSubgoals.push(goal.goalID);
+  // }
+  //
+  // // check if there's at least one subgoal selected for each main goal selected
+  // _subgoalRequirementMet(goalID : string){
+  //   const missingSubgoalIndex = this.goalsWithoutSubgoals.indexOf(goalID);
+  //   if (missingSubgoalIndex > -1) { // if you now have a subgoal for all goals that need it, you can continue
+  //     this.goalsWithoutSubgoals.splice(missingSubgoalIndex);
+  //   }
+  // }
+  //
+  // // Update percentage value where the above is a decimal
+  // updateProgress(val) {
+  //   this.workoutProgress = Math.min( (val * 100), 100) + '%';
+  // }
+  //
+  //
 
 
 

@@ -1,163 +1,161 @@
 
-
-<ion-card class="modal">
-  <ion-card-header *ngIf="isCustom">Custom {{dataType}} Data</ion-card-header>
-  <ion-card-header *ngIf="!isCustom">{{data.name}}</ion-card-header>
-
-  <ion-card-content>
-
-    <!--  Display Data Info  -->
-    <div class="listElement" *ngIf="isCustom">
-      <h3>Name:</h3>
-      <ion-input class="inputText" type="text" [(ngModel)]="data.name" placeholder="Enter name"></ion-input>
-    </div>
-
-    <div class="listElement" *ngIf="!isNew">
-      <h3>Description:</h3>
-      <h2 *ngIf="!isCustom">{{data.explanation}}</h2>
-      <h2 *ngIf="isCustom">Custom data you configured</h2>
-    </div>
-
-    <div class="listElement" *ngIf="!isCustom && data.recommendingGoals">
-      <h3>Recommended based on your goals:</h3>
-      <h2 text-wrap *ngFor="let goal of goalList">{{goal}}</h2>
-    </div>
-
-
-    <!--  Set Data Tracking Method  -->
-    <div class="listElement">
-      <h3>How you're tracking:</h3>
-
-      <div class="fullSelect">
-
-        <div class="selectOption">
-
-          <div class="optionHeader" (click)="expandField(data)">
-            <div class="optionName">{{data.field}}</div>
-            <ion-icon class="dropdownIcon" *ngIf="!fieldButtonsExpanded && !data.fieldSet" name="arrow-dropdown"></ion-icon>
-            <ion-icon class="dropdownIcon"  *ngIf="fieldButtonsExpanded && !data.fieldSet" name="arrow-dropup"></ion-icon>
-          </div>
-
-          <span *ngIf="fieldButtonsExpanded" class="optionDetails">
-            <span *ngIf="!data.recommendedField || data.field!==data.recommendedField">
-              {{data['fieldExplanation']}}
-            </span>
-
-            <span *ngIf="data.recommendedField && data.field===data.recommendedField">
-              <div class="recommended">(recommended)</div>
-              {{data.fieldDescription}}
-            </span>
-          </span>
-
+<ion-content class="content-wrapper">
+    <ion-card-header text-left class="data-header-wrapper">
+        <div *ngIf="data.custom">
+            <p class="data-header-title-text">Custom {{dataType}} Data</p>
+            <h2 class="data-header-explanation-text">Custom data you configured</h2>
         </div>
 
-        <ng-container *ngIf="fieldButtonsExpanded">
-          <ng-container *ngFor="let field of fieldList">
-            <ng-container *ngIf="(!data.fieldsAllowed) || (data.fieldsAllowed.indexOf(field.name) > -1)">
-              <div class="selectOption" *ngIf="field['name'] !== data.field" (click)="editedField(field)">
-                <div class="optionHeader">
-                  <div class="optionName">{{field['name']}}</div>
-                </div>
-                <div class="optionDetails">
-                  <span *ngIf="!data.recommendedField || field['name']!==data.recommendedField">
-                    {{field['explanation']}}
-                  </span>
-                  <span *ngIf="data.recommendedField && field['name']===data.recommendedField">
-                    <div class="recommended">(recommended)</div>
-                    {{data.fieldDescription}}
-                  </span>
-                </div>
-              </div>
+        <div *ngIf="!data.custom">
+            <p class="data-header-title-text">{{data.name}}</p>
+            <p class="data-header-explanation-text" text-wrap>{{data.explanation}}</p>
+        </div>
+    </ion-card-header>
+
+    <div text-left class="data-content-wrapper">
+        <div>
+            <p class="data-tracking-method-title">What are you tracking?</p>
+            <div class="data-name-wrapper" *ngIf="data.custom">
+                <ion-input class="name-textfield" type="text" placeholder="Data Name" [(ngModel)]="data.name"></ion-input>
+            </div>
+            <div class="recommended-goal-list" *ngIf="!data.custom && data.recommendingGoals">
+                <p class="recommended-goal-title">Suggested based on your goals:</p>
+                <p class="recommended-goal-text" text-wrap *ngFor="let goal of goalList">{{goal}}</p>
+            </div>
+        </div>
+
+        <!--  Set Data Tracking Method  -->
+        <div>
+            <p class="data-tracking-method-title">How are you tracking?</p>
+            <ng-container *ngFor="let field of fieldList">
+                <ng-container *ngIf="(!data.fieldsAllowed) || (data.fieldsAllowed.indexOf(field.name) > -1)">
+                    <div class="data-tracking-method-option">
+                        <div class="align-left add-btn-wrapper">
+                            <button class="add-btn" *ngIf="data.field !== field.name" icon-only (click)="setDataField(field)">
+                                <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                            </button>
+                            <button class="add-btn" *ngIf="data.field === field.name" icon-only (click)="removeDataField()">
+                                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                            </button>
+                        </div>
+
+                        <div class="align-left add-text-wrapper">
+                            <p *ngIf="data.recommendedField && field['name'] === data.recommendedField"
+                               class="data-tracking-method-recommended">Recommended</p>
+                            <p class="data-tracking-method-name">{{field['name']}}</p>
+                            <p class="data-tracking-method-explanation">{{field['explanation']}}</p>
+                        </div>
+                    </div>
+                </ng-container>
             </ng-container>
-          </ng-container>
-        </ng-container>
+        </div>
 
-      </div>
+        <div class="limit-wrapper" *ngIf="allowsGoals && (data.field && data.field === 'binary' || data.field === 'number')">
+            <p class="data-tracking-method-title">Do you want to set a limit?</p>
+            <div class="limit-option-wrapper">
+                <div class="more-less-option-wrapper">
+                    <div class="limit-option">
+                        <button *ngIf="!(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'more')"
+                                (click)="setLimit('more', null)" class="align-left limit-btn" icon-only>
+                            <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                        </button>
+                        <button *ngIf="(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'more')"
+                                (click)="setLimit('more', null)" class="align-left limit-btn" icon-only>
+                            <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                        </button>
+                        <p (click)="setLimit('more', null)" class="more-less-label">more</p>
+                    </div>
 
+                    <div class="limit-option">
+                        <button *ngIf="!(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'less')"
+                                (click)="setLimit('less', null)" class="align-left limit-btn" icon-only>
+                            <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                        </button>
+                        <button *ngIf="(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'less')"
+                                (click)="setLimit('less', null)" class="align-left limit-btn" icon-only>
+                            <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                        </button>
+                        <p (click)="setLimit('less', null)" class="more-less-label">less</p>
+                    </div>
+                </div>
+
+                <div class="limit-label">than</div>
+
+                <div class="limit-element-wrapper">
+                    <ion-input size="number" type="number" text-right class="limit-number-textfield" no-padding no-border
+                               [placeholder]="(data.goal && data.goal.threshold) ? data.goal.threshold : '---'"
+                               [(ngModel)]="data.goal.threshold"></ion-input>
+                </div>
+
+                <div class="limit-label">per</div>
+
+                <div class="limit-element-wrapper">
+                    <div class="limit-option">
+                        <button *ngIf="!(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'day')"
+                                (click)="setLimit(null, 'day')" class="align-left limit-btn" icon-only>
+                            <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                        </button>
+                        <button *ngIf="(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'day')"
+                                (click)="setLimit(null, 'day')" class="align-left limit-btn" icon-only>
+                            <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                        </button>
+                        <p (click)="setLimit(null, 'day')" class="more-less-label">day</p>
+                    </div>
+
+                    <div class="limit-option">
+                        <button *ngIf="!(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'week')"
+                                (click)="setLimit(null, 'week')" class="align-left limit-btn" icon-only>
+                            <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                        </button>
+                        <button *ngIf="(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'week')"
+                                (click)="setLimit(null, 'week')" class="align-left limit-btn" icon-only>
+                            <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                        </button>
+                        <p (click)="setLimit(null, 'week')" class="more-less-label">week</p>
+                    </div>
+
+                    <div class="limit-option">
+                        <button *ngIf="!(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'month')"
+                                (click)="setLimit(null, 'month')" class="align-left limit-btn" icon-only>
+                            <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                        </button>
+                        <button *ngIf="(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'month')"
+                                (click)="setLimit(null, 'month')" class="align-left limit-btn" icon-only>
+                            <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                        </button>
+                        <p (click)="setLimit(null, 'month')" class="more-less-label">month</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="no-limit">
+                <button *ngIf="data.goal.freq || data.goal.threshold || data.goal.timespan"
+                        (click)="removeLimit()" class="align-left limit-btn" icon-only>
+                    <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                </button>
+                <button *ngIf="!data.goal.freq && !data.goal.threshold && !data.goal.timespan"
+                        (click)="removeLimit()" class="align-left limit-btn" icon-only>
+                    <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                </button>
+                <p (click)="removeLimit()" class="more-less-label">I don't want to set a limit</p>
+            </div>
+        </div>
     </div>
 
+    <!-- buttons -->
+    <div class="button-wrapper" text-center>
+        <button class="data-select-btn remove-btn" [class.remove-btn-half]="data.selected"
+                *ngIf="data.selected" color="darkRed" ion-button (click)="backToConfig('remove')">Remove</button>
 
-    <div class="listElement" *ngIf="allowsGoals &&
-                          (data.field !== undefined && data.field === 'binary' || data.field === 'number')">
+        <button class="data-select-btn confirm-btn" [class.confirm-btn-half]="data.selected" color="goalThemeDark"
+                [disabled]="!data.name || !data.field || ((data.goal.timespan || data.goal.freq ||
+                data.goal.threshold) && !(data.goal.timespan && data.goal.freq && data.goal.threshold))"
+                ion-button (click)="backToConfig('add')">
+            <ng-container *ngIf="!data.selected">Add</ng-container>
+            <ng-container *ngIf="data.selected">Save</ng-container>
+        </button>
 
-
-
-    <h3>
-      Goal/Limit (Optional):
-    </h3>
-
-      <div class="selectOption goalSelects">
-
-        <div>
-          <div class="miniSelect" (click)="goalFreqExpanded = !goalFreqExpanded;">
-            <div class="optionName">{{data.goal.freq}}</div>
-            <ion-icon class="dropdownIcon" *ngIf="!goalFreqExpanded" name="arrow-dropdown"></ion-icon>
-            <ion-icon class="dropdownIcon" *ngIf="goalFreqExpanded" name="arrow-dropup"></ion-icon>
-          </div>
-          <ng-container *ngIf="goalFreqExpanded">
-            <div class="miniSelect" *ngIf="data.goal.freq!=='More'" (click)="editedGoal('freq', 'More')">
-              More
-            </div>
-            <div class="miniSelect" *ngIf="data.goal.freq!=='Less'" (click)="editedGoal('freq', 'Less')">
-              Less
-            </div>
-          </ng-container>
-        </div>
-
-        <div class="goalText">than</div>
-
-        <div>
-          <ion-input size="number" type="number" text-right class="textBox"  no-padding no-border
-          [placeholder]="(data.goal && data.goal.threshold) ? data.goal.threshold : '---'"
-          [(ngModel)]="data.goal.threshold" (ngModelChange)="somethingEdited=true;"></ion-input>
-        </div>
-
-        <div class="goalText">per</div>
-
-        <div>
-          <div class="miniSelect" (click)="goalTimeExpanded = !goalTimeExpanded;">
-            <div class="optionName">{{data.goal.timespan}}</div>
-            <ion-icon class="dropdownIcon" *ngIf="!goalTimeExpanded" name="arrow-dropdown"></ion-icon>
-            <ion-icon class="dropdownIcon" *ngIf="goalTimeExpanded" name="arrow-dropup"></ion-icon>
-          </div>
-
-          <ng-container *ngIf="goalTimeExpanded">
-            <div class="miniSelect" *ngIf="data.goal.timespan!=='Day'" (click)="editedGoal('timespan', 'Day')">
-              Day
-            </div>
-            <div class="miniSelect" *ngIf="data.goal.timespan!=='Week'" (click)="editedGoal('timespan', 'Week')">
-              Week
-            </div>
-            <div class="miniSelect" *ngIf="data.goal.timespan!=='Month'" (click)="editedGoal('timespan', 'Month')">
-              Month
-            </div>
-          </ng-container>
-
-        </div>
-
-        <ion-icon class="removeGoal" color="primary" item-right name="close-circle-outline" (click)="editedGoal('remove')"></ion-icon>
-
-      </div>
+        <button class="data-select-btn cancel-btn" outline color="light" ion-button
+                (click)="backToConfig('cancel')">Cancel</button>
     </div>
-
-
-
-    <button float-left ion-button (click)="backToConfig('cancel')">
-      Cancel
-    </button>
-
-    <button *ngIf="!data.selected || somethingEdited" float-right ion-button
-            [disabled]="!data.name || !data.field || ((data.goal.timespan || data.goal.freq || data.goal.threshold) && !(data.goal.timespan && data.goal.freq && data.goal.threshold) )" (click)="backToConfig('add')">
-      <ng-container *ngIf="!data.selected">Add</ng-container>
-      <ng-container *ngIf="data.selected">Save</ng-container>
-    </button>
-
-    <button *ngIf="data.selected && !somethingEdited" float-right ion-button (click)="backToConfig('remove')">
-      Remove
-    </button>
-
-  </ion-card-content>
-
-</ion-card>
-
-
+</ion-content>
