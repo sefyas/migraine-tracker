@@ -1,21 +1,10 @@
 
-
-<!--<ion-header>-->
-<!--  <ion-navbar>-->
-<!--    <ion-title> Add {{dataObject?.dataType}}</ion-title>-->
-<!--  </ion-navbar>-->
-<!--</ion-header>-->
-
-
-<ion-header>
-  <div class="progress-bar-wrapper">
-    <span class="progress-bar" [style.width]="workoutProgress"></span>
-  </div>
-</ion-header>
+<ion-header class="progress-bar" [style.width]="workoutProgress"></ion-header>
 
 <ion-content class="content vertical-center">
 
   <div class="ion-content-wrapper">
+    <!-- =============================================== 0. Title =============================================== -->
     <ion-card class="goal-title-card">
       <ion-card-header class="goal-card-header">
         <img class="goal-title-icon"  [src]="'../../assets/pages/' + dataObject['dataType'].toLowerCase() + '_icon.svg' " alt="">
@@ -29,13 +18,10 @@
       </ion-card-header>
     </ion-card>
 
-
-
     <!-- ============================= 1. Recommended Tracking Data based on Goals ============================= -->
-    <ion-card class="goal-card center">
+    <ion-card class="goal-card center" *ngIf="recommendedData.length > 0">
       <ion-card-header class="goal-header">
         <div class="goal-name-wrapper">
-<!--            <ion-icon class="goal-icon" name="{{'custom-' + goal['name'].slice(0, -3).toLowerCase()}}"></ion-icon>-->
           <p class="goal-name">Recommended</p>
         </div>
       </ion-card-header>
@@ -104,7 +90,7 @@
     <ion-card class="goal-card center" *ngIf="otherData.length > 0">
       <ion-card-header class="goal-header">
         <div class="goal-name-wrapper">
-          <p class="goal-name">Recommended</p>
+          <p class="goal-name">Common</p>
         </div>
       </ion-card-header>
 
@@ -200,9 +186,6 @@
   </div>
 
 </ion-content>
-
-
-<!--</div>-->
 
 <ion-footer class="footer-wrapper">
   <div>

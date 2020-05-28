@@ -60,11 +60,11 @@ export interface DataField {
 
 export interface Notification{
   delayNum?: number,
-  delayScale?: string, //"Hour" | "Day"; <- that's supposed to work, but won't
+  delayScale?: string, //"Hour" | "Day"
   timescale?: string, //"Daily" | "Weekly" | "Monthly",
-  dayOfWeek?: string, //"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday",
-  dayOfMonth?: string,
-  timeOfDay?: string
+  dayOfWeek?: string | number, //"Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday",
+  dayOfMonth?: string | number,
+  timeOfDay?: string | Date
 }
 
 export interface ConfiguredRoutine {

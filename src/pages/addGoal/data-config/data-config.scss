@@ -1,14 +1,19 @@
 page-data-config {
   .progress-bar-wrapper {
-    background-color: rgba(112, 65, 177, 1);
+    display: inline-block;
     height: 10px;
+    width: 20%;
+    margin-bottom: 0;
   }
 
   .progress-bar {
-    text-align: center;
-    display: inline-block;
-    background-color: color($colors, primary);
-    transition: width .4s ease-in-out;
+    background-color: var(--progress-bar-theme);
+    width: 20%;
+    height: 10px;
+  }
+
+  .content {
+    height: 100%;
   }
 
   .align-left {
@@ -237,15 +242,12 @@ page-data-config {
   }
 
   .footer-wrapper {
-    height: 5%;
+    height: 40px;
     vertical-align: center;
     justify-content: center;
     background: var(--ion-background-color);
     overflow-y:auto;
-  }
-
-  .content {
-    height: 98%;
+    padding-top: 10px;
   }
 
   .vertical-center {

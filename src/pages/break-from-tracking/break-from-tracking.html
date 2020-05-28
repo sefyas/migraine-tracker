@@ -15,8 +15,9 @@
 
 <ion-content class="container">
 
-  <div *ngIf="currentBreak && currentBreak.started">
-    <ion-card text-left class="current-break-card" [class.transparent]="displayBreakInfo || displayReasonInfo">
+  <div [class.transparent]="displayBreakInfo || displayReasonInfo" *ngIf="currentBreak && currentBreak.started">
+    <ion-backdrop *ngIf="displayBreakInfo || displayReasonInfo"></ion-backdrop>
+    <ion-card text-left class="current-break-card">
   <!--    <ion-card-header text-wrap class="current-break-title">You're currently on a break!</ion-card-header>-->
       <ion-card-content>
         <div class="break-wrapper">
@@ -89,15 +90,16 @@
         </ion-card-content>
     </ion-card>
 
-    <ion-footer text-center [class.transparent]="displayBreakInfo || displayReasonInfo">
+    <ion-footer text-center>
       <button ion-button color="darkRed" class="break-button" (click)="endBreak()">
         End Break Now
       </button>
     </ion-footer>
   </div>
 
-  <div *ngIf="!currentBreak || !currentBreak.started">
-    <ion-card class="break-card" [class.transparent]="displayBreakInfo || displayReasonInfo">
+  <div [class.transparent]="displayBreakInfo || displayReasonInfo" *ngIf="!currentBreak || !currentBreak.started">
+      <ion-backdrop *ngIf="displayBreakInfo || displayReasonInfo"></ion-backdrop>
+    <ion-card class="break-card">
       <ion-card-header text-wrap>
         <p class="break-title">
           Do you want to take a break from tracking?
@@ -163,7 +165,7 @@
       </ion-card-content>
     </ion-card>
 
-    <ion-card class="reason-card" *ngIf="selected === 'Yes'" [class.transparent]="displayBreakInfo || displayReasonInfo">
+    <ion-card class="reason-card" *ngIf="selected === 'Yes'">
       <ion-card-header text-wrap>
         <p class="reason-title">
           Why are you taking a break from tracking?
@@ -180,7 +182,7 @@
       </ion-card-content>
     </ion-card>
 
-    <ion-footer text-center [class.transparent]="displayBreakInfo || displayReasonInfo">
+    <ion-footer text-center>
       <button ion-button color="goalThemeDark" class="submit-button" (click)="takeBreak()"
               [disabled]="((selected!=='Yes' || !dateToSnoozeTo) && selected!=='No' && selected!=='Unsure')">
         Submit
@@ -189,7 +191,7 @@
   </div>
 
   <div class="info-card" *ngIf="displayBreakInfo || displayReasonInfo">
-    <ion-card-content class="reason-entry-card">
+    <ion-card-content>
       <button class="close-button" (click)="onClickCloseInfo()" icon-only>
         <ion-icon name="custom-close"></ion-icon>
       </button>

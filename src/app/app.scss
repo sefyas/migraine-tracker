@@ -38,9 +38,6 @@ html {
 ion-card{
   padding: 0 !important;
   border: 0 !important;
-  //padding:-1em !important;
-  //padding-left:-2em !important;
-  //padding-right:-2em !important;
 }
 
 ion-card-content h2{
@@ -56,23 +53,20 @@ ion-card-content h3{
 
 .select-modal {
   background: rgba(0, 0, 0, 0.5) !important;
-  //min-height: 40%;
-  //max-height: 65%;
-  //padding: 20% 10%  !important;
   padding-top: 30% !important;
 }
 
-
+.transparent {
+  opacity: 0.3;
+}
 
 .card-header{
   color:white;
 }
 
-
 .toolbar-background {
   background-color: var(--navbar-background-color);
 }
-
 
 ion-navbar {
   ion-title {
@@ -86,7 +80,6 @@ ion-navbar {
   color: white;
   font-weight: bold;
 }
-
 
 .menu-item:active {
   font-weight: bold;
@@ -147,24 +140,69 @@ ion-navbar {
 // ================= datetime picker END =================
 
 
+// ================= select START =================
 
-// ================= ModalController START =================
-//.my-custom-modal-css .modal-wrapper {
-//  height: 20%;
-//  top: 80%;
-//  position: absolute;
-//  display: block;
-//}
+.input-wrapper {
+  color: white;
+  font-size: 12pt;
+  font-weight: bold;
+}
 
+.popover-ios .popover-content{
+  border: 2px solid var(--info-theme);
+  width: 175px;
+}
 
-//.modal {
-//  height: 50%!important;
-//  width: 50%!important;
-//}
-// ================= ModalController END =================
+.item-ios.item-block .item-inner {
+  padding-right: 8px;
+  padding-left: 8px;
+  border-bottom: 1px solid white;
+}
 
+.popover-ios .item-ios {
+  padding-right: 10px;
+  padding-left: 10px;
+}
 
+.popover-ios .popover-arrow {
+  visibility: hidden;
+}
 
+.select-ios .select-icon {
+  background: none;
+}
+
+.select-ios .select-icon .select-icon-inner {
+  visibility: hidden;
+}
+
+.radio-ios .radio-icon {
+  visibility: hidden;
+}
+
+.item-radio-checked.item-ios ion-label {
+  color: var(--info-theme);
+}
+
+ion-select {
+  max-width: 150px;
+  display: inline-block;
+  vertical-align: middle;
+  background: none;
+  border-radius: 10px;
+  border: solid 2px white;
+  width: 150px;
+  margin-top: 10pt;
+  margin-bottom: 10pt;
+  height: 45px;
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.select-ios .select-placeholder {
+  color: white;
+}
+// ================== select END ==================
 
 ion-icon {
   &[class*="custom-"] {
@@ -281,4 +319,3 @@ ion-icon {
     background-image: url(../assets/pages/other_check_icon.svg);
   }
 }
-

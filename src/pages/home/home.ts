@@ -142,12 +142,12 @@ export class HomePage {
 
     // this.navCtrl.setRoot(GoalModificationPage, dataToSend);
     this.navCtrl.setRoot(HomePage);
-    this.navCtrl.push(TrackingPage, dataToSend);
+    this.navCtrl.push(TrackingPage, dataToSend, {animate: false});
   }
 
   // only if they don't have a goal setup yet
   addFirstGoal() {
-    this.navCtrl.push(GoalTypePage);
+    this.navCtrl.push(GoalTypePage, null, {animate: false});
   }
 
   setupTrackers(){

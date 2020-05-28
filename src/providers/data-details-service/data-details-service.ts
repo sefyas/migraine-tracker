@@ -8,6 +8,7 @@ export class DataDetailsServiceProvider {
   private supportedFields : DataField[];
   private listedData : {[dataType: string] : DataElement[]};
   private configData : DataType[];
+  private selectedConfigData : DataType[] = [];
 
   constructor(public http: HttpClient) {
     this._openListedData();
@@ -115,7 +116,6 @@ export class DataDetailsServiceProvider {
     }
   }
 
-
   getWhetherRecommended(activeGoals: string[], recs: string[]){
     // based on the set of configured goals, returns whether we recommend a specific data element
     for(let i=0; i<activeGoals.length; i++){
@@ -126,28 +126,38 @@ export class DataDetailsServiceProvider {
     return false;
   }
 
-
-  findNextConfigData(goalIDs : string[], currentlyConfiguring : DataType) {
-    console.log("!!!!!");
-    console.log(this.configData);
-    let newDataIndex;
-    if (!currentlyConfiguring) newDataIndex = 0;
-    else newDataIndex = this.configData.indexOf(currentlyConfiguring) + 1;
-    for (let i = newDataIndex; i < this.configData.length; i++) {
+  // load all config data based on the selected goals
+  getSelectedConfigData(goalIDs : string[]) {
+    this.selectedConfigData = [];
+    for (let i=0; i<this.configData.length; i++) {
       let dataType = this.configData[i];
-      if (!(dataType.conditionalGoals)){
-        return dataType;
+      if (!(dataType.conditionalGoals)) {
+        this.selectedConfigData.push(dataType);
       } else {
         for (let j=0; j<dataType.conditionalGoals.length; j++) { // if it has ANY of the conditional goals, show the page
           if (goalIDs.indexOf(dataType.conditionalGoals[j]) > -1) {
-            return dataType;
+            this.selectedConfigData.push(dataType);
+            break;
           }
         }
       }
     }
-    return null;
+    return this.selectedConfigData;
   }
 
+  // find the next config data based on the selected goals and the current config data
+  findNextConfigData(goalIDs : string[], currentlyConfiguring : DataType) {
+    if (!currentlyConfiguring) {
+      return this.selectedConfigData[0];
+    } else {
+      let newDataIndex = this.selectedConfigData.indexOf(currentlyConfiguring) + 1;
+      if (newDataIndex < this.selectedConfigData.length) {
+        return this.selectedConfigData[newDataIndex];
+      } else {
+        return null;
+      }
+    }
+  }
 
   getWhetherIsMed(dataType: string, id: string) : boolean{
     // uses the listed data to find the original data type

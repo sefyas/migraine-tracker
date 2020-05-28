@@ -6,8 +6,6 @@ import { EditDataPage } from "../edit-data/edit-data";
 import { CouchDbServiceProvider } from "../../../providers/couch-db-service/couch-db-service";
 import * as moment from 'moment';
 import { DataElement, DataType } from "../../../interfaces/customTypes";
-import {TrackingPage} from "../../tracking/tracking";
-
 
 @Component({
   selector: 'page-data-config',
@@ -30,6 +28,7 @@ export class DataConfigPage {
   public workoutProgress : string = '0' + '%';
   private recommendExpanded : boolean = true;
   private commonExpanded : boolean = false;
+  private selectedConfigData : string[];
 
   constructor(public navCtrl: NavController,
               public navParams: NavParams,
@@ -39,7 +38,7 @@ export class DataConfigPage {
               private couchDbService: CouchDbServiceProvider) {
     let activeGoals = this.couchDbService.getConfiguredRoutine();
     let alreadyTracking = {};
-    if(activeGoals !== null){
+    if (activeGoals !== null) {
       alreadyTracking = activeGoals['dataToTrack'] ? activeGoals['dataToTrack'] : {};
       this.allGoals = activeGoals['goals'] ? activeGoals['goals'] : [];
     }
@@ -48,29 +47,25 @@ export class DataConfigPage {
       this.allGoals = this.allGoals.concat(this.navParams.data['goalIDs']);
       this.dataObject = this.navParams.data['dataPage'];
       alreadyTracking = this.combineTracking(alreadyTracking, this.navParams.data['selectedData']);
-    }
-
-    else{ // got here via tracking routine modification page
+    } else { // got here via tracking routine modification page
       this.dataObject = this.dataDetailsServiceProvider.getConfigByName(this.navParams.data['dataType']);
       this.dataObject['dataDesc'] = this.navParams.data['dataDesc'];
     }
     this.displayName = this.dataObject.toDisplay ? this.dataObject.toDisplay : this.dataObject.dataType;
     this.startDate = this.dataObject.startDate ? new Date().toISOString() : null;
-
     this.getAllRecs(alreadyTracking);
+
+    this.selectedConfigData = this.navParams.data['selectedConfigData'];
+    this.workoutProgress = Math.min( ( (this.selectedConfigData.indexOf(this.navParams.data['dataPage']) + 1)
+        / (this.selectedConfigData.length + 1) * 100), 100).toString() + '%';
   }
 
   ionViewDidLoad() {
 
   }
 
-  // // Update percentage value where the above is a decimal
-  // updateProgress(val) {
-  //   this.workoutProgress = Math.min( (val * 100), 100) + '%';
-  // }
-
   onClickPrevious() {
-    this.navCtrl.pop();
+    this.navCtrl.pop({animate: false});
   }
 
   continueSetup() {
@@ -100,10 +95,10 @@ export class DataConfigPage {
       let configData = this.dataDetailsServiceProvider.findNextConfigData(this.navParams.data['goalIDs'], this.dataObject);
       if (configData !== null) {
         this.navParams.data['dataPage'] = configData;
-        this.navCtrl.push(DataConfigPage, this.navParams.data);
+        this.navCtrl.push(DataConfigPage, this.navParams.data, {animate: false});
       } else {
         delete this.navParams.data['dataPage'];
-        this.navCtrl.push(SelectTrackingFrequencyPage, this.navParams.data);
+        this.navCtrl.push(SelectTrackingFrequencyPage, this.navParams.data, {animate: false});
       }
     } else {
       this.viewCtrl.dismiss({'selected': selectedData, 'quickTrackers': quickTrackers});
@@ -117,19 +112,6 @@ export class DataConfigPage {
   expandCommonCard() {
     this.commonExpanded = !this.commonExpanded;
   }
-
-
-  show() {
-    console.log("@@@@@@@");
-    console.log(this.recommendedData);
-  }
-
-
-
-
-
-
-
 
   combineTracking(dict1, dict2){
     if(!dict2) return dict1;
@@ -248,7 +230,4 @@ export class DataConfigPage {
     }
     return quickTrackers;
   }
-
-
-
 }
