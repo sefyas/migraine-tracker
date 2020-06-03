@@ -53,15 +53,15 @@ export class DataCalendarPage {
 
 
   ionViewDidLoad() {
-    let dateFuns = this.dateFunctions;
-    this.currentMonth = this.dateFunctions.getDate(this.calendar.currentDate).format("MMMM");
-    let events = this.couchDBService.getTrackedData(); // could pull month by month but I think this is better for short studies
-    events.map(function(event){ // shouldn't be necessary if we're pushing right originally
-      event.startTime = dateFuns.getUTCDate(event.startTime);
-      event.endTime = dateFuns.getUTCDate(event.endTime);
-    });
-    this.eventSource = events;
-    this.calendar.currentDate = new Date();
+    // let dateFuns = this.dateFunctions;
+    // this.currentMonth = this.dateFunctions.getDate(this.calendar.currentDate).format("MMMM");
+    // let events = this.couchDBService.getTrackedData(); // could pull month by month but I think this is better for short studies
+    // events.map(function(event){ // shouldn't be necessary if we're pushing right originally
+    //   event.startTime = dateFuns.getUTCDate(event.startTime);
+    //   event.endTime = dateFuns.getUTCDate(event.endTime);
+    // });
+    // this.eventSource = events;
+    // this.calendar.currentDate = new Date();
   }
 
 

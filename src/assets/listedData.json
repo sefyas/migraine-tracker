@@ -250,8 +250,14 @@
                 "fieldSet": true,
                 "recommendedField": "calculated medication use",
                 "condition": true,
-                "recommendingGoals": []
+                "recommendingGoals": [],
+                "suggestedGoal": {
+                    "freq": "Less",
+                    "threshold": 4,
+                    "timespan": "Month"
+                }
             },
+
             {
                 "name": "Stress",
                 "id": "stressToday",

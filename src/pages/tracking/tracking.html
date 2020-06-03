@@ -1,12 +1,12 @@
 
 <ion-header>
   <ion-toolbar color="ionBackground">
-    <button class="align-left header-button" (click)="onHomeClick()" icon-only>
+    <button class="align-left header-button" (click)="onHomeClick(); saveTrackedData()" icon-only>
       <ion-icon name="custom-home"></ion-icon>
     </button>
-    <ion-title class="title">{{monthNames[dateSelected["month"]] + " " + dateSelected["date"] + ", " + dateSelected["year"]}}</ion-title>
-    <button class="align-right header-button" icon-only>
-      <ion-icon name="custom-eraser"></ion-icon>
+    <ion-title class="title">{{monthNames[dateSelected[1]] + " " + dateSelected[0] + ", " + dateSelected[2]}}</ion-title>
+    <button class="align-right header-button" (click)="onClearClick()" icon-only>
+      <ion-icon class="custom-reset-form-btn" name="custom-reset-form"></ion-icon>
     </button>
   </ion-toolbar>
 </ion-header>
@@ -26,61 +26,54 @@
   </ion-card>
 
   <ion-card text-center>
-
       <ion-card-content class="goal-card center">
-
         <ng-container *ngFor=" let data of dataToTrack[goal]">
           <p class="data-name">{{data['name']}}</p>
-            <data-element-tracking [data]="data" [trackedMedsToday] = trackedMeds() (valueChanged) = 'changeVals($event, data, goal)'>
-            </data-element-tracking>
-
-<!--                <div class="goalDiv" *ngIf="data.goal && data.goal.freq && goal !== 'Symptom' ">-->
-<!--                  <div>-->
-<!--                    Goal: {{data.goal.freq}} than <span text-lowercase>{{data.goal.threshold}}-->
-<!--                    per {{data.goal.timespan}}</span>-->
-<!--                  </div>-->
-<!--                  <div *ngIf="data.goal.timespan!=='Day'">-->
-<!--                    Total this <span text-lowercase>{{data.goal.timespan}}</span> (including today):-->
-<!--                    {{totalTrackedTimes(data, goal)}}-->
-<!--                  </div>-->
-
-<!--                  <div class="goalMet" *ngIf="goalProgress(data, goal) === 'met'">-->
-<!--                    You met your goal!-->
-<!--                  </div>-->
-<!--                  <div class="goalMet" *ngIf="goalProgress(data, goal) === 'below limit'">-->
-<!--                    You're under your limit!-->
-<!--                  </div>-->
-<!--                  <div class="goalOK" *ngIf="goalProgress(data, goal) === 'under'">-->
-<!--                    Keep going!-->
-<!--                  </div>-->
-<!--                  <div class="overGoal" *ngIf="goalProgress(data, goal) === 'over'">-->
-<!--                    Try to cut back!-->
-<!--                  </div>-->
-<!--                  <div class="goalOK" *ngIf="goalProgress(data, goal) === 'at limit'">-->
-<!--                    You're at your limit!-->
-<!--                  </div>-->
-<!--                </div>-->
-
+          <data-element-tracking [data]="data" [dataVal]="getDataVal(data['id'])"
+                                 [dataStart]="getDataStart(data['id'])" [dataEnd]="getDataEnd(data['id'])"
+                                 [trackedMedsToday] = trackedMeds() (valueChanged) = 'changeVals($event, data, goal)'>
+          </data-element-tracking>
+          <div class="limit-wrapper" *ngIf="data['goal'] && data['goal']['freq'] && goal !== 'Symptom' ">
+            <div class="limit-info-message">
+              Total / goal :
+              <p class="limit-value" [class.goal-ok]="goalProgress(data, goal) === 'at limit' ||
+                            goalProgress(data, goal) === 'under'"
+                 [class.goal-met]="goalProgress(data, goal) === 'met' ||
+                            goalProgress(data, goal) === 'below limit'"
+                 [class.goal-over]="goalProgress(data, goal) === 'over'">
+                {{totalTrackedTimes(data, goal)}}</p> / <p class="limit-value goal-info">{{data['goal']['threshold']}}</p>
+              per {{data['goal']['timespan'].toLowerCase()}}
+            </div>
+            <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, goal) === 'met'">
+              You met your goal!
+            </div>
+            <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, goal) === 'below limit'">
+              You're under your limit!
+            </div>
+            <div class="goal-ok limit-warning-message" *ngIf="goalProgress(data, goal) === 'at limit'">
+              You're at your limit!
+            </div>
+            <div class="goal-ok limit-warning-message" *ngIf="goalProgress(data, goal) === 'under'">
+              Keep going!
+            </div>
+            <div class="goal-over limit-warning-message" *ngIf="goalProgress(data, goal) === 'over'">
+              Try to cut back!
+            </div>
+          </div>
         </ng-container>
       </ion-card-content>
-
   </ion-card>
-
-
-
-
 </ion-content>
 
-
 <ion-footer class="footer-wrapper">
-  <div *ngIf="neighborData[goal][0] !== ''" (click)="onPreviousClick()">
+  <div *ngIf="neighborData[goal][0] !== ''" (click)="onPreviousClick(); saveTrackedData()">
     <button class="align-left footer-button" icon-only>
       <ion-icon name="custom-chevron-left"></ion-icon>
     </button><p class="align-left footer-text text-left">{{neighborData[goal][0]+ "s"}}</p>
 
   </div>
 
-  <div *ngIf="neighborData[goal][1] !== ''" (click)="onNextClick()">
+  <div *ngIf="neighborData[goal][1] !== ''" (click)="onNextClick(); saveTrackedData()">
     <button class="align-right footer-button" icon-only>
       <ion-icon name="custom-chevron-right"></ion-icon>
     </button>

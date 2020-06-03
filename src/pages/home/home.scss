@@ -1,56 +1,72 @@
 page-home {
-  .dataInfo{
-    padding-bottom: 2em;
+  [show]{
+    display: block !important;
   }
 
-  .dataExamples{
+  .data-examples{
     float: left;
     color: rgba(255, 255, 255, 0.5);
     padding-top: 3pt;
     font-size: 9pt;
     max-height: 1.5em;
     font-style: italic;
-    //text-transform: lowercase;
     overflow: hidden;
     text-overflow: ellipsis !important;
     max-width: 70%;
   }
 
-  .dataName{
+  .data-name{
     font-size: 13pt !important;
     font-weight: bold;
     padding-bottom: 15pt;
     padding-top: 15pt;
   }
 
-
-  .goalDiv{
-    font-style: italic;
-    padding-left:0.1em;
-    font-size: 1.7rem;
-  }
-
-  .trackingHeader{
+  .tracking-header{
     font-size: 13pt;
     background-color: var(--goal-card-background);
     float: left;
   }
 
-  .goalMet{
+  .limit-wrapper{
+    font-style: italic;
+    font-size: 1.7rem;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    text-align: left;
+    padding-left: 35px;
+    padding-right: 30px;
+  }
+
+  .goal-met{
     color: var(--green-text);
   }
 
-  .overGoal{
+  .goal-over{
     color: var(--red-text)
   }
 
-  .goalOK{
+  .goal-ok{
     color: var(--blue-accent)
   }
 
-  .quickTrackerButton{
-    height: 25vh;
-    display: inline-block
+  .goal-info {
+    color: var(--info-theme);
+  }
+
+  .limit-warning-message {
+    font-size: 10pt;
+    font-weight: bold;
+  }
+
+  .limit-info-message {
+    font-size: 11pt;
+    font-weight: bold;
+  }
+
+  .limit-value {
+    display: inline-block;
+    font-size: 11pt;
   }
 
   .align-right {
@@ -61,15 +77,6 @@ page-home {
     float: right;
     width: 32pt;
   }
-
-  //ion-content.content {
-  //  .scroll-content {
-  //    padding-top: 8pt;
-  //    padding-bottom: 8pt;
-  //    padding-left: 10pt;
-  //    padding-right: 10pt;
-  //  }
-  //}
 
   ion-card-header.goal-card {
     padding: 15pt;
@@ -123,5 +130,4 @@ page-home {
   .add-goal-icon {
     padding-right: 30pt;
   }
-
 }

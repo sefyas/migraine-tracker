@@ -130,12 +130,14 @@ page-select-tracking-frequency {
   .tracking-selected-wrapper {
     text-align: center;
     margin-top: 20px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
   }
 
   .tracking-options {
     display: inline-block;
     vertical-align: middle;
+    padding-top: 15px;
+    padding-bottom: 15px;
   }
 
   .tracking-label {
@@ -196,20 +198,22 @@ page-select-tracking-frequency {
   }
 
   .regular-time-picker-wrapper {
-    display: inline-block;
+    //display: inline-block;
     vertical-align: middle;
     background: none;
     width: 160px;
     margin-left: 6px;
+    margin-top: -10pt;
+    margin-bottom: -10pt;
   }
 
   .regular-time-picker {
-    display: inline-block;
+    //display: inline-block;
     vertical-align: middle;
     background: none;
     border-radius: 10px;
     border: solid 2px white;
-    width: 150px;
+    width: 160px;
     margin-top: 10pt;
     margin-bottom: 10pt;
     height: 45px;
@@ -235,11 +239,20 @@ page-select-tracking-frequency {
   }
 
   .regular-time-picker-popover-wrapper {
-    display: inline-block;
+    //display: inline-block;
     vertical-align: middle;
     background: none;
     width: 160px;
     margin-left: 6px;
+    margin-top: -10pt;
+    margin-bottom: -10pt;
+  }
+
+  .regular-options-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+    width: 160px;
+    //height: 100px;
   }
 
   // ============ regular tracking time picker END ============

@@ -107,7 +107,7 @@ ion-navbar {
 }
 
 .picker-opt.picker-opt-selected {
-    color: var(--info-theme);
+  color: var(--info-theme);
 }
 
 .picker-above-highlight {
@@ -137,20 +137,25 @@ ion-navbar {
 .float-right {
   float: right;
 }
-// ================= datetime picker END =================
 
-
-// ================= select START =================
-
-.input-wrapper {
-  color: white;
-  font-size: 12pt;
-  font-weight: bold;
+.datetime-ios {
+  padding: 0 20px 0 20px;
+  text-align: center;
 }
 
+.item-ios {
+  padding-left: 0px;
+}
+// ================= datetime picker END =================
+
+// ================= select START =================
 .popover-ios .popover-content{
   border: 2px solid var(--info-theme);
   width: 175px;
+  height: 300px;
+  position: absolute;
+  bottom: 50px;
+  //left: 50px;
 }
 
 .item-ios.item-block .item-inner {
@@ -191,12 +196,13 @@ ion-select {
   background: none;
   border-radius: 10px;
   border: solid 2px white;
-  width: 150px;
+  width: 160px;
   margin-top: 10pt;
   margin-bottom: 10pt;
   height: 45px;
   font-size: 12pt;
   font-weight: bold;
+  text-align: center;
 }
 
 .select-ios .select-placeholder {
@@ -267,7 +273,9 @@ ion-icon {
   &[class*="custom-uncheck-radio"] {
     mask-image: url(../assets/pages/uncheck_circle_icon.svg);
   }
-
+  &[class*="custom-reset-form"] {
+    mask-image: url(../assets/pages/reset_form_icon.svg);
+  }
 
 
   &[class*="colored-"] {

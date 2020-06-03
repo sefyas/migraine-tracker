@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import {IonicPage, NavController, NavParams, ViewController} from 'ionic-angular';
 import {HomePage} from "../home/home";
 import {ConfiguredRoutine, DataElement} from "../../interfaces/customTypes";
 import {GlobalFunctionsServiceProvider} from "../../providers/global-functions-service/global-functions-service";
@@ -14,21 +14,21 @@ import {DateFunctionServiceProvider} from "../../providers/date-function-service
  * Ionic pages and navigation.
  */
 
-// @IonicPage()
 @Component({
   selector: 'page-tracking',
   templateUrl: 'tracking.html',
 })
 export class TrackingPage {
-
-  private dataToTrack : {[dataType : string] : DataElement[]} = {};
-  private dateSelected : any;
-  private goal : any;
-  private neighborData: any;
-  // private dataTypes : string[];
-
   private tracked : {[dataType : string] : any} = {};
   private goalProgresses : {[dataType : string] : any} = {};
+  dataToTrack : {[dataType : string] : DataElement[]} = {};
+  dateSelected : any;
+  goal : any;
+  neighborData: any;
+  monthNames : string[] = ["January", "February", "March", "April", "May", "June", "July",
+    "August", "September", "October", "November", "December"];
+
+  // private dateSelected : any;
   // private activeGoals : ConfiguredRoutine;
   // private quickTrackers : DataElement[] = [];
   // private tracked : {[dataType : string] : any} = {};
@@ -38,18 +38,15 @@ export class TrackingPage {
   // private dataTypes : string[];
   // private previouslyTracked : {[dataType : string] : any}[];
   // private somethingTracked : boolean;
-  private durationItemStart : {[dataType : string] : any} = {};
-  private durationItemEnd : {[dataType : string] : any} ={};
   // private cardExpanded : {[dataType : string] : boolean} = {};
-  private saved : boolean;
-  // private dateSelected : any;
-
-  monthNames : string[] = ["January", "February", "March", "April", "May", "June", "July",
-      "August", "September", "October", "November", "December"];
+  // private durationItemStart : {[dataType : string] : any} = {};
+  // private durationItemEnd : {[dataType : string] : any} ={};
+  // private saved : boolean;
 
   constructor(public navCtrl: NavController,
               public navParams: NavParams,
               private couchDbService: CouchDbServiceProvider,
+              public viewCtrl: ViewController,
               private dataDetialsProvider: DataDetailsServiceProvider,
               private dateFunctionsProvider: DateFunctionServiceProvider,
               private globalFuns: GlobalFunctionsServiceProvider) {
@@ -58,18 +55,22 @@ export class TrackingPage {
     this.dateSelected = navParams.get('dateSelected');
     this.goal = navParams.get('goal');
     this.neighborData = navParams.get('neighborData');
+    this.loadTrackedData();
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad TrackingPage');
-    console.log(this.dateSelected);
-    console.log(this.dataToTrack);
-    console.log(this.goal)
   }
 
   // ================= BUTTONS Start =================
   onHomeClick() {
-    this.navCtrl.popToRoot();
+    // this.navCtrl.popToRoot({animate: false});
+
+    let dataToSend = {"goal": this.goal,
+      "dataToTrack": this.dataToTrack,
+      "dateSelected": this.dateSelected,
+      "neighborData": this.neighborData};
+
+    this.navCtrl.setRoot(HomePage, dataToSend, {animate: false});
   }
 
   onPreviousClick() {
@@ -77,7 +78,7 @@ export class TrackingPage {
                       "dataToTrack": this.dataToTrack,
                       "dateSelected": this.dateSelected,
                       "neighborData": this.neighborData};
-    this.navCtrl.push(TrackingPage, dataToSend, {direction: "back"});
+    this.navCtrl.push(TrackingPage, dataToSend, {animate: false});
   }
 
   onNextClick() {
@@ -85,36 +86,75 @@ export class TrackingPage {
                       "dataToTrack": this.dataToTrack,
                       "dateSelected": this.dateSelected,
                       "neighborData": this.neighborData};
-    this.navCtrl.push(TrackingPage, dataToSend, {direction: "forward"});
+    this.navCtrl.push(TrackingPage, dataToSend, {animate: false});
+  }
+
+  onClearClick() {
+    this.tracked = {};
   }
   // ================= BUTTONS Ends =================
+  async loadTrackedData() {
+    this.tracked = await this.couchDbService.getTrackedData(this.dateSelected);
+  }
 
-  // ================= Goal Data Starts =================
+  saveTrackedData() {
+    this.couchDbService.logTrackedData(this.tracked, this.dateSelected);
+  }
+
   trackedMeds(){
     return this.globalFuns.getWhetherTrackedMeds(this.tracked);
   }
 
-  changeVals(componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
-              dataType: string){
-    if(dataType === 'quickTracker') dataType = data.dataType; // SHOULD always work, given data config code ...
-    // todo: schedule the notification if they say they had a migraine!
-    if(componentEvent.dataVal){
-      if(!this.tracked.hasOwnProperty(dataType)) this.tracked[dataType] = {};
+  getDataVal(dataID) {
+    if (this.tracked[this.goal] && this.tracked[this.goal][dataID] && (typeof this.tracked[this.goal][dataID] !== typeof {})) {
+      return this.tracked[this.goal][dataID];
+    } else {
+      return null;
+    }
+  }
+
+  getDataStart(dataID) {
+    if (this.tracked[this.goal] && this.tracked[this.goal][dataID] && (typeof this.tracked[this.goal][dataID] === typeof {})) {
+      return this.tracked[this.goal][dataID]['start'];
+    } else {
+      return null;
+    }
+  }
+
+  getDataEnd(dataID) {
+    if (this.tracked[this.goal] && this.tracked[this.goal][dataID] && (typeof this.tracked[this.goal][dataID] === typeof {})) {
+      return this.tracked[this.goal][dataID]['end'];
+    } else {
+      return null;
+    }
+  }
+
+  changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
+              dataType: string) {
+    if (dataType === 'quickTracker') {
+      dataType = data.dataType;
+    }
+    if (!this.tracked.hasOwnProperty(dataType)) {
+      this.tracked[dataType] = {};
+    }
+    if (componentEvent.dataVal) {
       this.tracked[dataType][data.id] = componentEvent.dataVal;
     }
-    if(componentEvent.dataStart){
-      if(!this.durationItemStart[dataType]) this.durationItemStart[dataType] = {};
-      this.durationItemStart[dataType][data.id] = componentEvent.dataStart;
+    if (componentEvent.dataStart) {
+      if (!this.tracked[dataType].hasOwnProperty(data.id)) {
+        this.tracked[dataType][data.id] = {};
+      }
+      this.tracked[dataType][data.id]['start'] = componentEvent.dataStart;
     }
-    if(componentEvent.dataEnd){
-      if(!this.durationItemEnd[dataType]) this.durationItemEnd[dataType] = {};
-      this.durationItemEnd[dataType][data.id] = componentEvent.dataEnd;
+    if (componentEvent.dataEnd) {
+      if (!this.tracked[dataType].hasOwnProperty(data.id)) {
+        this.tracked[dataType][data.id] = {};
+      }
+      this.tracked[dataType][data.id]['end'] = componentEvent.dataEnd;
     }
-    this.saved = false;
-
-    console.log("!!!!!!!!!!!!!!");
-    console.log(this.dataToTrack);
   }
+
+
 
   formatForCalendar(event){ // call when we push to couch ...
     let startAndEndDates = this.dateFunctionsProvider.getStartAndEndDatesForCalendar();
@@ -137,20 +177,18 @@ export class TrackingPage {
 
   goalProgress(data : {[dataProps : string] : any}, dataType :string){
     let timesTracked = this.totalTrackedTimes(data, dataType);
-    if(timesTracked > data.goal.threshold){
+    if (timesTracked > data.goal.threshold) {
       if(data.goal.freq === 'More'){
         return 'met';
       }
       return 'over'
-    }
-    else if(timesTracked === data.goal.threshold){
+    } else if(timesTracked === data.goal.threshold){
       if(data.goal.freq === 'More'){
         return 'met';
       }
       return 'at limit';
-    }
-    else{
-      if(data.goal.freq === 'More'){
+    } else {
+      if (data.goal.freq === 'More') {
         return 'under';
       }
       return 'below limit';
@@ -158,21 +196,21 @@ export class TrackingPage {
   }
 
   totalTrackedTimes(data: {[dataProps : string] : any}, dataType : string) : Number{
-    if(dataType === 'quickTracker') dataType = data.dataType;
+    if (dataType === 'quickTracker') dataType = data.dataType;
     let timesSoFar = this.goalProgresses[dataType] ? this.goalProgresses[dataType][data.id] : 0;
-    if (data.id === 'frequentMedUse'){ // we pull from the 'treatments' dict!
+    if (data.id === 'frequentMedUse') { // we pull from the 'treatments' dict!
       timesSoFar += (this.trackedMeds() ? 1 : 0);
-    }
-    else if(this.tracked[dataType] && this.tracked[dataType][data.id]) {
+    } else if (this.tracked[dataType] && this.tracked[dataType][data.id]) {
       if (data.field === 'number') {
         timesSoFar += Number(this.tracked[dataType][data.id]);
-      }
-      else if (data.field !== 'binary' || this.tracked[dataType][data.id] === 'Yes') {
+      } else if (data.field !== 'binary' || this.tracked[dataType][data.id] === 'Yes') {
         timesSoFar += 1;
       }
     }
     return timesSoFar;
   }
+
+
 
   // calculateGoalProgresses() { // todo: rename, since we do the dataToTrack work here too...
   //   for(let i=0; i<this.dataTypes.length; i++){
@@ -197,5 +235,4 @@ export class TrackingPage {
   //   }
   // }
 
-    // ================= Goal Data Ends =================
 }

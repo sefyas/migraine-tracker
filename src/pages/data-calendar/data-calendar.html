@@ -24,8 +24,6 @@
 
   </div>
 
-
-
   <ng-template #template let-view="view" let-row="row" let-col="col">
     <div class="calendar-event-inner" [ngClass]="getClass(view.dates[row*7+col])">
       {{view.dates[row*7+col].label}}

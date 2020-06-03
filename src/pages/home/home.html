@@ -1,6 +1,6 @@
 <ion-header>
-  <ion-navbar text-right>
-    <button ion-button menuToggle icon-only>
+  <ion-navbar text-right hideBackButton>
+    <button ion-button menuToggle show icon-only>
       <ion-icon name="menu"></ion-icon>
     </button>
     <span id="title" class="header-title-right">Home</span>
@@ -21,44 +21,46 @@
   </ion-card>
 
   <ion-content padding text-center>
-    <ion-calendar *ngIf="activeGoals !== null" #calendar (onDaySelect)="onDaySelect($event)"></ion-calendar>
+    <ion-calendar #calendar *ngIf="activeGoals !== null" [dateSelected]="dateSelected" (onDaySelect)="onDaySelect($event)"></ion-calendar>
 
     <ng-container *ngFor="let dataType of dataTypes">
 
       <ion-card *ngIf="dataType === 'quickTracker'">
         <div class="center">
           <ion-card-content *ngIf="cardExpanded[dataType] || dataType === 'quickTracker'">
-            <ng-container *ngFor=" let data of dataToTrack[dataType]">
-                <h2 class="dataName">{{data.name}}</h2>
+            <ng-container *ngFor=" let data of dataToTrack[dataType]" text-center>
+                <h2 class="data-name">{{data.name}}</h2>
 
-                <data-element-tracking [data]="data" [trackedMedsToday] = trackedMeds() (valueChanged) = 'changeVals($event, data, dataType)'>
-                </data-element-tracking>
+                <data-element-tracking [data]="data" [trackedMedsToday] = trackedMeds()
+                (valueChanged) = 'changeVals($event, data, dataType)'></data-element-tracking>
 
-                <div class="goalDiv" *ngIf="data.goal && data.goal.freq && dataType !== 'Symptom' ">
-                  <div>
-                    Goal: {{data.goal.freq}} than <span text-lowercase>{{data.goal.threshold}}
-                    per {{data.goal.timespan}}</span>
-                  </div>
-                  <div *ngIf="data.goal.timespan!=='Day'">
-                    Total this <span text-lowercase>{{data.goal.timespan}}</span> (including today):
-                    {{totalTrackedTimes(data, dataType)}}
-                  </div>
+                <div class="limit-wrapper" *ngIf="data.goal && data.goal.freq && dataType !== 'Symptom' ">
+                    <div class="limit-info-message" *ngIf="data.goal.timespan!=='Day'">
+                        Total / goal :
+                        <p class="limit-value" [class.goal-ok]="goalProgress(data, dataType) === 'at limit' ||
+                            goalProgress(data, dataType) === 'under'"
+                            [class.goal-met]="goalProgress(data, dataType) === 'met' ||
+                            goalProgress(data, dataType) === 'below limit'"
+                            [class.goal-over]="goalProgress(data, dataType) === 'over'">
+                            {{totalTrackedTimes(data, dataType)}}</p> / <p class="limit-value goal-info">{{data.goal.threshold}}</p>
+                        per {{data.goal.timespan.toLowerCase()}}
+                    </div>
 
-                  <div class="goalMet" *ngIf="goalProgress(data, dataType) === 'met'">
-                    You met your goal!
-                  </div>
-                  <div class="goalMet" *ngIf="goalProgress(data, dataType) === 'below limit'">
-                    You're under your limit!
-                  </div>
-                  <div class="goalOK" *ngIf="goalProgress(data, dataType) === 'under'">
-                    Keep going!
-                  </div>
-                  <div class="overGoal" *ngIf="goalProgress(data, dataType) === 'over'">
-                    Try to cut back!
-                  </div>
-                  <div class="goalOK" *ngIf="goalProgress(data, dataType) === 'at limit'">
-                    You're at your limit!
-                  </div>
+                    <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, dataType) === 'met'">
+                        You met your goal!
+                    </div>
+                    <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, dataType) === 'below limit'">
+                        You're under your limit!
+                    </div>
+                    <div class="goal-ok limit-warning-message" *ngIf="goalProgress(data, dataType) === 'at limit'">
+                        You're at your limit!
+                    </div>
+                    <div class="goal-ok limit-warning-message" *ngIf="goalProgress(data, dataType) === 'under'">
+                        Keep going!
+                    </div>
+                    <div class="goal-over limit-warning-message" *ngIf="goalProgress(data, dataType) === 'over'">
+                        Try to cut back!
+                    </div>
                 </div>
             </ng-container>
           </ion-card-content>
@@ -67,9 +69,9 @@
 
       <ion-card *ngIf="dataType !== 'quickTracker' && dataList[dataType] !== ''">
         <ion-card-header class="goal-card" (click)="onClickTrackGoal(dataType)">
-          <span class="headerItem trackingHeader">Track {{dataType}} Data</span>
+          <span class="headerItem tracking-header">Track {{dataType}} Data</span>
           <img class="goal-icon" [src]="'../../assets/pages/' + dataType.toLowerCase() + '_icon.svg' " alt="">
-          <div class="dataExamples">
+          <div class="data-examples">
             <span>{{dataList[dataType]}}</span>
           </div>
         </ion-card-header>
@@ -78,20 +80,3 @@
     </ng-container>
   </ion-content>
 </ion-content>
-
-
-<!--  <ng-container *ngFor="let dataType of dataTypes">-->
-<!--      <ion-card *ngIf="dataType !== 'quickTracker' && dataList[dataType] !== ''">-->
-<!--        <ion-card-header class="goal-card" (click)="trackGoal(dataType)">-->
-<!--            <span class="headerItem trackingHeader">Track {{dataType}} Data</span>-->
-<!--            <img class="goal-icon" [src]="'../../assets/pages/' + dataType.toLowerCase() + '_icon.svg' " alt="">-->
-<!--            <div class="dataExamples">-->
-<!--              <span>{{dataList[dataType]}}</span>-->
-<!--            </div>-->
-<!--        </ion-card-header>-->
-<!--    </ion-card>-->
-<!--  </ng-container>-->
-
-<!--  <button class="button" [disabled]="saved" ion-button full icon-start (click)="saveTrackedData()">Save</button>-->
-
-

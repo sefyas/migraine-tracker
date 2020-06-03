@@ -75,9 +75,18 @@ export class CouchDbServiceProvider {
     return current_session.userCtx.name === credentials['username'];
   }
 
+  // // Initialize the user info document for the new user
+  // initializeUserInfoDoc(username) {
+  //   this.db.put({_id: "user-info", register_time: new Date(), username: username, current_configured_routine_id: 0,
+  //     current_track_date: CouchDbServiceProvider.getDate(), break: 0}, function(err, response) {
+  //     if (err) { return console.log(err); }
+  //   });
+  // }
+
   // Initialize the user info document for the new user
   initializeUserInfoDoc(username) {
-    this.db.put({_id: "user-info", register_time: new Date(), username: username, current_configured_routine_id: 0, break: 0}, function(err, response) {
+    this.db.put({_id: "user-info", register_time: new Date(), username: username, current_configured_routine_id: 0,
+      break: 0}, function(err, response) {
       if (err) { return console.log(err); }
     });
   }
@@ -170,16 +179,29 @@ export class CouchDbServiceProvider {
   }
 
   // get the tracked data doc id
-  static getTrackedDataDocID() {
-    var date = CouchDbServiceProvider.getDate();
-    return 'tracked-data-' + date[2] + "-" + date[1] + "-" + date[0];
+  static getTrackedDataDocID(date) {
+    return 'tracked-data-' + date[2] + "-" + (date[1] + 1) + "-" + date[0];
   }
 
-   // Log tracked data to the database
-  async logTrackedData(trackedData) {
-    var doc_id = CouchDbServiceProvider.getTrackedDataDocID();
+  // merge the old and new tracked data
+  static combineTrackedData(oldData, newData) {
+    for (let goal in newData) {
+      if (!oldData.hasOwnProperty(goal)) {
+        oldData[goal] = {};
+      }
+      for (let data in newData[goal]) {
+        oldData[goal][data] = newData[goal][data];
+      }
+    }
+    return oldData;
+  }
+
+  // Log tracked data to the database
+  async logTrackedData(trackedData, date) {
+    var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
     try {
       var doc = await this.db.get(doc_id);
+      trackedData = CouchDbServiceProvider.combineTrackedData(doc.tracked_data,trackedData);
       var response = await this.db.put({
         _id: doc_id,
         _rev: doc._rev,
@@ -196,35 +218,87 @@ export class CouchDbServiceProvider {
     }
   }
 
+  // Get the current configured routine
+  async getTrackedData(date) {
+    var trackedDataDocID = CouchDbServiceProvider.getTrackedDataDocID(date);
+    try {
+      var trackedDataDoc = await this.db.get(trackedDataDocID);
+      return trackedDataDoc['tracked_data'];
+    } catch (err) {
+      console.log(err);
+      return {};
+    }
+  }
 
 
-
-
-
-
-
+  // // Get the current track date from the user info doc in the database
+  // async getCurrentTrackDate() {
+  //   try {
+  //     var doc = await this.db.get('user-info');
+  //     return doc['current_track_date'];
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
+  //
+  // // Set the current track date
+  // async setCurrentTrackDate(current_track_date) {
+  //   try {
+  //     var doc = await this.db.get('user-info');
+  //     var response = await this.db.put({
+  //       _id: 'user-info',
+  //       _rev: doc._rev,
+  //       register_time: doc.register_time,
+  //       username: doc.username,
+  //       current_configured_routine_id: doc.current_configured_routine_id,
+  //       current_track_date: current_track_date,
+  //       break: doc.break,
+  //     });
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
 
 
   // ============================================= Old =============================================
 
 
 
-  getTrackedData(): DataReport[] {
-    console.log("!!!!!!!!!!!!!! getTrackedData !!!!!!!!!!!!!");
+  // getTrackedData(): DataReport[] {
+  //
+  // }
 
-    if(!this.seenConfig) {
-      return [];
-    }
-    console.log(this.trackedData);
-    if(this.trackedData.length > 0){
-      return this.trackedData;
-    }
-    else{
-      return this.getExamplePreviouslyTracked();
-      // return [];
-    }
-  }
 
+  // // Get the current configured routine
+  // async getPreviousTrackedData() : DataReport[] {
+  //   // var trackedDataDocID = CouchDbServiceProvider.getTrackedDataDocID();
+  //   // try {
+  //   //   var trackedDataDoc = await this.db.get(trackedDataDocID);
+  //   //   return trackedDataDoc['tracked_data'];
+  //   // } catch (err) {
+  //   //   console.log(err);
+  //   //   return {};
+  //   // }
+  //   // // if (this.currentConfiguredRoutine) {
+  //   // //   return this.currentConfiguredRoutine;
+  //   // // }
+  //
+  //   console.log("!!!!!!!!!!!!!! getTrackedData !!!!!!!!!!!!!");
+  //
+  //   if(!this.seenConfig) {
+  //     return [];
+  //   }
+  //   console.log(this.trackedData);
+  //   if(this.trackedData.length > 0){
+  //     return this.trackedData;
+  //   }
+  //   else{
+  //     return this.getExamplePreviouslyTracked();
+  //     // return [];
+  //   }
+  //
+  //
+  // }
 
 
 

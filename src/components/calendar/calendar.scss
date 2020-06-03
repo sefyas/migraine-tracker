@@ -19,7 +19,7 @@ ion-calendar {
     .not-this-month {
       color: var(--navbar-background-color);
       font-weight: bold;
-
+      //visibility: hidden;
     }
     .today {
       color: var(--info-theme);
@@ -31,6 +31,13 @@ ion-calendar {
       font-weight: bold;
       border-radius: 6pt;
       border: white;
+    }
+    .select-disabled {
+      color: var(--ion-background-color);
+      background: none;
+      font-weight: bold;
+      border-radius: 6pt;
+      //border: white;
     }
   }
 

@@ -34,6 +34,8 @@ export class SelectTrackingFrequencyPage {
   private recommended : string = "retroactive";
   private postSymptomInfoDisplayed : any = false;
   private regularInfoDisplayed : any = false;
+  days : number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+    25, 26, 27, 28, 29, 30, 31];
 
   @ViewChild('weekdayPicker') weekdayPicker;
 
@@ -160,7 +162,22 @@ export class SelectTrackingFrequencyPage {
     }
   }
 
+  canContinue() {
+    if (this.notificationData['retroactive']) {
+      if (!this.notificationData['retroactive']['delayNum']) return false;
+      if (!this.notificationData['retroactive']['delayScale']) return false;
+    }
 
+    if (this.notificationData['regular']) {
+      if (!this.notificationData['regular']['timescale']) return false;
+      if (!this.notificationData['regular']['timeOfDay']) return false;
+      if (this.notificationData['regular']['timescale']==='Monthly' &&
+          !this.notificationData['regular']['dayOfMonth']) return false;
+      if(this.notificationData['regular']['timescale']==='Weekly' &&
+          !this.notificationData['regular']['dayOfWeek']) return false;
+    }
+    return true;
+  }
 
 
 
@@ -208,24 +225,7 @@ export class SelectTrackingFrequencyPage {
   // }
   //
   //
-  // canContinue() {
-  //   if (this.notificationData['retroactive']) {
-  //     if (!this.notificationData['retroactive']['delayNum']) return false;
-  //     if (!this.notificationData['retroactive']['delayScale']) return false;
-  //   }
-  //
-  //   if (this.notificationData['regular']) {
-  //     if (!this.notificationData['regular']['timescale']) return false;
-  //     if (!this.notificationData['regular']['timeOfDay']) return false;
-  //     if (this.notificationData['regular']['timescale']==='Monthly' &&
-  //             (!this.notificationData['regular']['dayOfMonth'] ||
-  //               this.notificationData['regular']['dayOfMonth'].length === 0)) return false;
-  //     if(this.notificationData['regular']['timescale']==='Weekly' &&
-  //             (!this.notificationData['regular']['dayOfWeek'] ||
-  //               this.notificationData['regular']['dayOfWeek'].length === 0)) return false;
-  //   }
-  //   return true;
-  // }
+
 
 
 }

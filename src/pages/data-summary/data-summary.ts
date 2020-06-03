@@ -39,7 +39,7 @@ export class DataSummaryPage {
   }
 
   setDataTypes(){
-    this.allTrackedData = this.couchDBService.getTrackedData();
+    // this.allTrackedData = this.couchDBService.getTrackedData();
     this.currentlyTracking = this.couchDBService.getConfiguredRoutine()['dataToTrack'];
     let allDataTypes = Object.keys(this.currentlyTracking);
     console.log(this.currentlyTracking)

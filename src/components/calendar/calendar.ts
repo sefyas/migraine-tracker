@@ -1,4 +1,5 @@
 // Reference: https://github.com/laker007/ionic3-calendar
+// Author: Liwei Jiang
 
 import {Component, Output, EventEmitter, Input} from '@angular/core';
 import * as moment from 'moment';
@@ -10,57 +11,43 @@ import * as _ from "lodash";
 })
 
 export class Calendar {
-    @Output() onDaySelect = new EventEmitter<dateObj>();
-    @Input() isExpandCalendar: boolean;
+    @Output() onDaySelect = new EventEmitter<any>();
+    @Input() dateSelected: number[];
 
-    currentYear: number;
-    currentMonth: number;
-    currentDate: number;
-    currentDay: number;
-    displayYear: number;
-    displayMonth: number;
-    selectedDateText: string;
-    selectedDate: any;
-
+    displayDate : any = {};
+    currentDate: any = {};
+    displayDateText: string;
     dateArray: Array<dateObj> = []; // data for the current month
     weekArray = []; // weekly data (data per rows)
-    lastSelect: number = 0; // last click
+    lastSelect: number = 0; // last click index
+    isExpandCalendar: boolean;
     weekHead: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     monthNames: string[] = ["January", "February", "March", "April", "May", "June", "July",
       "August", "September", "October", "November", "December"];
 
     constructor() {
-        this.currentYear = moment().year();
-        this.currentMonth = moment().month();
-        this.currentDate = moment().date();
-        this.currentDay = moment().day();
+        this.currentDate = {'date': moment().date(), 'month': moment().month(), 'year': moment().year()};
         this.isExpandCalendar = false;
-        this.selectedDateText = (this.currentMonth + 1) + "/" + this.currentDate + "/" + this.currentYear.toString();
-        this.selectedDate = {'isToday': true}
     }
 
     ngOnInit() {
-        this.today()
+        this.initCalendar(this.dateSelected);
+        this.displayDateText = (this.displayDate['month'] + 1) + "/" + this.displayDate['date'] + "/" + this.displayDate['year'];
+        this.displayDate['isToday'] = false;
     }
 
-    // select today
-    today() {
-        this.displayYear = this.currentYear;
-        this.displayMonth = this.currentMonth;
-        this.createMonth(this.currentYear, this.currentMonth);
-
-        // mark today as selected
-        let todayIndex = _.findIndex(this.dateArray, {
-            year: this.currentYear,
-            month: this.currentMonth,
-            date: this.currentDate,
-            isThisMonth: true
+    initCalendar(dateSelected) {
+        this.displayDate = {'date': dateSelected[0], 'month': dateSelected[1], 'year': dateSelected[2]};
+        this.createMonth(this.displayDate['year'], this.displayDate['month']);
+        let selectedIndex = _.findIndex(this.dateArray, {
+            year: this.displayDate['year'],
+            month: this.displayDate['month'],
+            date: this.displayDate['date'],
         });
-        this.lastSelect = todayIndex;
-        this.dateArray[todayIndex].isSelect = true;
-
-        this.onDaySelect.emit(this.dateArray[todayIndex]);
+        this.lastSelect = selectedIndex;
+        this.dateArray[selectedIndex].isSelect = true;
     }
+
 
     createMonth(year: number, month: number) {
         this.dateArray = []; // dump last month's data
@@ -103,7 +90,6 @@ export class Calendar {
                         isSelect: false,
                     })
                 }
-
             }
         }
 
@@ -119,17 +105,17 @@ export class Calendar {
             })
         }
 
-        if (this.currentYear === year && this.currentMonth === month) {
+        if (this.currentDate['year'] === year && this.currentDate['month'] === month) {
             let todayIndex = _.findIndex(this.dateArray, {
-                year: this.currentYear,
-                month: this.currentMonth,
-                date: this.currentDate,
+                year: this.currentDate['year'],
+                month: this.currentDate['month'],
+                date: this.currentDate['date'],
                 isThisMonth: true
             });
             this.dateArray[todayIndex].isToday = true;
         }
 
-        // add next month's data. either 5 or 6 weeks
+        // add next month's data. either 5 or 6 weekss
         if (this.dateArray.length % 7 !== 0) {
             let nextMonthAdd = 7 - this.dateArray.length % 7
             for (let i = 0; i < nextMonthAdd; i++) {
@@ -169,40 +155,37 @@ export class Calendar {
 
     back() {
         // deal with cross-year case
-        if (this.displayMonth === 0) {
-            this.displayYear--;
-            this.displayMonth = 11;
+        if (this.displayDate['month'] === 0) {
+            this.displayDate['year']--;
+            this.displayDate['month'] = 11;
         } else {
-            this.displayMonth--;
+            this.displayDate['month']--;
         }
-        this.createMonth(this.displayYear, this.displayMonth);
+        this.createMonth(this.displayDate['year'], this.displayDate['month']);
     }
-
 
     forward() {
         // deal with cross-year case
-        if (this.displayMonth === 11) {
-            this.displayYear++;
-            this.displayMonth = 0;
+        if (this.displayDate['month'] === 11) {
+            this.displayDate['year']++;
+            this.displayDate['month'] = 0;
         } else {
-            this.displayMonth++;
+            this.displayDate['month']++;
         }
-        this.createMonth(this.displayYear, this.displayMonth);
+        this.createMonth(this.displayDate['year'], this.displayDate['month']);
     }
 
     // select a day
     daySelect(day, i, j) {
-        // first, dump previous data
-        this.dateArray[this.lastSelect].isSelect = false;
-        // save the selected day
-        this.lastSelect = i * 7 + j;
-        this.dateArray[i * 7 + j].isSelect = true;
-        this.selectedDateText = day['month'] + "/" + day['date'] + "/" + day['year'].toString();
-        this.selectedDate = day;
-
-        this.onDaySelect.emit(day);
-        // console.log("~~~~~~~~~");
-        // console.log(day);
+        if (!((day['year'] === this.currentDate['year'] && day['month'] === this.currentDate['month'] &&
+            day['date'] > this.currentDate['date']) || !day['isThisMonth'])) {
+            this.dateArray[this.lastSelect].isSelect = false;
+            this.lastSelect = i * 7 + j;
+            this.dateArray[i * 7 + j].isSelect = true;
+            this.displayDateText = (day['month'] + 1) + "/" + day['date'] + "/" + day['year'];
+            this.displayDate = day;
+            this.onDaySelect.emit([day['date'], day['month'], day['year']]);
+        }
     }
 
     expandCalendar() {

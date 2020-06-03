@@ -2,8 +2,8 @@
   <ion-card-content>
     <button class="calendar-btn" (click)="expandCalendar()">
       <ion-icon name="custom-calendar" class="calendar-icon"></ion-icon>
-      <label *ngIf="selectedDate.isToday">Today</label>
-      <label *ngIf="!selectedDate.isToday">{{selectedDateText}}</label>
+      <label *ngIf="displayDate.isToday">Today</label>
+      <label *ngIf="!displayDate.isToday">{{displayDateText}}</label>
       <label *ngIf="!isExpandCalendar" class="calendar-label">Change Date</label>
       <label *ngIf="isExpandCalendar" class="calendar-label">Hide Calendar</label>
     </button>
@@ -17,9 +17,9 @@
               <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
           </ion-col>
           <ion-col class="calendar-title" col-auto>
-              <div>{{monthNames[displayMonth]}} {{displayYear}}</div>
+              <div>{{monthNames[displayDate['month']]}} {{displayDate['year']}}</div>
           </ion-col>
-          <ion-col col-auto (click)="forward()">
+          <ion-col col-auto (click)="forward()" *ngIf="displayDate['month'] !== currentDate['month']">
               <ion-icon ios="ios-arrow-forward" md="md-arrow-forward"></ion-icon>
           </ion-col>
       </ion-row>
@@ -27,11 +27,13 @@
           <ion-col class="center calendar-header-col" *ngFor="let head of weekHead">{{head}}</ion-col>
       </ion-row>
       <ion-row class="calendar-row" *ngFor="let week of weekArray; let i = index">
-        <ion-col class="center calendar-col" (click)="daySelect(day,i,j)"
-          *ngFor="let day of week; let j = index"
-          [ngClass]="[day['isThisMonth']?'this-month':'not-this-month',
-                      day['isToday']?'today':'',
-                      day['isSelect']?'select':'']">
+        <ion-col class="center calendar-col" (click)="daySelect(day, i, j)"
+                 *ngFor="let day of week; let j = index"
+                 [ngClass]="[day['isThisMonth'] ? 'this-month' : 'not-this-month',
+                 day['isToday'] ? 'today' : '',
+                 day['isSelect'] ? 'select' : '',
+                 day['year'] === currentDate['year'] && day['month'] === currentDate['month'] &&
+                 day['date'] > currentDate['date'] ? 'not-this-month' : 'this-month']">
           {{day['date']}}
         </ion-col>
       </ion-row>

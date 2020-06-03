@@ -7,6 +7,7 @@ data-element-tracking {
     margin-left: 15pt;
     margin-right: 15pt;
     font-weight: bold;
+    font-size: 12pt;
   }
 
   .number-box {
@@ -29,12 +30,14 @@ data-element-tracking {
   }
 
   .category-btn {
-    background: rgba(255, 255, 255, 0.25);
+    width: 82px;
+    border: 1px solid white;
+    font-weight: bold;
     border-radius: 10px;
-    border: none;
     height: 40px;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    font-size: 12pt;
   }
 
   .num-range {
@@ -78,5 +81,25 @@ data-element-tracking {
     padding-left: 20px;
     padding-right: 20px;
     margin-bottom: 10px;
+  }
+
+  .date-range-picker-wrapper {
+    border: solid 1px white;
+    border-radius: 15px;
+    width: 130px;
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+    height: 45px;
+    font-size: 12pt;
+    background: none;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0;
+  }
+
+  .item-ios {
+    text-align: center;
+    vertical-align: middle;
   }
 }

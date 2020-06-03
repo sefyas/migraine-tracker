@@ -25,7 +25,7 @@
       <ion-icon class="goal-expanded-icon" item-right *ngIf="!faqSection['expanded']" name="custom-expand"></ion-icon>
     </ion-card-header>
 
-    <ion-card-content class="faq-card" *ngIf="faqSection['expanded']">
+    <ion-card-content class="faq-card" *ngIf="faqSection['expanded']" text-left>
       <ion-list no-lines>
         <ng-container *ngFor="let question of faqSection['questions']" >
           <ion-item class="question" (click)="question['expanded'] = !question['expanded']">
