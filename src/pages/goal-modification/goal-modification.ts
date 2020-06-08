@@ -4,8 +4,6 @@ import {CouchDbServiceProvider} from "../../providers/couch-db-service/couch-db-
 import {GoalTypePage} from "../addGoal/goal-type/goal-type";
 import {GlobalFunctionsServiceProvider} from "../../providers/global-functions-service/global-functions-service";
 
-
-
 @Component({
   selector: 'page-goal-modification',
   templateUrl: 'goal-modification.html',
@@ -20,30 +18,27 @@ export class GoalModificationPage {
               public globalFunctionsService: GlobalFunctionsServiceProvider) {
   }
 
-  ionViewDidLoad() {
-    if(this.navParams.data.goalsOnly){ // we changed the goals but not the tracking routine
+  async ionViewDidLoad() {
+    if (this.navParams.data.goalsOnly) { // we changed the goals but not the tracking routine
       this.textGoals = this.navParams.data.textGoals;
       this.goalHierarchy = this.globalFunctionsService.getGoalHierarchy(this.navParams.data.goalIDs);
       this.goalTypes = Object.keys(this.goalHierarchy);
-      this.couchDBService.modifyGoals(this.navParams.data);
-    }
-    else{
+      this.couchDBService.logConfiguredRoutine(this.navParams.data);
+      console.log("this.navParams.data ############");
+      console.log(this.navParams.data);
+    } else {
       let activeGoals;
-      if(this.navParams.data.configPath){ //we changed the goals AND routine todo: notification stuff
+      if (this.navParams.data.configPath) {
         activeGoals = this.couchDBService.addGoalFromSetup(this.navParams.data);
+      } else {
+        activeGoals = await this.couchDBService.getConfiguredRoutine();
       }
-      else{ // we're just coming from the menu
-        activeGoals = this.couchDBService.getConfiguredRoutine();
-      }
-      this.textGoals = activeGoals.textGoals;
       this.goalHierarchy = this.globalFunctionsService.getGoalHierarchy(activeGoals.goals);
       this.goalTypes = Object.keys(this.goalHierarchy);
     }
   }
 
   addGoal() {
-    this.navCtrl.push(GoalTypePage, {'modifying':true});
-
+    this.navCtrl.push(GoalTypePage, {'modifying':true}, {animate: false});
   }
-
 }

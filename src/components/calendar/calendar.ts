@@ -33,7 +33,7 @@ export class Calendar {
     ngOnInit() {
         this.initCalendar(this.dateSelected);
         this.displayDateText = (this.displayDate['month'] + 1) + "/" + this.displayDate['date'] + "/" + this.displayDate['year'];
-        this.displayDate['isToday'] = false;
+        this.displayDate['isToday'] = this.isToday();
     }
 
     initCalendar(dateSelected) {
@@ -48,6 +48,11 @@ export class Calendar {
         this.dateArray[selectedIndex].isSelect = true;
     }
 
+    isToday() {
+        return this.displayDate['date'] === this.currentDate['date'] &&
+            this.displayDate['month'] === this.currentDate['month'] &&
+            this.displayDate['year'] === this.currentDate['year'];
+    }
 
     createMonth(year: number, month: number) {
         this.dateArray = []; // dump last month's data

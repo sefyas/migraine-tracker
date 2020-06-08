@@ -3,9 +3,10 @@ import { ModalController, NavController, NavParams, ViewController } from 'ionic
 import { DataDetailsServiceProvider } from "../../../providers/data-details-service/data-details-service";
 import { SelectTrackingFrequencyPage } from "../select-tracking-frequency/select-tracking-frequency";
 import { EditDataPage } from "../edit-data/edit-data";
-import { CouchDbServiceProvider } from "../../../providers/couch-db-service/couch-db-service";
 import * as moment from 'moment';
+import { GoalModificationPage } from "../../goal-modification/goal-modification";
 import { DataElement, DataType } from "../../../interfaces/customTypes";
+import {CouchDbServiceProvider} from "../../../providers/couch-db-service/couch-db-service";
 
 @Component({
   selector: 'page-data-config',
@@ -29,18 +30,20 @@ export class DataConfigPage {
   private recommendExpanded : boolean = true;
   private commonExpanded : boolean = false;
   private selectedConfigData : string[];
+  private modifying : boolean;
 
   constructor(public navCtrl: NavController,
               public navParams: NavParams,
               public viewCtrl: ViewController,
+              private couchDbService: CouchDbServiceProvider,
               public dataDetailsServiceProvider: DataDetailsServiceProvider,
-              public modalCtrl: ModalController,
-              private couchDbService: CouchDbServiceProvider) {
-    let activeGoals = this.couchDbService.getConfiguredRoutine();
+              public modalCtrl: ModalController) {
+    this.modifying = this.navParams.data['modifying'];
+    let configuredRoutine = this.navParams.data['configuredRoutine'];
     let alreadyTracking = {};
-    if (activeGoals !== null) {
-      alreadyTracking = activeGoals['dataToTrack'] ? activeGoals['dataToTrack'] : {};
-      this.allGoals = activeGoals['goals'] ? activeGoals['goals'] : [];
+    if (configuredRoutine !== null) {
+      alreadyTracking = configuredRoutine['dataToTrack'] ? configuredRoutine['dataToTrack'] : {};
+      this.allGoals = configuredRoutine['goals'] ? configuredRoutine['goals'] : [];
     }
 
     if (this.navParams.data['goalIDs']) { // got here via adding a goal
@@ -56,11 +59,16 @@ export class DataConfigPage {
     this.getAllRecs(alreadyTracking);
 
     this.selectedConfigData = this.navParams.data['selectedConfigData'];
-    this.workoutProgress = Math.min( ( (this.selectedConfigData.indexOf(this.navParams.data['dataPage']) + 1)
-        / (this.selectedConfigData.length + 1) * 100), 100).toString() + '%';
+    if (!this.modifying) {
+      this.workoutProgress = Math.min( ( (this.selectedConfigData.indexOf(this.navParams.data['dataPage']) + 1)
+          / (this.selectedConfigData.length + 1) * 100), 100).toString() + '%';
+    } else {
+      this.workoutProgress = Math.min( ( (this.selectedConfigData.indexOf(this.navParams.data['dataPage']) + 1)
+          / this.selectedConfigData.length * 100), 100).toString() + '%';
+    }
   }
 
-  ionViewDidLoad() {
+  async ionViewDidLoad() {
 
   }
 
@@ -96,10 +104,12 @@ export class DataConfigPage {
       if (configData !== null) {
         this.navParams.data['dataPage'] = configData;
         this.navCtrl.push(DataConfigPage, this.navParams.data, {animate: false});
-      } else {
-        delete this.navParams.data['dataPage'];
-        this.navCtrl.push(SelectTrackingFrequencyPage, this.navParams.data, {animate: false});
-      }
+        } else if (configData === null && !this.modifying) {
+          delete this.navParams.data['dataPage'];
+          this.navCtrl.push(SelectTrackingFrequencyPage, this.navParams.data, {animate: false});
+        } else if (configData === null && this.modifying) {
+        this.navCtrl.setRoot(GoalModificationPage, this.navParams.data);
+        }
     } else {
       this.viewCtrl.dismiss({'selected': selectedData, 'quickTrackers': quickTrackers});
     }
@@ -176,9 +186,10 @@ export class DataConfigPage {
     }
 
     let dataToSend = {'data': oldDataCopy,
-        'dataType': this.dataObject.dataType,
-        'selectedGoals': this.allGoals,
-        'allowsDataGoals': this.dataObject.dataGoals};
+      'dataType': this.dataObject.dataType,
+      'selectedGoals': this.allGoals,
+      'allowsDataGoals': this.dataObject.dataGoals,
+      'modifying': this.navParams.data['modifying']};
 
     let editDataModal = this.modalCtrl.create(EditDataPage, dataToSend,
         {showBackdrop: true, cssClass: 'modal-fullscreen' });

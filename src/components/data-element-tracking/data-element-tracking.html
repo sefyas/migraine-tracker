@@ -41,7 +41,7 @@
 <ng-container class="time-wrapper" text-wrap *ngIf="data.field === 'time'" text-center>
     <div class="center">
         <ion-item class="date-picker">
-            <ion-datetime displayFormat="h:mm a" placeholder="Select Time" pickerFormat="h:mm a"
+            <ion-datetime displayFormat="h:mm a" placeholder="Select Time" pickerFormat="H:mm"
             (ngModelChange)="itemTracked($event,'val')" [(ngModel)]="dataVal"></ion-datetime>
         </ion-item>
     </div>
@@ -58,7 +58,7 @@
     <ion-row>
         <ion-col>
             <ion-item class="date-range-picker-wrapper">
-                <ion-datetime class="date-range-picker" displayFormat="h:mm a" placeholder="Start" pickerFormat="h:mm a"
+                <ion-datetime class="date-range-picker" displayFormat="H:mm" placeholder="Start" pickerFormat="H:mm"
                               [max]="dataEnd" (ngModelChange)="itemTracked($event,'start')" [(ngModel)]="dataStart">
                 </ion-datetime>
             </ion-item>
@@ -66,7 +66,7 @@
 
         <ion-col>
             <ion-item class="date-range-picker-wrapper">
-                <ion-datetime class="date-range-picker" displayFormat="h:mm a" placeholder="End" pickerFormat="h:mm a"
+                <ion-datetime class="date-range-picker" displayFormat="H:mm" placeholder="End" pickerFormat="H:mm"
                               [min]="dataStart" (ngModelChange)="itemTracked($event,'end')" [(ngModel)]="dataEnd">
                 </ion-datetime>
             </ion-item>

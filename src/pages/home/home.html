@@ -30,9 +30,10 @@
           <ion-card-content *ngIf="cardExpanded[dataType] || dataType === 'quickTracker'">
             <ng-container *ngFor=" let data of dataToTrack[dataType]" text-center>
                 <h2 class="data-name">{{data.name}}</h2>
-
-                <data-element-tracking [data]="data" [trackedMedsToday] = trackedMeds()
-                (valueChanged) = 'changeVals($event, data, dataType)'></data-element-tracking>
+                <data-element-tracking [data]="data" [dataVal]="getDataVal(data)"
+                                       [dataStart]="getDataStart(data)" [dataEnd]="getDataEnd(data)"
+                                       [trackedMedsToday] = getTrackedMeds() (valueChanged) = 'changeVals($event, data, dataType)'>
+                </data-element-tracking>
 
                 <div class="limit-wrapper" *ngIf="data.goal && data.goal.freq && dataType !== 'Symptom' ">
                     <div class="limit-info-message" *ngIf="data.goal.timespan!=='Day'">

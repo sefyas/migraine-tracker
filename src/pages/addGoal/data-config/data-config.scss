@@ -228,9 +228,15 @@ page-data-config {
   }
 
   .footer-button {
-    background: none;
     font-size: 8pt;
+    height: 30px;
+    border-radius: 8px;
+    background: none;
+    border: none;
     color: white;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-weight: bold;
   }
 
   .footer-text {
@@ -323,11 +329,39 @@ page-data-config {
     border: solid 1px white;
     border-radius: 10px;
     width: 200px;
-    margin-top: 10pt;
     margin-bottom: 10pt;
     height: 45px;
     font-size: 12pt;
     background: none;
     font-weight: bold;
+    vertical-align: middle;
+    justify-content: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .modify-footer-button {
+    height: 30px;
+    border-radius: 8px;
+    background: none;
+    border: solid 2px white;
+    color: white;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-weight: bold;
+  }
+
+  .modify-footer-wrapper {
+    height: 50px;
+    vertical-align: center;
+    justify-content: center;
+    background: var(--ion-background-color);
+    overflow-y:auto;
+    padding: 10px 10px 10px 10px;
+  }
+
+  .save-button {
+    background: var(--goal-theme);
+    border: solid 2px var(--goal-theme);
   }
 }

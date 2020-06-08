@@ -34,11 +34,11 @@ export class MyApp {
       this.pages = [
         { title: 'Home', component: HomePage},
         { title: 'About Migraine', component: FaqPage},
-        { title: 'Data Summary', component: DataSummaryPage},
-        { title: 'Data Calendar', component: DataCalendarPage},
-        { title: 'Data Visualizations', component: DataVisPage},
-        { title: 'Goals', component: GoalModificationPage},
-        { title: 'Tracking Routines', component: TrackingModificationPage},
+        // { title: 'Data Summary', component: DataSummaryPage},
+        // { title: 'Data Calendar', component: DataCalendarPage},
+        // { title: 'Data Visualizations', component: DataVisPage},
+        { title: 'Modify Goals', component: GoalModificationPage},
+        { title: 'Modify Tracking Routines', component: TrackingModificationPage},
         { title: 'Take a Break from Tracking', component: BreakFromTrackingPage},
       ];
     });
@@ -56,11 +56,11 @@ export class MyApp {
       this.pages = [
         { title: 'Home', component: HomePage},
         { title: 'About Migraine', component: FaqPage},
-        { title: 'Data Summary', component: DataSummaryPage},
-        { title: 'Data Calendar', component: DataCalendarPage},
-        { title: 'Data Visualizations', component: DataVisPage},
-        { title: 'Goals', component: GoalModificationPage},
-        { title: 'Tracking Routines', component: TrackingModificationPage},
+        // { title: 'Data Summary', component: DataSummaryPage},
+        // { title: 'Data Calendar', component: DataCalendarPage},
+        // { title: 'Data Visualizations', component: DataVisPage},
+        { title: 'Modify Goals', component: GoalModificationPage},
+        { title: 'Modify Tracking Routines', component: TrackingModificationPage},
         { title: 'Take a Break from Tracking', component: BreakFromTrackingPage},
       ];
     }

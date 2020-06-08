@@ -142,26 +142,15 @@
 
     </ion-card>
 
-
-<!--    <button class="submit-button" *ngIf="modifying" float-left ion-button (click)="continueSetup(true)"-->
-<!--            [disabled]="selectedGoals.length === 0">Save</button>-->
-
-<!--    <button class="submit-button" *ngIf="!modifying" float-right ion-button (click)="continueSetup()"-->
-<!--            [disabled]="selectedGoals.length === 0">Continue</button>-->
-
-<!--    <button class="submit-button" *ngIf="modifying" float-right ion-button (click)="continueSetup()"-->
-<!--            [disabled]="selectedGoals.length === 0">Modify Tracking</button>-->
-
   </div>
 
 </ion-content>
-<!--</div>-->
 
-<ion-footer class="footer-wrapper">
+<ion-footer class="footer-wrapper" *ngIf="!modifying">
   <div>
     <button class="align-left footer-button" (click)="onClickPrevious()" icon-only>
       <ion-icon name="custom-chevron-left"></ion-icon>
-    </button><p class="align-left footer-text text-left"></p>
+    </button>
 
   </div>
 
@@ -169,6 +158,19 @@
     <button class="align-right footer-button" (click)="continueSetup()" icon-only>
       <ion-icon name="custom-chevron-right"></ion-icon>
     </button>
-    <p class="align-right footer-text text-right" ></p>
+  </div>
+</ion-footer>
+
+<ion-footer class="modify-footer-wrapper" *ngIf="modifying">
+  <div>
+    <button class="align-left modify-footer-button save-button" (click)="continueSetup(true)" icon-only>
+      Save
+    </button>
+  </div>
+
+  <div>
+    <button class="align-right modify-footer-button" (click)="continueSetup()" icon-only>
+      Modify Tracking
+    </button>
   </div>
 </ion-footer>

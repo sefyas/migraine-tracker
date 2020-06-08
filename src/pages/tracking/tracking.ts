@@ -28,21 +28,6 @@ export class TrackingPage {
   monthNames : string[] = ["January", "February", "March", "April", "May", "June", "July",
     "August", "September", "October", "November", "December"];
 
-  // private dateSelected : any;
-  // private activeGoals : ConfiguredRoutine;
-  // private quickTrackers : DataElement[] = [];
-  // private tracked : {[dataType : string] : any} = {};
-  // private goalProgresses : {[dataType : string] : any} = {};
-  // private dataToTrack : {[dataType : string] : DataElement[]} = {};
-  // private dataList : {[dataType : string] : string} = {};
-  // private dataTypes : string[];
-  // private previouslyTracked : {[dataType : string] : any}[];
-  // private somethingTracked : boolean;
-  // private cardExpanded : {[dataType : string] : boolean} = {};
-  // private durationItemStart : {[dataType : string] : any} = {};
-  // private durationItemEnd : {[dataType : string] : any} ={};
-  // private saved : boolean;
-
   constructor(public navCtrl: NavController,
               public navParams: NavParams,
               private couchDbService: CouchDbServiceProvider,
@@ -51,7 +36,6 @@ export class TrackingPage {
               private dateFunctionsProvider: DateFunctionServiceProvider,
               private globalFuns: GlobalFunctionsServiceProvider) {
     this.dataToTrack = navParams.get('dataToTrack');
-    // this.dataTypes = navParams.get('dataTypes');
     this.dateSelected = navParams.get('dateSelected');
     this.goal = navParams.get('goal');
     this.neighborData = navParams.get('neighborData');
@@ -63,8 +47,6 @@ export class TrackingPage {
 
   // ================= BUTTONS Start =================
   onHomeClick() {
-    // this.navCtrl.popToRoot({animate: false});
-
     let dataToSend = {"goal": this.goal,
       "dataToTrack": this.dataToTrack,
       "dateSelected": this.dateSelected,
@@ -101,12 +83,13 @@ export class TrackingPage {
     this.couchDbService.logTrackedData(this.tracked, this.dateSelected);
   }
 
-  trackedMeds(){
+  getTrackedMeds(){
     return this.globalFuns.getWhetherTrackedMeds(this.tracked);
   }
 
   getDataVal(dataID) {
-    if (this.tracked[this.goal] && this.tracked[this.goal][dataID] && (typeof this.tracked[this.goal][dataID] !== typeof {})) {
+    if (this.tracked[this.goal] && this.tracked[this.goal][dataID] && (typeof this.tracked[this.goal][dataID]
+        !== typeof {})) {
       return this.tracked[this.goal][dataID];
     } else {
       return null;
@@ -114,7 +97,8 @@ export class TrackingPage {
   }
 
   getDataStart(dataID) {
-    if (this.tracked[this.goal] && this.tracked[this.goal][dataID] && (typeof this.tracked[this.goal][dataID] === typeof {})) {
+    if (this.tracked[this.goal] && this.tracked[this.goal][dataID] && (typeof this.tracked[this.goal][dataID]
+        === typeof {})) {
       return this.tracked[this.goal][dataID]['start'];
     } else {
       return null;
@@ -122,7 +106,8 @@ export class TrackingPage {
   }
 
   getDataEnd(dataID) {
-    if (this.tracked[this.goal] && this.tracked[this.goal][dataID] && (typeof this.tracked[this.goal][dataID] === typeof {})) {
+    if (this.tracked[this.goal] && this.tracked[this.goal][dataID] && (typeof this.tracked[this.goal][dataID]
+        === typeof {})) {
       return this.tracked[this.goal][dataID]['end'];
     } else {
       return null;
@@ -131,6 +116,8 @@ export class TrackingPage {
 
   changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
               dataType: string) {
+    console.log("@@@@@");
+    console.log(data);
     if (dataType === 'quickTracker') {
       dataType = data.dataType;
     }
@@ -152,9 +139,8 @@ export class TrackingPage {
       }
       this.tracked[dataType][data.id]['end'] = componentEvent.dataEnd;
     }
+    this.saveTrackedData();
   }
-
-
 
   formatForCalendar(event){ // call when we push to couch ...
     let startAndEndDates = this.dateFunctionsProvider.getStartAndEndDatesForCalendar();
@@ -199,7 +185,7 @@ export class TrackingPage {
     if (dataType === 'quickTracker') dataType = data.dataType;
     let timesSoFar = this.goalProgresses[dataType] ? this.goalProgresses[dataType][data.id] : 0;
     if (data.id === 'frequentMedUse') { // we pull from the 'treatments' dict!
-      timesSoFar += (this.trackedMeds() ? 1 : 0);
+      timesSoFar += (this.getTrackedMeds() ? 1 : 0);
     } else if (this.tracked[dataType] && this.tracked[dataType][data.id]) {
       if (data.field === 'number') {
         timesSoFar += Number(this.tracked[dataType][data.id]);
@@ -209,8 +195,6 @@ export class TrackingPage {
     }
     return timesSoFar;
   }
-
-
 
   // calculateGoalProgresses() { // todo: rename, since we do the dataToTrack work here too...
   //   for(let i=0; i<this.dataTypes.length; i++){

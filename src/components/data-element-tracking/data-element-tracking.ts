@@ -24,6 +24,10 @@ export class DataElementTrackingComponent {
         this.dataVal = this.dateFuns.getISOTime(this.dataVal);
       }
     }
+    this.formatTime();
+  }
+
+  formatTime() {
     if (this.dataStart) {
       this.dataStart = this.dateFuns.getISOTime(this.dataStart);
     }

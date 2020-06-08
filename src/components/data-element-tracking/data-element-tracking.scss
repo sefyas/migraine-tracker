@@ -52,18 +52,6 @@ data-element-tracking {
     font-weight: bold;
   }
 
-  .date-picker {
-    border: solid 1px white;
-    border-radius: 15px;
-    width: 180px;
-    margin-top: 10pt;
-    margin-bottom: 10pt;
-    height: 45px;
-    font-size: 12pt;
-    background: none;
-    font-weight: bold;
-  }
-
   .note-box {
     border: solid 1px white;
     border-radius: 15px;
@@ -81,6 +69,18 @@ data-element-tracking {
     padding-left: 20px;
     padding-right: 20px;
     margin-bottom: 10px;
+  }
+
+  .date-picker {
+    border: solid 1px white;
+    border-radius: 15px;
+    width: 180px;
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+    height: 45px;
+    font-size: 12pt;
+    background: none;
+    font-weight: bold;
   }
 
   .date-range-picker-wrapper {

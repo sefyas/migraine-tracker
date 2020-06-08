@@ -20,15 +20,12 @@ let options = {
 @Injectable()
 export class CouchDbServiceProvider {
   private seenConfig: boolean = false; // set to false for configuration mode
-  // private seenConfig : boolean = true; // set to true for tracking mode
-  // private currentConfiguredRoutine: ; // only ONE entry is active at a given time; "goals" lists all current goals
   private trackedData: DataReport[] = [];
 
   // private baseUrl: string = 'http://127.0.0.1:5984/';
   private baseUrl: string = 'https://migraine-tracker.com:6984/';
   private db: any;
   private remote: any;
-  // private username: any;
   private currentConfiguredRoutine : ConfiguredRoutine;
 
   constructor(private storage: Storage,
@@ -101,6 +98,16 @@ export class CouchDbServiceProvider {
     }
   }
 
+  // Get the current configured routine doc from the user info doc in the database
+  async getCurrentConfiguredRoutineDoc() {
+    try {
+      var doc = await this.db.get('user-info');
+      return doc;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   // Set the current configured routine id
   async setCurrentConfiguredRoutineID(current_configured_routine_id) {
     try {
@@ -120,20 +127,27 @@ export class CouchDbServiceProvider {
 
   // Log the configured routine
   async logConfiguredRoutine(data) {
+    // console.log("******");
+    // console.log(data["selectedData"]);
     var dataToTrack = data["selectedData"];
     var quickTrackers = [];
     var dataTypes = ['Symptom', 'Treatment', 'Contributor', 'Change', 'Other'];
     // Append the quick tracker data to a list
     for (let i=0; i < dataTypes.length; i++) {
-      var data_tracked = dataToTrack[dataTypes[i]];
-      if (data_tracked) {
-        for (let j=0; j<data_tracked.length; j++) {
-          if (data_tracked[j]['quickTrack']) {
-            quickTrackers.push(data_tracked[j]);
+      if (dataToTrack.hasOwnProperty(dataTypes[i])) {
+        var data_tracked = dataToTrack[dataTypes[i]];
+        if (data_tracked) {
+          for (let j=0; j<data_tracked.length; j++) {
+            if (data_tracked[j]['quickTrack']) {
+              quickTrackers.push(data_tracked[j]);
+            }
           }
         }
       }
     }
+
+    // data['dateAdded'] = new Date();
+
     // Construct the configured routine
     var currentConfiguredRoutine = {
       dateAdded: new Date(),
@@ -141,8 +155,10 @@ export class CouchDbServiceProvider {
       dataToTrack: data["selectedData"],
       quickTrackers: quickTrackers,
       textGoals: data["textGoals"],
-      notifications: data["notifications"]
+      notifications: data["notifications"],
     };
+
+
     var currentConfiguredRoutineID = await this.getCurrentConfiguredRoutineID();
     currentConfiguredRoutineID = currentConfiguredRoutineID + 1;
     this.setCurrentConfiguredRoutineID(currentConfiguredRoutineID);
@@ -231,33 +247,7 @@ export class CouchDbServiceProvider {
   }
 
 
-  // // Get the current track date from the user info doc in the database
-  // async getCurrentTrackDate() {
-  //   try {
-  //     var doc = await this.db.get('user-info');
-  //     return doc['current_track_date'];
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
-  //
-  // // Set the current track date
-  // async setCurrentTrackDate(current_track_date) {
-  //   try {
-  //     var doc = await this.db.get('user-info');
-  //     var response = await this.db.put({
-  //       _id: 'user-info',
-  //       _rev: doc._rev,
-  //       register_time: doc.register_time,
-  //       username: doc.username,
-  //       current_configured_routine_id: doc.current_configured_routine_id,
-  //       current_track_date: current_track_date,
-  //       break: doc.break,
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
+
 
 
   // ============================================= Old =============================================

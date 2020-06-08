@@ -5,44 +5,51 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-
-  <ion-navbar>
-    <button ion-button menuToggle icon-only>
+  <ion-navbar text-right hideBackButton>
+    <button ion-button menuToggle show icon-only>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Goals</ion-title>
+    <span id="title" class="header-title-right">Modify Goals</span>
   </ion-navbar>
-
 </ion-header>
 
+<ion-content class="content vertical-center">
+  <div class="ion-content-wrapper">
+    <ion-card class="goal-title-card">
+      <ion-card-header class="goal-card-header">
+        <img class="goal-title-icon"  [src]="'../../assets/pages/goal_icon.svg' " alt="">
+        <div class="goal-title-text-wrapper">
+          <p class="goal-title-text">Current Goals</p>
+        </div>
+        <button class="align-right edit-button" (click)="addGoal()" icon-only>
+          <img [src]="'../../assets/pages/edit_icon.svg'" alt="">
+        </button>
+      </ion-card-header>
+    </ion-card>
 
-<ion-content padding>
+    <ion-card class="goal-card center">
+      <div *ngFor="let goal of goalTypes">
+        <ion-card-header>
+          <div class="goal-name-wrapper">
+            <ion-icon class="goal-icon" name="{{'custom-' + goal.slice(0, -3).toLowerCase()}}"></ion-icon>
+            <p class="goal-name">{{goal.slice(0, -3)}}</p>
+          </div>
+          <div class="effort-wrapper">
+            <p class="effort-dot-fill"></p>
+            <p class="effort-dot-outline" [class.effort-dot-fill]="goalHierarchy[goal]['effort']==='medium'
+            || goalHierarchy[goal]['effort']==='high'"></p>
+            <p class="effort-dot-outline" [class.effort-dot-fill]="goalHierarchy[goal]['effort']==='high'"></p>
+            <p class="effort-text">{{goalHierarchy[goal]['effort']}} effort </p>
+          </div>
+        </ion-card-header>
 
-  <ion-card>
-    <ion-card-header text-wrap (click)="addGoal()" >
-      <ion-item class="headerItem">
-        <span>Current Goals</span>
-        <ion-icon class="headerIcon" item-right color="primary" name="create"></ion-icon>
-      </ion-item>
-    </ion-card-header>
+        <ion-card-content class="goal-card-content">
+          <ion-list no-lines *ngFor="let subgoal of goalHierarchy[goal]['subgoals']">
+            <p class="sub-goal-chosen-text">{{subgoal}}</p>
+          </ion-list>
+        </ion-card-content>
+      </div>
 
-    <ion-card-content>
-      <ion-item text-wrap *ngFor="let goal of goalTypes">
-        {{goal}}
-        <ion-item *ngFor="let subgoal of goalHierarchy[goal]">
-          {{subgoal}}
-        </ion-item>
-      </ion-item>
-
-      <ion-item *ngIf="textGoals !== undefined">
-        Custom
-        <ion-item>
-          {{textGoals}}
-        </ion-item>
-      </ion-item>
-    </ion-card-content>
-  </ion-card>
-
-
-
+    </ion-card>
+  </div>
 </ion-content>

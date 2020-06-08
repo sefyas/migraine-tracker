@@ -6,7 +6,6 @@ import { DataDetailsServiceProvider } from "../../../providers/data-details-serv
 import { CouchDbServiceProvider } from "../../../providers/couch-db-service/couch-db-service";
 import { GoalModificationPage } from "../../goal-modification/goal-modification";
 import { Goal } from "../../../interfaces/customTypes";
-import {SelectTrackingFrequencyPage} from "../select-tracking-frequency/select-tracking-frequency";
 
 @Component({
   selector: 'page-goal-type',
@@ -31,12 +30,17 @@ export class GoalTypePage {
 
   async ionViewDidLoad() {
     this.modifying = this.navParams.data['modifying'];
-    let activeGoals = await this.couchDbService.getConfiguredRoutine().then((val) => {
+    if (this.modifying) {
+      this.expandMonitor = true;
+      this.expandLearn = true;
+    }
+
+    let configuredRoutine = await this.couchDbService.getConfiguredRoutine().then((val) => {
       return val;
     });
-    if (activeGoals !== null) {
-      this.selectedGoals = activeGoals['goals'];
-      this.textGoals = activeGoals.textGoals;
+    if (configuredRoutine !== null) {
+      this.selectedGoals = configuredRoutine['goals'];
+      this.textGoals = configuredRoutine.textGoals;
       this.textGoalExpand = true;
     }
     this.goalList = this.goalDetailsServiceProvider.getGoalList();
@@ -59,10 +63,24 @@ export class GoalTypePage {
   }
 
   async continueSetup(exit=false) {
-    // this.selectedGoals = ['1a', '1b', '1c', '2a', '2b', '2c', '3'];
     let selectedConfigData = this.dataDetails.getSelectedConfigData(this.selectedGoals);
-    let dataToSend = {'goalIDs': this.selectedGoals, 'textGoals': this.textGoals,
-      'selectedConfigData': selectedConfigData};
+    let dataToSend = await this.couchDbService.getConfiguredRoutine().then((val) => {
+      return val;
+    });
+
+    // console.log("!!!!!!!!!!!!!!!!!!!!!!");
+    // console.log(dataToSend);
+    // let dataToSend = {'goals': this.selectedGoals,
+    //   'textGoals': this.textGoals,
+    //   'selectedConfigData': selectedConfigData,
+    //   'modifying': this.modifying,
+    //   'configuredRoutine': configuredRoutine};
+
+    dataToSend['goals'] = this.selectedGoals;
+    dataToSend['textGoals'] = this.textGoals;
+    dataToSend['selectedConfigData'] = selectedConfigData;
+    dataToSend['modifying'] = this.modifying;
+
     if (exit) {
       dataToSend['goalsOnly'] = true;
       this.navCtrl.setRoot(GoalModificationPage, dataToSend);
@@ -71,7 +89,6 @@ export class GoalTypePage {
 
       if (configData!== null) {
         dataToSend['dataPage'] = configData;
-        // this.navCtrl.push(SelectTrackingFrequencyPage, dataToSend, {animate: false});
         this.navCtrl.push(DataConfigPage, dataToSend, {animate: false});
       } else {
         let error = new Error("All data conditional, no conditions met.");

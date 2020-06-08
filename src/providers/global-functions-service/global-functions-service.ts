@@ -61,18 +61,21 @@ export class GlobalFunctionsServiceProvider {
   }
 
 
-  getGoalHierarchy(currentGoalIDs : string[]) : {[goal:string] : string[]}{
+  getGoalHierarchy(currentGoalIDs : string[]) : {[goal:string] : string[]} {
     currentGoalIDs.sort();
     let goalHierarchy = {};
-    for(let i=0; i<currentGoalIDs.length; i++){
+    for (let i=0; i<currentGoalIDs.length; i++) {
       let goalID = currentGoalIDs[i];
       let goalInfo = this.goalDetails.getGoalByID(goalID, false);
-      if(goalInfo['isTopGoal']){ // it's not a subogal
-        goalHierarchy[goalInfo.name] = [];
+      if (goalInfo['isTopGoal']) { // it's not a subogal
+        goalHierarchy[goalInfo.name] = {};
+        goalHierarchy[goalInfo.name]['id'] = goalInfo.goalID;
+        goalHierarchy[goalInfo.name]['effort'] = goalInfo.effort;
+        goalHierarchy[goalInfo.name]['subgoals'] = [];
         let allGoalSubgoals = goalInfo['subgoals'] ? goalInfo['subgoals'] : [];
-        for(let j=0; j<allGoalSubgoals.length; j++){
-          if(currentGoalIDs.indexOf(allGoalSubgoals[j].goalID) > -1){
-            goalHierarchy[goalInfo.name].push(allGoalSubgoals[j].name)
+        for (let j=0; j<allGoalSubgoals.length; j++) {
+          if (currentGoalIDs.indexOf(allGoalSubgoals[j].goalID) > -1) {
+            goalHierarchy[goalInfo.name]['subgoals'].push(allGoalSubgoals[j].name)
           }
         }
       }

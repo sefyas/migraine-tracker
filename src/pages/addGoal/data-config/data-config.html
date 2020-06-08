@@ -187,7 +187,7 @@
 
 </ion-content>
 
-<ion-footer class="footer-wrapper">
+<ion-footer class="modify-footer-wrapper" *ngIf="!modifying || dataDetailsServiceProvider.findNextConfigData(navParams.data['goalIDs'], dataObject)">
   <div>
     <button class="align-left footer-button" (click)="onClickPrevious()" icon-only>
       <ion-icon name="custom-chevron-left"></ion-icon>
@@ -200,5 +200,21 @@
       <ion-icon name="custom-chevron-right"></ion-icon>
     </button>
     <p class="align-right footer-text text-right" ></p>
+  </div>
+</ion-footer>
+
+
+<ion-footer class="modify-footer-wrapper" *ngIf="modifying && !dataDetailsServiceProvider.findNextConfigData(navParams.data['goalIDs'], dataObject)">
+  <div>
+    <button class="align-left footer-button" (click)="onClickPrevious()" icon-only>
+      <ion-icon name="custom-chevron-left"></ion-icon>
+    </button><p class="align-left footer-text text-left"></p>
+
+  </div>
+
+  <div>
+    <button class="align-right modify-footer-button save-button" (click)="continueSetup()" icon-only>
+      Save
+    </button>
   </div>
 </ion-footer>

@@ -10,14 +10,7 @@ import { DateFunctionServiceProvider } from "../../providers/date-function-servi
 import { GlobalFunctionsServiceProvider } from "../../providers/global-functions-service/global-functions-service";
 import { ConfiguredRoutine, DataElement } from "../../interfaces/customTypes";
 import { Storage } from "@ionic/storage";
-// import { Calendar } from '@ionic-native/calendar/ngx';
-import { NgCalendarModule  } from 'ionic2-calendar';
-import {SignUpPage} from "../signup/signup";
-import {c} from "@angular/core/src/render3";
-import {GoalModificationPage} from "../goal-modification/goal-modification";
-import {DataConfigPage} from "../addGoal/data-config/data-config";
 import * as moment from 'moment';
-import {EditDataPage} from "../addGoal/edit-data/edit-data";
 
 
 @Component({
@@ -26,9 +19,6 @@ import {EditDataPage} from "../addGoal/edit-data/edit-data";
 })
 
 export class HomePage {
-  private skipConfig = false;
-  // private skipConfig = true;
-
   private activeGoals : ConfiguredRoutine;
   private quickTrackers : DataElement[] = [];
   private tracked : {[dataType : string] : any} = {};
@@ -36,12 +26,8 @@ export class HomePage {
   private dataToTrack : {[dataType : string] : DataElement[]} = {};
   private dataList : {[dataType : string] : string} = {};
   private dataTypes : string[];
-  // private previouslyTracked : {[dataType : string] : any}[];
   private previouslyTracked : any;
-  private durationItemStart : {[dataType : string] : any} = {};
-  private durationItemEnd : {[dataType : string] : any} ={};
   private cardExpanded : {[dataType : string] : boolean} = {};
-  private saved : boolean;
   private dateSelected : any;
 
   constructor(public navCtrl: NavController,
@@ -58,6 +44,7 @@ export class HomePage {
     } else {
       this.dateSelected = [moment().date(), moment().month(), moment().year()];
     }
+    this.loadTrackedData();
   }
 
   async ionViewDidEnter() {
@@ -98,13 +85,17 @@ export class HomePage {
     }
   }
 
+  async loadTrackedData() {
+    this.tracked = await this.couchDbService.getTrackedData(this.dateSelected);
+  }
+
   saveTrackedData() {
     this.couchDbService.logTrackedData(this.tracked, this.dateSelected);
-    this.saved = true;
   }
 
   onDaySelect(componentEvent : any) {
     this.dateSelected = componentEvent;
+    this.loadTrackedData();
   }
 
   onClickTrackGoal(goal) {
@@ -135,31 +126,12 @@ export class HomePage {
     this.navCtrl.push(TrackingPage, dataToSend, {animate: false});
   }
 
-
-  //   let editDataModal = this.modalCtrl.create(TrackingPage, dataToSend,
-  //       {showBackdrop: false, cssClass: 'modal-fullscreen'});
-  //
-  //   editDataModal.onDidDismiss(data => {
-  //     console.log("onDidDismiss @@@@@@@@@@@@@");
-  //     console.log(data);
-  //   });
-  //   editDataModal.present();
-  // }
-
-  // homePagePopCallBack() {
-  //   console.log("homePagePopCallBack !!!!!!!!!!!!!!!!");
-  //   console.log("homePagePopCallBack $$$$$$$$$$$$$$$$");
-  //   // this.
-  //   console.log(this.navCtrl.getPrevious());
-  // }
-
   // only if they don't have a goal setup yet
   addFirstGoal() {
     this.navCtrl.push(GoalTypePage, null, {animate: false});
   }
 
   setupTrackers(){
-    this.saved = true;
     if (this.activeGoals['dataToTrack']) {
       this.previouslyTracked = this.couchDbService.getTrackedData([this.dateSelected['date'],
         this.dateSelected['month'], this.dateSelected['year']]); // todo: only need to grab this month's
@@ -177,46 +149,58 @@ export class HomePage {
     }
   }
 
-  trackedMeds(){
-    // console.log("$$$$$$$$$$$$$$ trackedMeds: ");
-    // console.log(this.globalFuns.getWhetherTrackedMeds(this.tracked));
+  getTrackedMeds(){
     return this.globalFuns.getWhetherTrackedMeds(this.tracked);
   }
 
-  changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any}, dataType: string) {
-    // console.log("$$$$$$$$$$$$$$ changeVals: ");
-    // console.log("----------- componentEvent");
-    // console.log(componentEvent);
-    // console.log("----------- data");
-    // console.log(data);
-    // console.log("----------- dataType");
-    // console.log(dataType);
+  getDataVal(data) {
+    if (this.tracked[data.dataType] && this.tracked[data.dataType][data.id] && (typeof this.tracked[data.dataType][data.id] !== typeof {})) {
+      return this.tracked[data.dataType][data.id];
+    } else {
+      return null;
+    }
+  }
 
+  getDataStart(data) {
+    if (this.tracked[data.dataType] && this.tracked[data.dataType][data.id] && (typeof this.tracked[data.dataType][data.id] === typeof {})) {
+      return this.tracked[data.dataType][data.id]['start'];
+    } else {
+      return null;
+    }
+  }
+
+  getDataEnd(data) {
+    if (this.tracked[data.dataType] && this.tracked[data.dataType][data.id] && (typeof this.tracked[data.dataType][data.id] === typeof {})) {
+      return this.tracked[data.dataType][data.id]['end'];
+    } else {
+      return null;
+    }
+  }
+
+  changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
+              dataType: string) {
     if (dataType === 'quickTracker') {
       dataType = data.dataType;
     }
+    if (!this.tracked.hasOwnProperty(dataType)) {
+      this.tracked[dataType] = {};
+    }
     if (componentEvent.dataVal) {
-      if (!this.tracked.hasOwnProperty(dataType)) {
-        this.tracked[dataType] = {};
-      }
       this.tracked[dataType][data.id] = componentEvent.dataVal;
     }
     if (componentEvent.dataStart) {
-      if(!this.durationItemStart[dataType]) {
-        this.durationItemStart[dataType] = {};
+      if (!this.tracked[dataType].hasOwnProperty(data.id)) {
+        this.tracked[dataType][data.id] = {};
       }
-      this.durationItemStart[dataType][data.id] = componentEvent.dataStart;
+      this.tracked[dataType][data.id]['start'] = componentEvent.dataStart;
     }
-    if (componentEvent.dataEnd){
-      if (!this.durationItemEnd[dataType]) {
-        this.durationItemEnd[dataType] = {};
+    if (componentEvent.dataEnd) {
+      if (!this.tracked[dataType].hasOwnProperty(data.id)) {
+        this.tracked[dataType][data.id] = {};
       }
-      this.durationItemEnd[dataType][data.id] = componentEvent.dataEnd;
+      this.tracked[dataType][data.id]['end'] = componentEvent.dataEnd;
     }
-    // console.log("########");
-    // console.log(this.durationItemEnd);
-    // console.log(this.durationItemStart);
-    this.saved = false;
+    this.saveTrackedData();
   }
 
   formatForCalendar(event){ // call when we push to couch ...
@@ -264,7 +248,7 @@ export class HomePage {
     if(dataType === 'quickTracker') dataType = data.dataType;
     let timesSoFar = this.goalProgresses[dataType] ? this.goalProgresses[dataType][data.id] : 0;
     if (data.id === 'frequentMedUse'){ // we pull from the 'treatments' dict!
-      timesSoFar += (this.trackedMeds() ? 1 : 0);
+      timesSoFar += (this.getTrackedMeds() ? 1 : 0);
     }
     else if(this.tracked[dataType] && this.tracked[dataType][data.id]) {
       if (data.field === 'number') {

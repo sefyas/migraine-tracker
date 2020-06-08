@@ -34,6 +34,7 @@ export class SelectTrackingFrequencyPage {
   private recommended : string = "retroactive";
   private postSymptomInfoDisplayed : any = false;
   private regularInfoDisplayed : any = false;
+
   days : number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
     25, 26, 27, 28, 29, 30, 31];
 
@@ -178,54 +179,4 @@ export class SelectTrackingFrequencyPage {
     }
     return true;
   }
-
-
-
-
-  //
-  // isSelected(type : string, element : string, val : any) : boolean{
-  //   return this.notificationData[type][element] && this.notificationData[type][element].indexOf(val) >-1;
-  // }
-  //
-  // changeVal(type : string, element : string, val : any, multi=false){
-  //   this.dataChanged = true;
-  //   if(multi){
-  //     if(!this.notificationData[type][element]) this.notificationData[type][element] = [val];
-  //     else {
-  //       let index = this.notificationData[type][element].indexOf(val);
-  //       if (index > -1) this.notificationData[type][element].splice(index, 1);
-  //       else this.notificationData[type][element].push(val);
-  //     }
-  //   }
-  //   else{
-  //     this.expansions[element] = false;
-  //     this.notificationData[type][element] = val;
-  //     if(type==='regular' && element === 'timescale'){ // otherwise we accidentally save irrelevant settings
-  //       delete this.notificationData[type]['dayOfWeek'];
-  //       delete this.notificationData[type]['dayOfMonth'];
-  //     }
-  //   }
-  // }
-  //
-  //
-  // addOrRemove(type){
-  //   this.dataChanged = true;
-  //   if(this.notificationData[type]){
-  //     delete this.notificationData[type];
-  //   }
-  //   else{
-  //     this.notificationData[type] = {};
-  //   }
-  //   this.expansions[type] = !this.expansions[type];
-  // }
-  //
-  //
-  // cancelChange(){
-  //   this.viewCtrl.dismiss();
-  // }
-  //
-  //
-
-
-
 }
