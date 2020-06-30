@@ -1,74 +1,34 @@
-<!--
-  Generated template for the TrackingModificationPage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
-
-  <ion-navbar>
-    <button ion-button menuToggle icon-only>
+  <ion-navbar text-right hideBackButton>
+    <button ion-button menuToggle show icon-only>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Tracking Routine</ion-title>
+    <span id="title" class="header-title-right">Modify Tracking Routines</span>
   </ion-navbar>
-
 </ion-header>
 
+<ion-content class="content">
+    <div class="ion-content-wrapper">
+      <ion-card class="goal-card center" *ngFor="let dataType of allDataTypes">
+        <ion-card-header class="goal-header-wrapper" text-wrap >
+            <img class="goal-title-icon"  [src]="'../../assets/pages/' + dataType.toLowerCase() + '_icon.svg' " alt="">
+            <p class="goal-title-text">{{dataType}} Data</p>
+            <button class="align-right edit-button" icon-only>
+                <img [src]="'../../assets/pages/edit_icon.svg'" alt="">
+            </button>
+        </ion-card-header>
 
-<ion-content padding>
-
-  <ion-card *ngFor="let dataType of allDataTypes">
-    <ion-card-header text-wrap (click)="modifyDatatypeRoutine(dataType)" >
-      <ion-item class="headerItem">
-        <span>Current {{displayNames[dataType]}} Data</span>
-        <ion-icon class="headerIcon" item-right color="primary" name="create"></ion-icon>
-      </ion-item>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let data of currentData[dataType]" text-wrap>
-          {{data.name}}
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
-
-  <ion-card>
-
-    <ion-card-header class="cardHeader" text-wrap (click)="changeFreq(dataType)" >
-      <ion-item class="headerItem">
-        <span>Current Frequency</span>
-        <ion-icon class="headerIcon" item-right color="primary" name="create"></ion-icon>
-      </ion-item>
-    </ion-card-header>
-
-    <ion-card-content *ngIf="notifications['regular']">
-      You are currently receiving notifications
-      <span text-lowercase>{{notifications['regular'].timescale}}</span>,
-      at {{timeToDisplay}}<span text-lowercase
-       *ngIf="notifications['regular'].dayOfWeek !== undefined"> on
-        {{notifications['regular'].dayOfWeek.slice(0, notifications['regular'].dayOfWeek.length-1).join('s, ')}}<span
-        *ngIf="notifications['regular'].dayOfWeek.length > 1">s</span><span
-          *ngIf="notifications['regular'].dayOfWeek.length > 2">,</span><span
-        *ngIf="notifications['regular'].dayOfWeek.length > 1"> and</span>
-        {{notifications['regular'].dayOfWeek[notifications['regular'].dayOfWeek.length-1]}}s</span><span
-      text-lowercase *ngIf="notifications['regular'].dayOfMonth !== undefined"> on the
-        {{notifications['regular'].dayOfMonth.slice(0, notifications['regular'].dayOfMonth.length-1).join(', ')}}<span
-          *ngIf="notifications['regular'].dayOfMonth.length > 2">,</span> <span
-        *ngIf="notifications['regular'].dayOfMonth.length > 1">and</span>
-        {{notifications['regular'].dayOfMonth[notifications['regular'].dayOfMonth.length-1]}} day<span
-          *ngIf="notifications['regular'].dayOfMonth.length > 1">s</span> of the month</span>.
-    </ion-card-content>
-
-    <ion-card-content *ngIf="notifications['retroactive']">
-      You are <span *ngIf="notifications['regular']">also</span>
-      <span *ngIf="!notifications['regular']">currently</span>
-      receiving notifications {{notifications['retroactive']['delayNum']}}
-      <span text-lowercase>{{notifications['retroactive']['delayScale']}}</span><span
-      *ngIf="notifications['retroactive'].delayNum > 1">s</span> after indicating symptoms.
-    </ion-card-content>
-
-  </ion-card>
+        <ion-card-content>
+          <ion-list no-lines *ngFor="let data of currentData[dataType]">
+              <div class="goal-list-item">
+                  <button class="align-left check-radio-btn" icon-only>
+                      <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                  </button>
+                  <p class="goal-data-title">{{data.name}}</p>
+              </div>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+    </div>
 
 </ion-content>

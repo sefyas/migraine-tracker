@@ -16,9 +16,9 @@
           <p class="goal-title-text">Select your migraine</p>
           <p class="goal-title-text">tracking goals</p>
         </div>
-  <!--      <button class="align-right info-button" icon-only>-->
-  <!--        <img [src]="'../../assets/pages/info_icon.svg' " alt="">-->
-  <!--      </button>-->
+<!--        <button class="align-right info-button" icon-only>-->
+<!--          <img [src]="'../../assets/pages/info_icon.svg' " alt="">-->
+<!--        </button>-->
       </ion-card-header>
     </ion-card>
 
@@ -119,9 +119,9 @@
 
       <ion-card-content class="goal-card-content">
         <p class="text-goal-title" text-wrap>Do you have any other goals you want to remember?</p>
-        <p class="text-goal-content goal-reason-text" *ngIf="!textGoalExpand" text-wrap>{{textGoals}}</p>
+        <p class="text-goal-content goal-reason-text" *ngIf="!textGoalExpand" text-wrap>{{configuredRoutine['textGoals']}}</p>
 
-        <ion-textarea class="text-goal-entry" *ngIf="textGoalExpand" [(ngModel)]="textGoals" rows="5"
+        <ion-textarea class="text-goal-entry" *ngIf="textGoalExpand" [(ngModel)]="configuredRoutine['textGoals']" rows="5"
                       [class.color-info-theme]="!displayTextGoalEditBtn" [class.color-white]="displayTextGoalEditBtn"
                       (ionFocus)="onEditTextGoalFocus()" (ionBlur)="onEditTextGoalBlur()"
                       placeholder="Write any other migraine-related goals you have so you can reflect on them later or share them with your doctor ...">
@@ -131,11 +131,11 @@
           <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
         </button>
 
-        <button class="align-right goal-btn" *ngIf="textGoalExpand" (click)="expandTextGoal()" icon-only>
+        <button class="align-right goal-btn" *ngIf="textGoalExpand" (click)="toggleTextGoal()" icon-only>
           <img [src]="'../../assets/pages/drop_up_icon.svg'" alt="">
         </button>
 
-        <button class="align-right goal-btn" *ngIf="!textGoalExpand" (click)="expandTextGoal()" icon-only>
+        <button class="align-right goal-btn" *ngIf="!textGoalExpand" (click)="toggleTextGoal()" icon-only>
           <img [src]="'../../assets/pages/drop_down_icon.svg'" alt="">
         </button>
       </ion-card-content>
@@ -155,7 +155,7 @@
   </div>
 
   <div>
-    <button class="align-right footer-button" (click)="continueSetup()" icon-only>
+    <button class="align-right footer-button" [disabled]="selectedGoals.length === 0" (click)="onClickNext()" icon-only>
       <ion-icon name="custom-chevron-right"></ion-icon>
     </button>
   </div>
@@ -163,13 +163,13 @@
 
 <ion-footer class="modify-footer-wrapper" *ngIf="modifying">
   <div>
-    <button class="align-left modify-footer-button save-button" (click)="continueSetup(true)" icon-only>
+    <button class="align-left modify-footer-button save-button" (click)="onClickNext(true)" icon-only>
       Save
     </button>
   </div>
 
   <div>
-    <button class="align-right modify-footer-button" (click)="continueSetup()" icon-only>
+    <button class="align-right modify-footer-button" (click)="onClickNext()" icon-only>
       Modify Tracking
     </button>
   </div>

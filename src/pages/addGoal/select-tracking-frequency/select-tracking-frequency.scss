@@ -220,6 +220,15 @@ page-select-tracking-frequency {
     font-size: 12pt;
     font-weight: bold;
   }
+
+  .datetime-ios {
+    padding: 10px 20px 10px 20px;
+    text-align: center;
+    //vertical-align: middle;
+    //justify-content: center;
+  }
+
+
   // ============ regular tracking selected/expanded END ============
 
 
@@ -236,6 +245,7 @@ page-select-tracking-frequency {
     height: 45px;
     font-size: 12pt;
     font-weight: bold;
+    padding: 10px 20px 10px 20px;
   }
 
   .regular-time-picker-popover-wrapper {

@@ -211,4 +211,48 @@ page-edit-data {
     text-align: center;
   }
 
+  .info-button {
+    background: none;
+    position: absolute;
+    width: 40px;
+    right: 15px;
+    float: right;
+    margin-top: -48px;
+  }
+
+  .limit-option-header-wrapper {
+    display: inline-block;
+  }
+
+  // ============ info popups START ============
+  .info-card {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 200px;
+    width: 86%;
+    margin: auto;
+    border: 1.5px solid var(--info-theme);
+    background: var(--goal-card-background);
+    border-radius: 10px;
+    min-height: 200px;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .info-title {
+    font-size: 12pt;
+    position: relative;
+    top: 30px;
+    color: white;
+  }
+
+  .close-button {
+    background: none;
+    color: white;
+    float: right;
+    font-size: 10px;
+  }
+  // ============ info popups END ============
 }

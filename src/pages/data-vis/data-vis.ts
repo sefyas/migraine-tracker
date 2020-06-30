@@ -104,8 +104,8 @@ export class DataVisPage {
   }
 
   ionViewDidLoad() {
-    // this.allTrackedData = this.sortByDate(this.couchDBService.getTrackedData());
-    this.currentGoals = this.couchDBService.getConfiguredRoutine();
+    // this.allTrackedData = this.sortByDate(this.couchDBService.fetchTrackedData());
+    this.currentGoals = this.couchDBService.fetchConfiguredRoutine();
     this.setVisTypes();
   }
 

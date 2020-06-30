@@ -13,15 +13,26 @@
     <ion-card-content>
       <p class="no-goal-title">Hello, configure your tracking goals to start!</p>
       <p class="no-goal-subtitle"> You have not configured any migraine tracking goals. Add a goal to start tracking!</p>
-      <button class="add-goal-button" ion-button color="goalThemeDark" full icon-start (click)="addFirstGoal()">
+      <button class="add-goal-button" ion-button color="goalThemeDark" full icon-start (click)="configureGoals()">
         <ion-icon small class="add-goal-icon" name="custom-add-outline"></ion-icon>
         Add Goals
       </button>
     </ion-card-content>
   </ion-card>
 
-  <ion-content padding text-center>
-    <ion-calendar #calendar *ngIf="activeGoals !== null" [dateSelected]="dateSelected" (onDaySelect)="onDaySelect($event)"></ion-calendar>
+	<ion-card class="no-goal-card" *ngIf="activeGoals && !activeGoals['dataToTrack']">
+		<ion-card-content>
+			<p class="no-goal-title">Configure tracking routines for your goals to start!</p>
+			<p class="no-goal-subtitle"> You have not configured any migraine tracking routines. Add data to start tracking!</p>
+			<button class="add-goal-button" ion-button color="goalThemeDark" full icon-start (click)="configureGoals()">
+				<ion-icon small class="add-goal-icon" name="custom-add-outline"></ion-icon>
+				Add Data
+			</button>
+		</ion-card-content>
+	</ion-card>
+
+  <ion-content padding text-center *ngIf="activeGoals && activeGoals['dataToTrack']">
+    <ion-calendar #calendar *ngIf="activeGoals !== null" [dateSelected]="dateSelected" (onDaySelect)="onDaySelectClick($event)"></ion-calendar>
 
     <ng-container *ngFor="let dataType of dataTypes">
 
@@ -69,12 +80,12 @@
       </ion-card>
 
       <ion-card *ngIf="dataType !== 'quickTracker' && dataList[dataType] !== ''">
-        <ion-card-header class="goal-card" (click)="onClickTrackGoal(dataType)">
-          <span class="headerItem tracking-header">Track {{dataType}} Data</span>
-          <img class="goal-icon" [src]="'../../assets/pages/' + dataType.toLowerCase() + '_icon.svg' " alt="">
-          <div class="data-examples">
-            <span>{{dataList[dataType]}}</span>
-          </div>
+        <ion-card-header class="goal-card" (click)="onTrackGoalClick(dataType)">
+            <div class="goal-examples-header">
+                <span class="headerItem tracking-header">Track {{dataType}} Data</span>
+                <img class="goal-icon" [src]="'../../assets/pages/' + dataType.toLowerCase() + '_icon.svg' " alt="">
+            </div>
+            <p class="data-examples">{{dataList[dataType]}}</p>
         </ion-card-header>
       </ion-card>
 

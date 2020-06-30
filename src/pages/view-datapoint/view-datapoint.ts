@@ -31,7 +31,7 @@ export class ViewDatapointPage {
     this.dataDict = this.navParams.data;
     if(!this.dataDict['dateChanged']) this.dataDict['dateChanged'] = []; // keep track of modifications
     this.dataDict['date'] = this.dateFunctions.dateToPrettyDate(this.dataDict['startTime'], true);
-    let configuredGoals = this.couchDBService.getConfiguredRoutine();
+    let configuredGoals = this.couchDBService.fetchConfiguredRoutine();
 
     let allDataTypes = this.dataDetailsService.getAllDataTypes();
     for(let i=0; i<allDataTypes.length; i++){

@@ -1,14 +1,9 @@
 import PouchDB from 'pouchdb';
 import PouchDBAuthentication from 'pouchdb-authentication';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Events } from "ionic-angular";
-import { HomePage } from "../../pages/home/home";
-import {ConfiguredRoutine, DataElement, Notification} from "../../interfaces/customTypes";
+import { ConfiguredRoutine, DataElement, Notification } from "../../interfaces/customTypes";
 import { DataReport } from "../../interfaces/customTypes";
 import { Break } from "../../interfaces/customTypes";
-import { Storage } from '@ionic/storage';
-import { DateFunctionServiceProvider } from "../date-function-service/date-function-service";
 
 let options = {
   live: true,
@@ -19,77 +14,58 @@ let options = {
 
 @Injectable()
 export class CouchDbServiceProvider {
-  private seenConfig: boolean = false; // set to false for configuration mode
-  private trackedData: DataReport[] = [];
-
-  // private baseUrl: string = 'http://127.0.0.1:5984/';
-  private baseUrl: string = 'https://migraine-tracker.com:6984/';
+  private baseUrl: string = 'https://migraine-tracker.com:6984/'; // http://127.0.0.1:5984/
   private db: any;
   private remote: any;
-  private currentConfiguredRoutine : ConfiguredRoutine;
+  private currentConfiguredRoutine : any = null;
 
-  constructor(private storage: Storage,
-              private dateFunctionsProvider: DateFunctionServiceProvider) {
+  constructor() {
     PouchDB.plugin(PouchDBAuthentication);
     this.db = new PouchDB('migraine-tracker', {skip_setup: true});
     this.remote = new PouchDB(this.baseUrl);
-    // this.currentConfiguredRoutine = {goals: null, dataToTrack: {}, quickTrackers: null, textGoals: null, dateAdded: null, notifications: null};
-  }
-
-  // Sign up a new user with the given credential info
-  // Report errors if the credential info is incorrect or invalid
-  signUp(credentials) {
-    // log in as the admin temporarily for the permission to create a separate database for the user
-    this.remote.logOut(function (err, response) {
-      console.log("Log out the existing account.");
-    });
     this.remote.logIn("migraine-tracker-admin", "migraine-tracker-admin", function (err, response) {
-      console.log("Log in as an admin to create a new database.");
+      console.log("Log in as an admin");
     });
-    this.remote = new PouchDB(this.baseUrl + 'migraine-tracker-' + credentials.username);
-    this.remote.logOut(function (err, response) {
-      console.log("Log out the admin account.");
-    });
-    this.db.sync(this.remote, options).on('error', console.log.bind(console));
-    // sign up as a new user
-    return this.remote.signUp(credentials.username, credentials.password,
-      {metadata : {register_time : new Date()}}, function (err, response) {});
   }
 
-  // Log a registered user into the system given the credential info
-  // Report errors if the credential info is incorrect or invalid
+  /**
+   * Sign up a new user with the given credential info
+   * Report errors if the credential info is incorrect or invalid
+   * @param credentials
+   */
+  signUp(credentials) {
+    this.remote = new PouchDB(this.baseUrl + 'migraine-tracker-' + credentials.username);
+    this.db.sync(this.remote, options).on('error', console.log.bind(console));
+    return this.remote.signUp(credentials.username, credentials.password,
+      {metadata : {register_time : new Date()}}, function (err, response) {}); // sign up as a new user
+  }
+
+  /**
+   * Log a registered user into the system given the credential info
+   * Report errors if the credential info is incorrect or invalid
+   * @param credentials
+   */
   login(credentials) {
     this.remote = new PouchDB(this.baseUrl + 'migraine-tracker-' + credentials.username);
     this.db.sync(this.remote, options).on('error', console.log.bind(console));
     return this.remote.logIn(credentials.username, credentials.password, function (err, response) {});
   }
 
-  // Check whether a user is in the login session
-  async userInSession(credentials) {
-    var current_session = await this.remote.getSession(function (err, response) {
-      return response
-    });
-    return current_session.userCtx.name === credentials['username'];
-  }
-
-  // // Initialize the user info document for the new user
-  // initializeUserInfoDoc(username) {
-  //   this.db.put({_id: "user-info", register_time: new Date(), username: username, current_configured_routine_id: 0,
-  //     current_track_date: CouchDbServiceProvider.getDate(), break: 0}, function(err, response) {
-  //     if (err) { return console.log(err); }
-  //   });
-  // }
-
-  // Initialize the user info document for the new user
+  /**
+   * Initialize the user info document for the new user
+   * @param username
+   */
   initializeUserInfoDoc(username) {
-    this.db.put({_id: "user-info", register_time: new Date(), username: username, current_configured_routine_id: 0,
-      break: 0}, function(err, response) {
+    this.db.put({_id: "user-info", register_time: new Date(), username: username,
+      current_configured_routine_id: 0, break: 0}, function(err, response) {
       if (err) { return console.log(err); }
     });
   }
 
-  // Get the current configured routine id from the user info doc in the database
-  async getCurrentConfiguredRoutineID() {
+  /**
+   * Fetch the current configured routine id from the user info doc in the database
+   */
+  async fetchCurrentConfiguredRoutineID() {
     try {
       var doc = await this.db.get('user-info');
       return doc['current_configured_routine_id'];
@@ -98,18 +74,18 @@ export class CouchDbServiceProvider {
     }
   }
 
-  // Get the current configured routine doc from the user info doc in the database
-  async getCurrentConfiguredRoutineDoc() {
-    try {
-      var doc = await this.db.get('user-info');
-      return doc;
-    } catch (err) {
-      console.log(err);
-    }
+  /**
+   * Return the current configured routine
+   */
+  getCurrentConfiguredRoutine() {
+    return this.currentConfiguredRoutine;
   }
 
-  // Set the current configured routine id
-  async setCurrentConfiguredRoutineID(current_configured_routine_id) {
+  /**
+   * Set the current configured routine id
+   * @param current_configured_routine_id
+   */
+  async logCurrentConfiguredRoutineID(current_configured_routine_id) {
     try {
       var doc = await this.db.get('user-info');
       var response = await this.db.put({
@@ -125,17 +101,16 @@ export class CouchDbServiceProvider {
     }
   }
 
-  // Log the configured routine
-  async logConfiguredRoutine(data) {
-    // console.log("******");
-    // console.log(data["selectedData"]);
-    var dataToTrack = data["selectedData"];
-    var quickTrackers = [];
+  /**
+   * Get the quick trackers given the list of selected data
+   * @param data
+   */
+  getQuickTrackers(data) {
+    let quickTrackers = [];
     var dataTypes = ['Symptom', 'Treatment', 'Contributor', 'Change', 'Other'];
-    // Append the quick tracker data to a list
-    for (let i=0; i < dataTypes.length; i++) {
-      if (dataToTrack.hasOwnProperty(dataTypes[i])) {
-        var data_tracked = dataToTrack[dataTypes[i]];
+    for (let i=0; i < dataTypes.length; i++) { // Append the quick tracker data to a list
+      if (data.hasOwnProperty(dataTypes[i])) {
+        var data_tracked = data[dataTypes[i]];
         if (data_tracked) {
           for (let j=0; j<data_tracked.length; j++) {
             if (data_tracked[j]['quickTrack']) {
@@ -145,32 +120,32 @@ export class CouchDbServiceProvider {
         }
       }
     }
-
-    // data['dateAdded'] = new Date();
-
-    // Construct the configured routine
-    var currentConfiguredRoutine = {
-      dateAdded: new Date(),
-      goals: data["goalIDs"],
-      dataToTrack: data["selectedData"],
-      quickTrackers: quickTrackers,
-      textGoals: data["textGoals"],
-      notifications: data["notifications"],
-    };
-
-
-    var currentConfiguredRoutineID = await this.getCurrentConfiguredRoutineID();
-    currentConfiguredRoutineID = currentConfiguredRoutineID + 1;
-    this.setCurrentConfiguredRoutineID(currentConfiguredRoutineID);
-    this.db.put({_id: "configured-routine-" + currentConfiguredRoutineID, configured_routine: currentConfiguredRoutine}, function(err, response) {
-      if (err) { return console.log(err); }
-      // handle response
-    });
+    return quickTrackers;
   }
 
-  // Get the current configured routine
-  async getConfiguredRoutine() {
-    var currentConfiguredRoutineID = await this.getCurrentConfiguredRoutineID();
+  /**
+   * Log the configured routine to the database
+   * @param data
+   */
+  async logConfiguredRoutine(data) {
+    if (data["dataToTrack"]) {
+      data["quickTrackers"] = this.getQuickTrackers(data["dataToTrack"]);
+    }
+    var currentConfiguredRoutineID = await this.fetchCurrentConfiguredRoutineID();
+    currentConfiguredRoutineID = currentConfiguredRoutineID + 1;
+    this.logCurrentConfiguredRoutineID(currentConfiguredRoutineID);
+    this.db.put({_id: "configured-routine-" + currentConfiguredRoutineID,
+      date_added: new Date(), configured_routine: data}, function(err, response) {
+      if (err) { return console.log(err); }
+    });
+    this.currentConfiguredRoutine = data;
+  }
+
+  /**
+   * Get the current configured routine
+   */
+  async fetchConfiguredRoutine() {
+    var currentConfiguredRoutineID = await this.fetchCurrentConfiguredRoutineID();
     if (currentConfiguredRoutineID != 0) {
       try {
         this.currentConfiguredRoutine = await this.db.get("configured-routine-" + currentConfiguredRoutineID);
@@ -185,7 +160,9 @@ export class CouchDbServiceProvider {
     return null;
   }
 
-  // get the current date
+  /**
+   * get the current date
+   */
   static getDate() {
       var date = new Date();
       var day = date.getDate();
@@ -194,12 +171,19 @@ export class CouchDbServiceProvider {
       return [day, month, year];
   }
 
-  // get the tracked data doc id
+  /**
+   * get the tracked data doc id
+   * @param date
+   */
   static getTrackedDataDocID(date) {
     return 'tracked-data-' + date[2] + "-" + (date[1] + 1) + "-" + date[0];
   }
 
-  // merge the old and new tracked data
+  /**
+   * merge the old and new tracked data
+   * @param oldData
+   * @param newData
+   */
   static combineTrackedData(oldData, newData) {
     for (let goal in newData) {
       if (!oldData.hasOwnProperty(goal)) {
@@ -212,7 +196,11 @@ export class CouchDbServiceProvider {
     return oldData;
   }
 
-  // Log tracked data to the database
+  /**
+   * Log tracked data to the database
+   * @param trackedData
+   * @param date
+   */
   async logTrackedData(trackedData, date) {
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
     try {
@@ -234,8 +222,11 @@ export class CouchDbServiceProvider {
     }
   }
 
-  // Get the current configured routine
-  async getTrackedData(date) {
+  /**
+   * Get the current configured routine
+   * @param date
+   */
+  async fetchTrackedData(date) {
     var trackedDataDocID = CouchDbServiceProvider.getTrackedDataDocID(date);
     try {
       var trackedDataDoc = await this.db.get(trackedDataDocID);
@@ -245,6 +236,11 @@ export class CouchDbServiceProvider {
       return {};
     }
   }
+
+
+
+
+
 
 
 

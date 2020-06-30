@@ -29,7 +29,7 @@
 
     <ion-card class="goal-card center">
       <div *ngFor="let goal of goalTypes">
-        <ion-card-header>
+        <ion-card-header class="goal-card-header">
           <div class="goal-name-wrapper">
             <ion-icon class="goal-icon" name="{{'custom-' + goal.slice(0, -3).toLowerCase()}}"></ion-icon>
             <p class="goal-name">{{goal.slice(0, -3)}}</p>
@@ -46,6 +46,21 @@
         <ion-card-content class="goal-card-content">
           <ion-list no-lines *ngFor="let subgoal of goalHierarchy[goal]['subgoals']">
             <p class="sub-goal-chosen-text">{{subgoal}}</p>
+          </ion-list>
+        </ion-card-content>
+      </div>
+
+      <div class="custom-goal">
+        <ion-card-header class="goal-card-header">
+          <div class="goal-name-wrapper">
+            <ion-icon class="goal-icon" name="custom-other-note"></ion-icon>
+            <p class="goal-name">Custom</p>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content class="goal-card-content" *ngIf="textGoals">
+          <ion-list no-lines>
+            <p class="sub-goal-chosen-text">{{textGoals}}</p>
           </ion-list>
         </ion-card-content>
       </div>

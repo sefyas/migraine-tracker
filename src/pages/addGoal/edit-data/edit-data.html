@@ -1,20 +1,20 @@
 
 <ion-content class="content-wrapper">
-    <ion-card-header text-left class="data-header-wrapper">
-        <div *ngIf="data.custom">
-            <p class="data-header-title-text">Custom {{dataType}} Data</p>
-            <h2 class="data-header-explanation-text">Custom data you configured</h2>
-        </div>
+    <div [class.transparent]="displayDataInfo || displayLimitInfo">
+        <ion-card-header text-left class="data-header-wrapper">
+            <div *ngIf="data.custom">
+                <p class="data-header-title-text">Custom {{dataType}} Data</p>
+                <h2 class="data-header-explanation-text">Custom data you configured</h2>
+            </div>
 
-        <div *ngIf="!data.custom">
-            <p class="data-header-title-text">{{data.name}}</p>
-            <p class="data-header-explanation-text" text-wrap>{{data.explanation}}</p>
-        </div>
-    </ion-card-header>
+            <div *ngIf="!data.custom">
+                <p class="data-header-title-text">{{data.name}}</p>
+                <p class="data-header-explanation-text" text-wrap>{{data.explanation}}</p>
+            </div>
+        </ion-card-header>
 
-    <div text-left class="data-content-wrapper">
-        <div>
-            <p class="data-tracking-method-title">What are you tracking?</p>
+        <div text-left class="data-content-wrapper" [class.transparent]="displayDataInfo || displayLimitInfo">
+            <ion-backdrop *ngIf="displayDataInfo || displayLimitInfo"></ion-backdrop>
             <div class="data-name-wrapper" *ngIf="data.custom">
                 <ion-input class="name-textfield" type="text" placeholder="Data Name" [(ngModel)]="data.name"></ion-input>
             </div>
@@ -22,140 +22,161 @@
                 <p class="recommended-goal-title">Suggested based on your goals:</p>
                 <p class="recommended-goal-text" text-wrap *ngFor="let goal of goalList">{{goal}}</p>
             </div>
-        </div>
 
-        <!--  Set Data Tracking Method  -->
-        <div>
-            <p class="data-tracking-method-title">How are you tracking?</p>
-            <ng-container *ngFor="let field of fieldList">
-                <ng-container *ngIf="(!data.fieldsAllowed) || (data.fieldsAllowed.indexOf(field.name) > -1)">
-                    <div class="data-tracking-method-option">
-                        <div class="align-left add-btn-wrapper">
-                            <button class="add-btn" *ngIf="data.field !== field.name" icon-only (click)="setDataField(field)">
+            <!--  Set Data Tracking Method  -->
+            <div>
+                <p class="data-tracking-method-title">How are you tracking?</p>
+                <button class="align-right info-button" (click)="onDisplayInfoClick('data')" icon-only>
+                    <img [src]="'../../assets/pages/info_icon.svg' " alt="">
+                </button>
+                <ng-container *ngFor="let field of fieldList">
+                    <ng-container *ngIf="(!data.fieldsAllowed) || (data.fieldsAllowed.indexOf(field.name) > -1)">
+                        <div class="data-tracking-method-option">
+                            <div class="align-left add-btn-wrapper">
+                                <button class="add-btn" *ngIf="data.field !== field.name" icon-only (click)="setDataField(field)">
+                                    <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                                </button>
+                                <button class="add-btn" *ngIf="data.field === field.name" icon-only (click)="removeDataField()">
+                                    <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                                </button>
+                            </div>
+
+                            <div class="align-left add-text-wrapper">
+                                <p *ngIf="data.recommendedField && field['name'] === data.recommendedField"
+                                   class="data-tracking-method-recommended">Recommended</p>
+                                <p class="data-tracking-method-name">{{field['name']}}</p>
+                                <p class="data-tracking-method-explanation">{{field['explanation']}}</p>
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+
+            <div class="limit-wrapper" *ngIf="allowsGoals && (data.field && data.field === 'binary' || data.field === 'number')">
+                <div class="limit-option-header-wrapper">
+                    <p class="data-tracking-method-title">Do you want to set a limit?</p>
+                    <button class="align-right info-button" (click)="onDisplayInfoClick('limit')" icon-only>
+                        <img [src]="'../../assets/pages/info_icon.svg' " alt="">
+                    </button>
+                </div>
+                <div class="limit-option-wrapper">
+                    <div class="more-less-option-wrapper">
+                        <div class="limit-option">
+                            <button *ngIf="!(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'more')"
+                                    (click)="setLimit('more', null)" class="align-left limit-btn" icon-only>
                                 <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
                             </button>
-                            <button class="add-btn" *ngIf="data.field === field.name" icon-only (click)="removeDataField()">
+                            <button *ngIf="(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'more')"
+                                    (click)="setLimit('more', null)" class="align-left limit-btn" icon-only>
                                 <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
                             </button>
+                            <p (click)="setLimit('more', null)" class="more-less-label">more</p>
                         </div>
 
-                        <div class="align-left add-text-wrapper">
-                            <p *ngIf="data.recommendedField && field['name'] === data.recommendedField"
-                               class="data-tracking-method-recommended">Recommended</p>
-                            <p class="data-tracking-method-name">{{field['name']}}</p>
-                            <p class="data-tracking-method-explanation">{{field['explanation']}}</p>
+                        <div class="limit-option">
+                            <button *ngIf="!(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'less')"
+                                    (click)="setLimit('less', null)" class="align-left limit-btn" icon-only>
+                                <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                            </button>
+                            <button *ngIf="(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'less')"
+                                    (click)="setLimit('less', null)" class="align-left limit-btn" icon-only>
+                                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                            </button>
+                            <p (click)="setLimit('less', null)" class="more-less-label">less</p>
                         </div>
                     </div>
-                </ng-container>
-            </ng-container>
-        </div>
 
-        <div class="limit-wrapper" *ngIf="allowsGoals && (data.field && data.field === 'binary' || data.field === 'number')">
-            <p class="data-tracking-method-title">Do you want to set a limit?</p>
-            <div class="limit-option-wrapper">
-                <div class="more-less-option-wrapper">
-                    <div class="limit-option">
-                        <button *ngIf="!(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'more')"
-                                (click)="setLimit('more', null)" class="align-left limit-btn" icon-only>
-                            <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
-                        </button>
-                        <button *ngIf="(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'more')"
-                                (click)="setLimit('more', null)" class="align-left limit-btn" icon-only>
-                            <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
-                        </button>
-                        <p (click)="setLimit('more', null)" class="more-less-label">more</p>
+                    <div class="limit-label">than</div>
+
+                    <div class="limit-element-wrapper">
+                        <ion-input size="number" type="number" text-right class="limit-number-textfield" no-padding no-border
+                                   [placeholder]="(data.goal && data.goal.threshold) ? data.goal.threshold : '---'"
+                                   [(ngModel)]="data.goal.threshold"></ion-input>
                     </div>
 
-                    <div class="limit-option">
-                        <button *ngIf="!(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'less')"
-                                (click)="setLimit('less', null)" class="align-left limit-btn" icon-only>
-                            <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
-                        </button>
-                        <button *ngIf="(data.goal && data.goal.freq && data.goal.freq.toLowerCase() === 'less')"
-                                (click)="setLimit('less', null)" class="align-left limit-btn" icon-only>
-                            <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
-                        </button>
-                        <p (click)="setLimit('less', null)" class="more-less-label">less</p>
+                    <div class="limit-label">per</div>
+
+                    <div class="limit-element-wrapper">
+                        <div class="limit-option">
+                            <button *ngIf="!(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'day')"
+                                    (click)="setLimit(null, 'day')" class="align-left limit-btn" icon-only>
+                                <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                            </button>
+                            <button *ngIf="(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'day')"
+                                    (click)="setLimit(null, 'day')" class="align-left limit-btn" icon-only>
+                                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                            </button>
+                            <p (click)="setLimit(null, 'day')" class="more-less-label">day</p>
+                        </div>
+
+                        <div class="limit-option">
+                            <button *ngIf="!(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'week')"
+                                    (click)="setLimit(null, 'week')" class="align-left limit-btn" icon-only>
+                                <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                            </button>
+                            <button *ngIf="(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'week')"
+                                    (click)="setLimit(null, 'week')" class="align-left limit-btn" icon-only>
+                                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                            </button>
+                            <p (click)="setLimit(null, 'week')" class="more-less-label">week</p>
+                        </div>
+
+                        <div class="limit-option">
+                            <button *ngIf="!(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'month')"
+                                    (click)="setLimit(null, 'month')" class="align-left limit-btn" icon-only>
+                                <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                            </button>
+                            <button *ngIf="(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'month')"
+                                    (click)="setLimit(null, 'month')" class="align-left limit-btn" icon-only>
+                                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                            </button>
+                            <p (click)="setLimit(null, 'month')" class="more-less-label">month</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="limit-label">than</div>
-
-                <div class="limit-element-wrapper">
-                    <ion-input size="number" type="number" text-right class="limit-number-textfield" no-padding no-border
-                               [placeholder]="(data.goal && data.goal.threshold) ? data.goal.threshold : '---'"
-                               [(ngModel)]="data.goal.threshold"></ion-input>
-                </div>
-
-                <div class="limit-label">per</div>
-
-                <div class="limit-element-wrapper">
-                    <div class="limit-option">
-                        <button *ngIf="!(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'day')"
-                                (click)="setLimit(null, 'day')" class="align-left limit-btn" icon-only>
-                            <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
-                        </button>
-                        <button *ngIf="(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'day')"
-                                (click)="setLimit(null, 'day')" class="align-left limit-btn" icon-only>
-                            <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
-                        </button>
-                        <p (click)="setLimit(null, 'day')" class="more-less-label">day</p>
-                    </div>
-
-                    <div class="limit-option">
-                        <button *ngIf="!(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'week')"
-                                (click)="setLimit(null, 'week')" class="align-left limit-btn" icon-only>
-                            <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
-                        </button>
-                        <button *ngIf="(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'week')"
-                                (click)="setLimit(null, 'week')" class="align-left limit-btn" icon-only>
-                            <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
-                        </button>
-                        <p (click)="setLimit(null, 'week')" class="more-less-label">week</p>
-                    </div>
-
-                    <div class="limit-option">
-                        <button *ngIf="!(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'month')"
-                                (click)="setLimit(null, 'month')" class="align-left limit-btn" icon-only>
-                            <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
-                        </button>
-                        <button *ngIf="(data.goal && data.goal.timespan && data.goal.timespan.toLowerCase() === 'month')"
-                                (click)="setLimit(null, 'month')" class="align-left limit-btn" icon-only>
-                            <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
-                        </button>
-                        <p (click)="setLimit(null, 'month')" class="more-less-label">month</p>
-                    </div>
+                <div class="no-limit">
+                    <button *ngIf="data.goal.freq || data.goal.threshold || data.goal.timespan"
+                            (click)="removeLimit()" class="align-left limit-btn" icon-only>
+                        <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                    </button>
+                    <button *ngIf="!data.goal.freq && !data.goal.threshold && !data.goal.timespan"
+                            (click)="removeLimit()" class="align-left limit-btn" icon-only>
+                        <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                    </button>
+                    <p (click)="removeLimit()" class="more-less-label">I don't want to set a limit</p>
                 </div>
             </div>
-
-            <div class="no-limit">
-                <button *ngIf="data.goal.freq || data.goal.threshold || data.goal.timespan"
-                        (click)="removeLimit()" class="align-left limit-btn" icon-only>
-                    <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
-                </button>
-                <button *ngIf="!data.goal.freq && !data.goal.threshold && !data.goal.timespan"
-                        (click)="removeLimit()" class="align-left limit-btn" icon-only>
-                    <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
-                </button>
-                <p (click)="removeLimit()" class="more-less-label">I don't want to set a limit</p>
-            </div>
         </div>
-    </div>
 
-    <!-- buttons -->
-    <div class="button-wrapper" text-center>
-        <button class="data-select-btn remove-btn" [class.remove-btn-half]="data.selected"
-                *ngIf="data.selected" color="darkRed" ion-button (click)="backToConfig('remove')">Remove</button>
+        <!-- buttons -->
+        <div class="button-wrapper" text-center>
+            <button class="data-select-btn remove-btn" [class.remove-btn-half]="data.selected"
+                    *ngIf="data.selected" color="darkRed" ion-button (click)="backToConfig('remove')">Remove</button>
 
-        <button class="data-select-btn confirm-btn" [class.confirm-btn-half]="data.selected" color="goalThemeDark"
-                [disabled]="!data.name || !data.field || ((data.goal.timespan || data.goal.freq ||
+            <button class="data-select-btn confirm-btn" [class.confirm-btn-half]="data.selected" color="goalThemeDark"
+                    [disabled]="!data.name || !data.field || ((data.goal.timespan || data.goal.freq ||
                 data.goal.threshold) && !(data.goal.timespan && data.goal.freq && data.goal.threshold))"
-                ion-button (click)="backToConfig('add')">
-            <ng-container *ngIf="!data.selected">Add</ng-container>
-            <ng-container *ngIf="data.selected">Save</ng-container>
-        </button>
+                    ion-button (click)="backToConfig('add')">
+                <ng-container *ngIf="!data.selected">Add</ng-container>
+                <ng-container *ngIf="data.selected">Save</ng-container>
+            </button>
 
-        <button class="data-select-btn cancel-btn" outline color="light" ion-button
-                (click)="backToConfig('cancel')">Cancel</button>
+            <button class="data-select-btn cancel-btn" outline color="light" ion-button
+                    (click)="backToConfig('cancel')">Cancel</button>
+        </div>
     </div>
 </ion-content>
+
+<ion-card-content class="info-card" slot="fixed" *ngIf="displayDataInfo || displayLimitInfo">
+    <button class="close-button" (click)="onCloseInfoClick()" icon-only>
+        <ion-icon name="custom-close"></ion-icon>
+    </button>
+    <p class="info-title" *ngIf="displayDataInfo">
+        Choose a data type to start tracking your data.
+    </p>
+    <p class="info-title" *ngIf="displayLimitInfo">
+        Set a limit/goal for the data you track. The recommended dose given by medical providers is preset for you.
+        However, you can modify it based on your goals and needs.
+    </p>
+</ion-card-content>

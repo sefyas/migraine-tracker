@@ -1,8 +1,7 @@
 import {Component, ViewChild} from '@angular/core';
-import {Events, ModalController, Nav, Platform} from 'ionic-angular';
+import {Events, Nav, Platform} from 'ionic-angular';
 import {StatusBar} from '@ionic-native/status-bar';
 import {SplashScreen} from '@ionic-native/splash-screen';
-import {ErrorHandler, NgModule, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 
 import {HomePage} from '../pages/home/home';
 import {GoalModificationPage} from "../pages/goal-modification/goal-modification";
@@ -19,10 +18,8 @@ import {DataVisPage} from "../pages/data-vis/data-vis";
 })
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
-
   // make HomePage the root (or first) page, which will be the first page loaded in the nav controller
   rootPage: any = HomePage;
-
   pages: Array<{title: string, component: any}>;
   activePage: any;
 
@@ -34,7 +31,7 @@ export class MyApp {
       this.pages = [
         { title: 'Home', component: HomePage},
         { title: 'About Migraine', component: FaqPage},
-        // { title: 'Data Summary', component: DataSummaryPage},
+        { title: 'Data Summary', component: DataSummaryPage},
         // { title: 'Data Calendar', component: DataCalendarPage},
         // { title: 'Data Visualizations', component: DataVisPage},
         { title: 'Modify Goals', component: GoalModificationPage},
@@ -45,18 +42,20 @@ export class MyApp {
 
     this.initializeApp();
 
+    // console.log("$$$$$$$$$$$$");
+    // console.log(this.couchDBService.fetchConfiguredRoutine());
+
     // used for an example of ngFor and navigation
-    if(this.couchDBService.getConfiguredRoutine() === null){
+    if (this.couchDBService.fetchConfiguredRoutine() === null) {
       this.pages = [
         { title: 'Home', component: HomePage},
         { title: 'About Migraine', component: FaqPage}
       ];
-    }
-    else{
+    } else {
       this.pages = [
         { title: 'Home', component: HomePage},
         { title: 'About Migraine', component: FaqPage},
-        // { title: 'Data Summary', component: DataSummaryPage},
+        { title: 'Data Summary', component: DataSummaryPage},
         // { title: 'Data Calendar', component: DataCalendarPage},
         // { title: 'Data Visualizations', component: DataVisPage},
         { title: 'Modify Goals', component: GoalModificationPage},
@@ -64,10 +63,8 @@ export class MyApp {
         { title: 'Take a Break from Tracking', component: BreakFromTrackingPage},
       ];
     }
-
     this.activePage = this.pages[0];
   }
-
 
   initializeApp() {
     this.platform.ready().then(() => {

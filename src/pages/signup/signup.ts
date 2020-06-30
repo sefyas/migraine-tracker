@@ -36,8 +36,8 @@ export class SignUpPage {
     this.couchDbService.signUp(credentials).then(response => {
       console.log("Sign up as " + this.username);
       this.storage.set('credentials', credentials);
-      this.nav.push(HomePage);
       this.couchDbService.initializeUserInfoDoc(this.username);
+      this.nav.push(HomePage);
     }).catch(err => {
       console.log(err);
       if (err.name === 'conflict') {

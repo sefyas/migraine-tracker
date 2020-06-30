@@ -16,11 +16,12 @@ export class GoalTypePage {
   private goalList : Goal[];
   private modifying : boolean = false;
   private selectedGoals : string[] = [];
-  private textGoals : string;
   private textGoalExpand : boolean = false;
   private expandMonitor : boolean = false;
   private expandLearn : boolean = false;
   private displayTextGoalEditBtn : boolean = true;
+  private configuredRoutine : any = {};
+  private params : any = {};
 
   constructor(private navCtrl: NavController,
               public navParams: NavParams,
@@ -29,31 +30,50 @@ export class GoalTypePage {
               private dataDetails: DataDetailsServiceProvider) {}
 
   async ionViewDidLoad() {
-    this.modifying = this.navParams.data['modifying'];
-    if (this.modifying) {
+    if (this.navParams.data.length !== 0 && this.navParams.data) { // from the goal modification page
+      this.configuredRoutine = this.navParams.data.configuredRoutine;
+      this.params = this.navParams.data.params;
+    } else { // from the initial setup page
+      this.configuredRoutine = await this.couchDbService.fetchConfiguredRoutine().then((val) => {
+        return val;
+      });
+    }
+    if (this.configuredRoutine) { // load existing configurations
+      this.selectedGoals = this.configuredRoutine['goals'];
+      this.textGoalExpand = true;
+    } else { // initialize the goal configuration
+      this.configuredRoutine = {};
+    }
+    if (this.params && this.params['modifying']) {
+      this.modifying = true;
       this.expandMonitor = true;
       this.expandLearn = true;
+    } else {
+      this.modifying = false;
     }
-
-    let configuredRoutine = await this.couchDbService.getConfiguredRoutine().then((val) => {
-      return val;
-    });
-    if (configuredRoutine !== null) {
-      this.selectedGoals = configuredRoutine['goals'];
-      this.textGoals = configuredRoutine.textGoals;
-      this.textGoalExpand = true;
-    }
-    this.goalList = this.goalDetailsServiceProvider.getGoalList();
+    this.goalList = this.goalDetailsServiceProvider.getGoalList(); // load all goals
   }
 
+  /**
+   * Select a goal
+   * @param subgoal
+   */
   addGoal(subgoal : Goal = null) {
     this.selectedGoals.push(subgoal.goalID);
   }
 
+  /**
+   * Deselect a goal
+   * @param subgoal
+   */
   removeGoal(subgoal : Goal = null) {
     this.selectedGoals.splice(this.selectedGoals.indexOf(subgoal.goalID), 1);
   }
 
+  /**
+   * Expand a goal with subgoals
+   * @param goal
+   */
   expandGoal(goal : Goal) {
     if (goal.name === "Monitoring") {
       this.expandMonitor = !this.expandMonitor;
@@ -62,55 +82,54 @@ export class GoalTypePage {
     }
   }
 
-  async continueSetup(exit=false) {
+  /**
+   * Called when the previous navigation button is clicked
+   */
+  onClickPrevious() {
+    this.navCtrl.pop({animate: false});
+  }
+
+  /**
+   * Called when the previous navigation button is clicked
+   */
+  async onClickNext(exit=false) {
     let selectedConfigData = this.dataDetails.getSelectedConfigData(this.selectedGoals);
-    let dataToSend = await this.couchDbService.getConfiguredRoutine().then((val) => {
-      return val;
-    });
-
-    // console.log("!!!!!!!!!!!!!!!!!!!!!!");
-    // console.log(dataToSend);
-    // let dataToSend = {'goals': this.selectedGoals,
-    //   'textGoals': this.textGoals,
-    //   'selectedConfigData': selectedConfigData,
-    //   'modifying': this.modifying,
-    //   'configuredRoutine': configuredRoutine};
-
-    dataToSend['goals'] = this.selectedGoals;
-    dataToSend['textGoals'] = this.textGoals;
-    dataToSend['selectedConfigData'] = selectedConfigData;
-    dataToSend['modifying'] = this.modifying;
-
-    if (exit) {
-      dataToSend['goalsOnly'] = true;
-      this.navCtrl.setRoot(GoalModificationPage, dataToSend);
-    } else{
+    this.configuredRoutine['goals'] = this.selectedGoals;
+    this.configuredRoutine['selectedConfigData'] = selectedConfigData;
+    if (exit) { // save and go back to the goal modification page
+      this.navCtrl.setRoot(GoalModificationPage,
+          {'configuredRoutine': this.configuredRoutine, 'params': this.params});
+    } else { // continue with tracking data setup pages
       let configData = this.dataDetails.findNextConfigData(this.selectedGoals, null);
-
-      if (configData!== null) {
-        dataToSend['dataPage'] = configData;
-        this.navCtrl.push(DataConfigPage, dataToSend, {animate: false});
+      if (configData !== null) {
+        this.params['dataPage'] = configData;
+        this.navCtrl.push(DataConfigPage,
+            {'configuredRoutine': this.configuredRoutine, 'params': this.params}, {animate: false});
       } else {
         let error = new Error("All data conditional, no conditions met.");
         throw(error);
       }
     }
-    // this.couchDBService.addGoals(dataToSend["goalIDs"]);
   }
 
-  expandTextGoal() {
+  /**
+   * Expand/collapse the text goal
+   */
+  toggleTextGoal() {
       this.textGoalExpand = !this.textGoalExpand;
   }
 
+  /**
+   * Called when the edit text field is focused
+   */
   onEditTextGoalFocus() {
     this.displayTextGoalEditBtn = false;
   }
 
+  /**
+   * Called when the edit text field loses focus
+   */
   onEditTextGoalBlur() {
     this.displayTextGoalEditBtn = true;
-  }
-
-  onClickPrevious() {
-    this.navCtrl.pop({animate: false});
   }
 }

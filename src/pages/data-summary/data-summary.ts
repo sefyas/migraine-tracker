@@ -39,8 +39,8 @@ export class DataSummaryPage {
   }
 
   setDataTypes(){
-    // this.allTrackedData = this.couchDBService.getTrackedData();
-    this.currentlyTracking = this.couchDBService.getConfiguredRoutine()['dataToTrack'];
+    // this.allTrackedData = this.couchDBService.fetchTrackedData();
+    this.currentlyTracking = this.couchDBService.fetchConfiguredRoutine()['dataToTrack'];
     let allDataTypes = Object.keys(this.currentlyTracking);
     console.log(this.currentlyTracking)
     for(let i=0; i<allDataTypes.length; i++){ // we won't report notes, so if it's all they have for a datatype, remove

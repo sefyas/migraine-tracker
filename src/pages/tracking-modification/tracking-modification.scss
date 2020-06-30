@@ -1,18 +1,76 @@
 page-tracking-modification {
-
-  .addCustom{
-    padding-top: 1em;
-    font-size: 2rem;
+  .align-right {
+    float: right;
   }
 
-  .addItem{
-    background-color: var(--ion-background-color);
-    font-size:1.8rem;
-    padding: 0 !important;
+  .center {
+    display: inline-block;
+    justify-content: center;
   }
 
-  .addIcon{
-    margin-right: 0.2em !important;
+  .goal-title-icon {
+    margin-left: 10px;
+    width: 45pt;
+    display: inline-block;
   }
 
+  .goal-title-text {
+    font-size: 15pt;
+    font-weight: bold;
+    max-width: 200px;
+    display: inline-block;
+    margin-left: 10px;
+    position: relative;
+    top: -20px;
+  }
+
+  .edit-button {
+    background: none;
+    width: 50px;
+    margin-top: 15px;
+    display: inline-block;
+  }
+
+  .check-radio-btn {
+    position: relative;
+    background: none;
+    margin-right: 10px;
+    margin-left: -10px;
+    width: 40px;
+    display: inline-block;
+  }
+
+  .goal-data-title {
+    position: relative;
+    top: -10px;
+    align-content: center;
+    justify-content: center;
+    font-size: 12pt;
+    font-weight: bold;
+    line-height: 20px;
+    max-width: 220px;
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  .goal-list-item {
+    height: 60px;
+  }
+
+  .goal-card {
+    position: relative;
+    margin-top: 10px;
+    background: var(--goal-card-background);
+    border-radius: 15px;
+  }
+
+  .ion-content-wrapper {
+    padding: 10px;
+    position: relative;
+    top: 10px;
+  }
+
+  .content {
+    height: 100%;
+  }
 }

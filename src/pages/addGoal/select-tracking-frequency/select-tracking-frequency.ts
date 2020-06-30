@@ -35,6 +35,8 @@ export class SelectTrackingFrequencyPage {
   private postSymptomInfoDisplayed : any = false;
   private regularInfoDisplayed : any = false;
 
+  private configuredRoutine : any = {};
+
   days : number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
     25, 26, 27, 28, 29, 30, 31];
 
@@ -48,11 +50,9 @@ export class SelectTrackingFrequencyPage {
   }
 
   async ionViewDidLoad() {
-    this.activeGoals = await this.couchDbService.getConfiguredRoutine().then((val) => {
-      return val;
-    });
-    this.allGoals = this.activeGoals ? this.activeGoals['goals'] : [];
-    this.allGoals = this.allGoals.concat(this.navParams.data['goalIDs'] ? this.navParams.data['goalIDs'] : []);
+    this.configuredRoutine = this.navParams.data;
+    this.allGoals = this.configuredRoutine ? this.configuredRoutine['goals'] : [];
+    this.allGoals = this.allGoals.concat(this.configuredRoutine['goals'] ? this.configuredRoutine['goals'] : []);
     this.recommended = this.getRecommendation(this.allGoals);
 
     if (this.activeGoals) { // if they have configured notifications, display those
@@ -64,7 +64,7 @@ export class SelectTrackingFrequencyPage {
         this.notificationData['regular'] = {'delayScale': 'Daily', 'timeOfDay': "18:00"};
       }
     }
-    this.isModal = this.navParams.data['isModal'];
+    this.isModal = this.configuredRoutine['isModal'];
   }
 
   onClickPrevious() {
@@ -75,14 +75,14 @@ export class SelectTrackingFrequencyPage {
     if (this.isModal) {
       this.viewCtrl.dismiss(this.notificationData);
     } else {
-      this.navParams.data['notifications'] = this.notificationData;
+      this.configuredRoutine['notifications'] = this.notificationData;
       if (this.activeGoals) {
-        this.navCtrl.setRoot(GoalModificationPage, this.navParams.data);
+        this.navCtrl.setRoot(GoalModificationPage, this.configuredRoutine);
       } else {
-        this.navCtrl.setRoot(HomePage, this.navParams.data);
+        this.navCtrl.setRoot(HomePage, this.configuredRoutine);
       }
     }
-    this.couchDbService.logConfiguredRoutine(this.navParams['data']);
+    this.couchDbService.logConfiguredRoutine(this.configuredRoutine);
   }
 
   selectPostSymptom() {
@@ -116,9 +116,9 @@ export class SelectTrackingFrequencyPage {
     }
   }
 
-  getRecommendation(goalIDs : string[]){
-    for(let i=0; i<goalIDs.length; i++){
-      if(this.goalDetails.getGoalByID(goalIDs[i])['suggestedFrequency'] === "regular"){
+  getRecommendation(goals : string[]){
+    for(let i=0; i<goals.length; i++){
+      if(this.goalDetails.getGoalByID(goals[i])['suggestedFrequency'] === "regular"){
         return 'regular';
       }
     }

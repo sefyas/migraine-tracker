@@ -76,7 +76,7 @@ export class TrackingPage {
   }
   // ================= BUTTONS Ends =================
   async loadTrackedData() {
-    this.tracked = await this.couchDbService.getTrackedData(this.dateSelected);
+    this.tracked = await this.couchDbService.fetchTrackedData(this.dateSelected);
   }
 
   saveTrackedData() {

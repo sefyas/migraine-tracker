@@ -61,11 +61,11 @@
                 <img [src]="'../../assets/pages/add_radio_icon.svg' " alt="">
               </button>
 
-              <button class="align-left subgoal-btn" *ngIf="rec['selected']" (click)="remove(rec, 'rec')" icon-only>
+              <button class="align-left subgoal-btn" *ngIf="rec['selected']" (click)="removeData(rec, 'rec')" icon-only>
                 <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
               </button>
 
-              <p class="sub-goal-text" (click)="rec['selected'] ? remove(rec, 'rec') : editData(rec, 'rec')"> {{rec.name}} </p>
+              <p class="sub-goal-text" (click)="rec['selected'] ? removeData(rec, 'rec') : editData(rec, 'rec')"> {{rec.name}} </p>
 
               <button item-right class="data-edit-button"*ngIf="rec['selected']" (click)="editData(rec, 'rec')" icon-only>
                 <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
@@ -75,11 +75,11 @@
           </ion-list>
         </div>
 
-        <button class="align-right goal-btn" *ngIf="recommendExpanded" (click)="expandRecommendCard()" icon-only>
+        <button class="align-right goal-btn" *ngIf="recommendExpanded" (click)="toggleRecommendCard()" icon-only>
           <img [src]="'../../assets/pages/drop_up_icon.svg' " alt="">
         </button>
 
-        <button class="align-right goal-btn" *ngIf="!recommendExpanded" (click)="expandRecommendCard()" icon-only>
+        <button class="align-right goal-btn" *ngIf="!recommendExpanded" (click)="toggleRecommendCard()" icon-only>
           <img [src]="'../../assets/pages/drop_down_icon.svg' " alt="">
         </button>
 
@@ -116,11 +116,11 @@
                 <img [src]="'../../assets/pages/add_radio_icon.svg' " alt="">
               </button>
 
-              <button class="align-left subgoal-btn" *ngIf="data['selected']" (click)="remove(data, 'other')" icon-only>
+              <button class="align-left subgoal-btn" *ngIf="data['selected']" (click)="removeData(data, 'other')" icon-only>
                 <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
               </button>
 
-              <p class="sub-goal-text" (click)="data['selected'] ? remove(data, 'other') : editData(data, 'other')"> {{data.name}} </p>
+              <p class="sub-goal-text" (click)="data['selected'] ? removeData(data, 'other') : editData(data, 'other')"> {{data.name}} </p>
 
               <button item-right class="data-edit-button"*ngIf="data['selected']" (click)="editData(data, 'other')" icon-only>
                 <ion-icon class="edit-icon" name="custom-edit"></ion-icon>
@@ -130,11 +130,11 @@
           </ion-list>
         </div>
 
-        <button class="align-right goal-btn" *ngIf="commonExpanded" (click)="expandCommonCard()" icon-only>
+        <button class="align-right goal-btn" *ngIf="commonExpanded" (click)="toggleCommonCard()" icon-only>
           <img [src]="'../../assets/pages/drop_up_icon.svg' " alt="">
         </button>
 
-        <button class="align-right goal-btn" *ngIf="!commonExpanded" (click)="expandCommonCard()" icon-only>
+        <button class="align-right goal-btn" *ngIf="!commonExpanded" (click)="toggleCommonCard()" icon-only>
           <img [src]="'../../assets/pages/drop_down_icon.svg' " alt="">
         </button>
 
@@ -196,7 +196,7 @@
   </div>
 
   <div>
-    <button class="align-right footer-button" (click)="continueSetup()" icon-only>
+    <button class="align-right footer-button" (click)="onClickNext()" icon-only>
       <ion-icon name="custom-chevron-right"></ion-icon>
     </button>
     <p class="align-right footer-text text-right" ></p>
@@ -213,7 +213,7 @@
   </div>
 
   <div>
-    <button class="align-right modify-footer-button save-button" (click)="continueSetup()" icon-only>
+    <button class="align-right modify-footer-button save-button" (click)="onClickNext()" icon-only>
       Save
     </button>
   </div>

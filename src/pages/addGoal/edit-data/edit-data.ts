@@ -23,6 +23,8 @@ export class EditDataPage {
   private fieldList : DataField[]= [];
   private allowsGoals: boolean;
   private recLimit : any = {};
+  private displayDataInfo : boolean = false;
+  private displayLimitInfo : boolean = false;
 
   constructor(public navParams: NavParams,
               public viewCtrl: ViewController,
@@ -48,11 +50,9 @@ export class EditDataPage {
     }
   }
 
-
   ionViewDidLoad() {
     this.fieldList = this.dataDetails.getSupportedFields();
   }
-
 
   getRecommendingGoals(){
     for(let i=0; i<this.data.recommendingGoals.length; i++){
@@ -62,7 +62,6 @@ export class EditDataPage {
       }
     }
   }
-
 
   setDataField(field : DataField) {
     this.data.field = field['name'];
@@ -79,13 +78,11 @@ export class EditDataPage {
     }
   }
 
-
   removeDataField() {
     this.data.field = null;
     this.data.explanation = null;
     this.data.goal = {'freq': null, 'threshold': null, 'timespan': null};
   }
-
 
   setLimit(freq : string=null, timespan : string=null) {
     if (freq) {
@@ -107,7 +104,6 @@ export class EditDataPage {
     }
   }
 
-
   removeLimit() {
     if (!this.data.goal.freq && !this.data.goal.threshold && !this.data.goal.timespan) {
       this.data.goal.freq = this.recLimit.freq;
@@ -120,7 +116,6 @@ export class EditDataPage {
     }
   }
 
-
   backToConfig(choice : string){
     if (choice === 'add') {
       this.viewCtrl.dismiss(this.data);
@@ -128,6 +123,19 @@ export class EditDataPage {
       this.viewCtrl.dismiss('remove');
     } else {
       this.viewCtrl.dismiss();
+    }
+  }
+
+  onCloseInfoClick() {
+    this.displayDataInfo = false;
+    this.displayLimitInfo = false;
+  }
+
+  onDisplayInfoClick(type : string) {
+    if (type === "data") {
+      this.displayDataInfo = true;
+    } else if (type === "limit") {
+      this.displayLimitInfo = true;
     }
   }
 }

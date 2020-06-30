@@ -3,8 +3,35 @@ page-home {
     display: block !important;
   }
 
+  ion-card-header.goal-card {
+    padding-left: 20px;
+    padding-right: 20px;
+    border: 0.03em solid rgba(255, 255, 255, 0.3);
+    border-radius: 8pt;
+    background-color: var(--goal-card-background);
+    height: 80px;
+    vert-align: middle;
+    justify-content: center;
+  }
+
+  .goal-examples-header {
+    display: block;
+    text-align: left;
+  }
+
+  .tracking-header{
+    font-size: 13pt;
+    background-color: var(--goal-card-background);
+    display: inline;
+  }
+
+  .goal-icon {
+    width: 36pt;
+    display: inline;
+    float: right;
+  }
+
   .data-examples{
-    float: left;
     color: rgba(255, 255, 255, 0.5);
     padding-top: 3pt;
     font-size: 9pt;
@@ -13,6 +40,9 @@ page-home {
     overflow: hidden;
     text-overflow: ellipsis !important;
     max-width: 70%;
+    display: block;
+    margin-bottom: 20px;
+    text-align: left;
   }
 
   .data-name{
@@ -20,12 +50,6 @@ page-home {
     font-weight: bold;
     padding-bottom: 15pt;
     padding-top: 15pt;
-  }
-
-  .tracking-header{
-    font-size: 13pt;
-    background-color: var(--goal-card-background);
-    float: left;
   }
 
   .limit-wrapper{
@@ -71,18 +95,6 @@ page-home {
 
   .align-right {
     text-align: left;
-  }
-
-  .goal-icon {
-    float: right;
-    width: 32pt;
-  }
-
-  ion-card-header.goal-card {
-    padding: 15pt;
-    border: 0.03em solid rgba(255, 255, 255, 0.3);
-    border-radius: 8pt;
-    background-color: var(--goal-card-background);
   }
 
   .center {

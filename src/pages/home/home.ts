@@ -12,7 +12,6 @@ import { ConfiguredRoutine, DataElement } from "../../interfaces/customTypes";
 import { Storage } from "@ionic/storage";
 import * as moment from 'moment';
 
-
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
@@ -39,7 +38,7 @@ export class HomePage {
               private modalCtrl: ModalController,
               public events: Events,
               private storage: Storage) {
-    if (this.navParams.data['dateSelected']) {
+    if (this.navParams.data['dateSelected']) { // return from the sub tracking pages
       this.dateSelected = this.navParams.data['dateSelected'];
     } else {
       this.dateSelected = [moment().date(), moment().month(), moment().year()];
@@ -48,26 +47,20 @@ export class HomePage {
   }
 
   async ionViewDidEnter() {
-    if(this.navParams.data['goalIDs']){
-      this.events.publish('configSeen');
-      this.activeGoals = this.couchDbService.addGoalFromSetup(this.navParams.data);
-      this.setupTrackers();
+    var credentials = await this.storage.get('credentials').then((val) => {
+      return val;
+    });
+    if (credentials != null) {
+      this.couchDbService.login(credentials);
+      this.loggedIn();
+    } else {
+      this.login();
     }
-    else{
-      // Fetch the credentials from the cache
-      var credentials = await this.storage.get('credentials').then((val) => {
-        return val;
-      });
-      if (credentials != null) {
-        this.couchDbService.login(credentials);
-        this.loggedIn();
-      } else {
-        this.login();
-      }
-    }
-
   }
 
+  /**
+   * Direct to the login page if there's no user credential info stored in cache
+   */
   login() {
     let customDataModal = this.modalCtrl.create(LoginPage);
     customDataModal.onDidDismiss(() => {
@@ -76,8 +69,11 @@ export class HomePage {
     customDataModal.present();
   }
 
+  /**
+   * Set up the app if there's cached user credential info
+   */
   async loggedIn(){
-    this.activeGoals = await this.couchDbService.getConfiguredRoutine().then((val) => {
+    this.activeGoals = await this.couchDbService.fetchConfiguredRoutine().then((val) => {
       return val;
     });
     if (this.activeGoals !== null) {
@@ -85,20 +81,34 @@ export class HomePage {
     }
   }
 
+  /**
+   * Load tracked data from the database into local memory
+   */
   async loadTrackedData() {
-    this.tracked = await this.couchDbService.getTrackedData(this.dateSelected);
+    this.tracked = await this.couchDbService.fetchTrackedData(this.dateSelected);
   }
 
+  /**
+   * Save tracked data to the database
+   */
   saveTrackedData() {
     this.couchDbService.logTrackedData(this.tracked, this.dateSelected);
   }
 
-  onDaySelect(componentEvent : any) {
+  /**
+   * Called when a date is selected from the calendar
+   * @param componentEvent
+   */
+  onDaySelectClick(componentEvent : any) {
     this.dateSelected = componentEvent;
     this.loadTrackedData();
   }
 
-  onClickTrackGoal(goal) {
+  /**
+   * Called when the sub tracking pages for each goal is selected
+   * @param goal
+   */
+  onTrackGoalClick(goal) {
     var nonEmptyDataTypes = [""];
     for (var i = 0; i < this.dataTypes.length; i++) {
       var dt = this.dataTypes[i];
@@ -122,37 +132,27 @@ export class HomePage {
       "neighborData": neighborData
     };
 
-    // this.navCtrl.setRoot(HomePage, dataToSend, null, this.homePagePopCallBack);
     this.navCtrl.push(TrackingPage, dataToSend, {animate: false});
   }
 
-  // only if they don't have a goal setup yet
-  addFirstGoal() {
+  /**
+   * Add goals/tracking routines if the user doesn't have so yet
+   */
+  configureGoals() {
     this.navCtrl.push(GoalTypePage, null, {animate: false});
   }
 
-  setupTrackers(){
-    if (this.activeGoals['dataToTrack']) {
-      this.previouslyTracked = this.couchDbService.getTrackedData([this.dateSelected['date'],
-        this.dateSelected['month'], this.dateSelected['year']]); // todo: only need to grab this month's
-      this.quickTrackers = this.activeGoals.quickTrackers;
-
-      if(this.quickTrackers && this.quickTrackers.length > 0){
-        this.dataTypes = ['quickTracker'];
-      } else{
-        console.log("NO QUICK TRACKERS?!")
-      }
-      this.dataToTrack = Object.assign({}, this.activeGoals['dataToTrack']); // otherwise we modify it >.<
-      this.dataTypes = this.dataTypes.concat(Object.keys(this.dataToTrack));
-      this.dataToTrack["quickTracker"] = this.quickTrackers;
-      this.calculateGoalProgresses();
-    }
-  }
-
+  /**
+   * Get data about as-needed medications
+   */
   getTrackedMeds(){
     return this.globalFuns.getWhetherTrackedMeds(this.tracked);
   }
 
+  /**
+   * Get data value
+   * @param data
+   */
   getDataVal(data) {
     if (this.tracked[data.dataType] && this.tracked[data.dataType][data.id] && (typeof this.tracked[data.dataType][data.id] !== typeof {})) {
       return this.tracked[data.dataType][data.id];
@@ -161,6 +161,10 @@ export class HomePage {
     }
   }
 
+  /**
+   * Get start time
+   * @param data
+   */
   getDataStart(data) {
     if (this.tracked[data.dataType] && this.tracked[data.dataType][data.id] && (typeof this.tracked[data.dataType][data.id] === typeof {})) {
       return this.tracked[data.dataType][data.id]['start'];
@@ -169,6 +173,10 @@ export class HomePage {
     }
   }
 
+  /**
+   * Get end time
+   * @param data
+   */
   getDataEnd(data) {
     if (this.tracked[data.dataType] && this.tracked[data.dataType][data.id] && (typeof this.tracked[data.dataType][data.id] === typeof {})) {
       return this.tracked[data.dataType][data.id]['end'];
@@ -177,6 +185,12 @@ export class HomePage {
     }
   }
 
+  /**
+   * Change data values
+   * @param componentEvent
+   * @param data
+   * @param dataType
+   */
   changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
               dataType: string) {
     if (dataType === 'quickTracker') {
@@ -203,62 +217,70 @@ export class HomePage {
     this.saveTrackedData();
   }
 
-  formatForCalendar(event){ // call when we push to couch ...
-    let startAndEndDates = this.dateFunctionsProvider.getStartAndEndDatesForCalendar();
-    event['startTime'] = startAndEndDates[0];
-    event['endTime'] = startAndEndDates[1];
-    event['allDay'] = true;
-    event['title'] = this.globalFuns.getWhetherMigraine(event['Symptom']) ? 'Migraine' : 'No Migraine';
-    return event;
-  }
-
-  addDurationItems(durationDict : {[dataID : string] : any}, endPoint : string){ // call when we push to couch ...
-    let dataNames = Object.keys(durationDict);
-    for(let i=0; i<dataNames.length; i++){
-      if(!this.tracked[dataNames[i]]){
-        this.tracked[dataNames[i]] = {};
-      }
-      this.tracked[dataNames[i]][endPoint] = durationDict[dataNames[i]];
-    }
-  }
-
-  goalProgress(data : {[dataProps : string] : any}, dataType :string){
+  /**
+   * Calculate progress to the limit/goal
+   * @param data
+   * @param dataType
+   */
+  goalProgress(data : {[dataProps : string] : any}, dataType :string) {
     let timesTracked = this.totalTrackedTimes(data, dataType);
-    if(timesTracked > data.goal.threshold){
-      if(data.goal.freq === 'More'){
+    if (timesTracked > data.goal.threshold) {
+      if (data.goal.freq === 'More') {
         return 'met';
       }
       return 'over'
-    }
-    else if(timesTracked === data.goal.threshold){
-      if(data.goal.freq === 'More'){
-        return 'met';
+    } else if(timesTracked === data.goal.threshold) {
+      if (data.goal.freq === 'More') {
+return 'met';
       }
       return 'at limit';
-    }
-    else{
-      if(data.goal.freq === 'More'){
+    } else {
+      if (data.goal.freq === 'More') {
         return 'under';
       }
       return 'below limit';
     }
   }
 
-  totalTrackedTimes(data: {[dataProps : string] : any}, dataType : string) : Number{
-    if(dataType === 'quickTracker') dataType = data.dataType;
+  /**
+   * Calculate the total tracked times given data
+   * @param data
+   * @param dataType
+   */
+  totalTrackedTimes(data: {[dataProps : string] : any}, dataType : string) : Number {
+    if (dataType === 'quickTracker') dataType = data.dataType;
     let timesSoFar = this.goalProgresses[dataType] ? this.goalProgresses[dataType][data.id] : 0;
-    if (data.id === 'frequentMedUse'){ // we pull from the 'treatments' dict!
+    if (data.id === 'frequentMedUse') { // we pull from the 'treatments' dict!
       timesSoFar += (this.getTrackedMeds() ? 1 : 0);
-    }
-    else if(this.tracked[dataType] && this.tracked[dataType][data.id]) {
+    } else if (this.tracked[dataType] && this.tracked[dataType][data.id]) {
       if (data.field === 'number') {
         timesSoFar += Number(this.tracked[dataType][data.id]);
-      }
-      else if (data.field !== 'binary' || this.tracked[dataType][data.id] === 'Yes') {
+      } else if (data.field !== 'binary' || this.tracked[dataType][data.id] === 'Yes') {
         timesSoFar += 1;
       }
     }
     return timesSoFar;
+  }
+
+  /**
+   * Set up the trackers
+   */
+  setupTrackers() {
+    if (this.activeGoals['dataToTrack']) {
+      this.previouslyTracked = this.couchDbService.fetchTrackedData([this.dateSelected['date'],
+        this.dateSelected['month'], this.dateSelected['year']]); // todo: only need to grab this month's
+      this.quickTrackers = this.activeGoals['quickTrackers'];
+
+      if (this.quickTrackers && this.quickTrackers.length > 0) {
+        this.dataTypes = ['quickTracker'];
+      } else {
+        console.log("NO QUICK TRACKERS?!")
+      }
+      this.dataToTrack = Object.assign({}, this.activeGoals['dataToTrack']); // otherwise we modify it >.<
+      this.dataTypes = this.dataTypes.concat(Object.keys(this.dataToTrack));
+      this.dataToTrack["quickTracker"] = this.quickTrackers;
+      this.calculateGoalProgresses();
+    }
   }
 
   calculateGoalProgresses() { // todo: rename, since we do the dataToTrack work here too...

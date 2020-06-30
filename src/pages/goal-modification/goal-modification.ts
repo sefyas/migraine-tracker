@@ -12,33 +12,35 @@ export class GoalModificationPage {
   private goalTypes : string[];
   private goalHierarchy : {[goal: string] : string[]};
   private textGoals : string;
+  private configuredRoutine : any = {};
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
-              public couchDBService: CouchDbServiceProvider,
+              public couchDbService: CouchDbServiceProvider,
               public globalFunctionsService: GlobalFunctionsServiceProvider) {
   }
 
   async ionViewDidLoad() {
-    if (this.navParams.data.goalsOnly) { // we changed the goals but not the tracking routine
-      this.textGoals = this.navParams.data.textGoals;
-      this.goalHierarchy = this.globalFunctionsService.getGoalHierarchy(this.navParams.data.goalIDs);
+    // arrive here from goal/tracking routine modification page
+    if (this.navParams.data && this.navParams.data.params && this.navParams.data.params['modifying']) {
+      this.configuredRoutine = this.navParams.data.configuredRoutine;
+      this.textGoals = this.configuredRoutine['textGoals'];
+      this.goalHierarchy = this.globalFunctionsService.getGoalHierarchy(this.configuredRoutine['goals']);
       this.goalTypes = Object.keys(this.goalHierarchy);
-      this.couchDBService.logConfiguredRoutine(this.navParams.data);
-      console.log("this.navParams.data ############");
-      console.log(this.navParams.data);
+      this.couchDbService.logConfiguredRoutine(this.configuredRoutine);
     } else {
-      let activeGoals;
-      if (this.navParams.data.configPath) {
-        activeGoals = this.couchDBService.addGoalFromSetup(this.navParams.data);
-      } else {
-        activeGoals = await this.couchDBService.getConfiguredRoutine();
-      }
+      this.configuredRoutine = await this.couchDbService.fetchConfiguredRoutine().then((val) => {
+        return val;
+      });
+      let activeGoals = await this.couchDbService.fetchConfiguredRoutine();
       this.goalHierarchy = this.globalFunctionsService.getGoalHierarchy(activeGoals.goals);
       this.goalTypes = Object.keys(this.goalHierarchy);
+      this.textGoals = this.configuredRoutine['textGoals'];
     }
   }
 
   addGoal() {
-    this.navCtrl.push(GoalTypePage, {'modifying':true}, {animate: false});
+    let params = {'modifying': true};
+    this.navCtrl.push(GoalTypePage,
+        {'configuredRoutine': this.configuredRoutine, 'params': params}, {animate: false});
   }
 }
