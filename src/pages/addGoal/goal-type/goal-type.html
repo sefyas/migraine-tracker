@@ -146,7 +146,7 @@
 
 </ion-content>
 
-<ion-footer class="footer-wrapper" *ngIf="!modifying">
+<ion-footer class="footer-wrapper" *ngIf="!modifyGoal">
   <div>
     <button class="align-left footer-button" (click)="onClickPrevious()" icon-only>
       <ion-icon name="custom-chevron-left"></ion-icon>
@@ -161,7 +161,7 @@
   </div>
 </ion-footer>
 
-<ion-footer class="modify-footer-wrapper" *ngIf="modifying">
+<ion-footer class="modify-footer-wrapper" *ngIf="modifyGoal">
   <div>
     <button class="align-left modify-footer-button save-button" (click)="onClickNext(true)" icon-only>
       Save

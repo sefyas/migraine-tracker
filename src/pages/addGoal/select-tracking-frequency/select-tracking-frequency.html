@@ -177,46 +177,7 @@
                                 </div>
                             </ion-select>
                         </ion-item>
-
-<!--                        <ion-item class="regular-time-picker-wrapper"-->
-<!--                                  *ngIf="(notificationData['regular'].timescale === 'Monthly')" text-wrap text-center>-->
-<!--                            <ion-datetime class="regular-time-picker" placeholder="Select Day"-->
-<!--                                          pickerFormat="D" [(ngModel)]="notificationData['regular']['dayOfMonth']">-->
-<!--                            </ion-datetime>-->
-<!--                        </ion-item>-->
                     </div>
-
-
-<!--                    <ion-item class="regular-time-picker-wrapper"-->
-<!--                              *ngIf="(notificationData['regular'].timescale === 'Daily') ||-->
-<!--                                  (notificationData['regular'].timescale === 'Weekly') ||-->
-<!--                                  (notificationData['regular'].timescale === 'Monthly')" text-wrap text-center>-->
-<!--                        <ion-datetime class="regular-time-picker" displayFormat="H:mm" placeholder="Select Time"-->
-<!--                                      pickerFormat="HH:mm" minuteValues="0,10,20,30,40,50"-->
-<!--                                      [(ngModel)]="notificationData['regular']['timeOfDay']">-->
-<!--                        </ion-datetime>-->
-<!--                    </ion-item>-->
-
-<!--                    <ion-item class="regular-time-picker-popover-wrapper" *ngIf="(notificationData['regular'].timescale === 'Weekly')" text-wrap text-center>-->
-<!--                        <ion-select class="regular-time-picker-popover" placeholder="Select Day" interface="popover"-->
-<!--                                    [(ngModel)]="notificationData['regular']['dayOfWeek']">-->
-<!--                            <ion-option>Monday</ion-option>-->
-<!--                            <ion-option>Tuesday</ion-option>-->
-<!--                            <ion-option>Wednesday</ion-option>-->
-<!--                            <ion-option>Thursday</ion-option>-->
-<!--                            <ion-option>Friday</ion-option>-->
-<!--                            <ion-option>Saturday</ion-option>-->
-<!--                            <ion-option>Sunday</ion-option>-->
-<!--                        </ion-select>-->
-<!--                    </ion-item>-->
-
-<!--                    <ion-item class="regular-time-picker-wrapper"-->
-<!--                              *ngIf="(notificationData['regular'].timescale === 'Monthly')" text-wrap text-center>-->
-<!--                        <ion-datetime class="regular-time-picker" placeholder="Select Day"-->
-<!--                                      pickerFormat="D" [(ngModel)]="notificationData['regular']['dayOfMonth']">-->
-<!--                        </ion-datetime>-->
-<!--                    </ion-item>-->
-
                 </div>
 
                 <button class="align-right tracking-add-btn" *ngIf="notificationData['regular']"
@@ -261,7 +222,7 @@
     </div>
 
     <div>
-        <button class="align-right footer-button" (click)="onClickContinue()" icon-only [disabled]="!canContinue()">
+        <button class="align-right footer-button" (click)="onClickNext()" icon-only [disabled]="!canContinue()">
             <ion-icon name="custom-chevron-right"></ion-icon>
         </button>
         <p class="align-right footer-text" ></p>

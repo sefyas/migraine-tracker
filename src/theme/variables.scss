@@ -113,18 +113,23 @@ $app-direction: ltr;
 // The "primary" color is the only required color in the map.
 
 $colors: (
-  primary:    #4A90E2,
-  secondary:  #32db64,
-  danger:     #f53d3d,
-  light:      #f4f4f4,
-  dark:       #222,
-  base:       #4a4a4a,
-  midgrey:       #979797,
-  mutedPrimary: #c8ddf6,
-  ionBackground: rgba(9, 17, 58, 1),
-  infoTheme: #FFD13B,
-  goalThemeDark: #105D5D,
-  darkRed: #88212D,
+        primary:    #4A90E2,
+        secondary:  #32db64,
+        danger:     #f53d3d,
+        light:      #f4f4f4,
+        dark:       #222,
+        base:       #4a4a4a,
+        midgrey:       #979797,
+        mutedPrimary: #c8ddf6,
+        ionBackground: rgba(9, 17, 58, 1),
+        infoTheme: #FFD13B,
+        goalThemeDark: #105D5D,
+        darkRed: #88212D,
+        changeTheme: #542074,
+        symptomTheme: #2A8CAA,
+        treatmentTheme: #E09845,
+        contributorTheme: #30916C,
+        otherTheme: #D09595,
 );
 
 

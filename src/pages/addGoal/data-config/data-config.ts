@@ -5,6 +5,7 @@ import { SelectTrackingFrequencyPage } from "../select-tracking-frequency/select
 import { EditDataPage } from "../edit-data/edit-data";
 import * as moment from 'moment';
 import { GoalModificationPage } from "../../goal-modification/goal-modification";
+import { TrackingModificationPage } from "../../tracking-modification/tracking-modification";
 import { DataElement, DataType } from "../../../interfaces/customTypes";
 
 @Component({
@@ -16,7 +17,8 @@ export class DataConfigPage {
   params : any = {};
   allGoals : string[] = [];
   dataObject : DataType;
-  modifying : boolean;
+  modifyGoal : boolean = false;
+  modifyData : boolean = false;
   startDate : any = null;
   private workoutProgress : string = '0' + '%';
   private selectedConfigData : string[];
@@ -33,25 +35,25 @@ export class DataConfigPage {
               public viewCtrl: ViewController,
               public dataDetailsServiceProvider: DataDetailsServiceProvider,
               public modalCtrl: ModalController) {
-
     this.configuredRoutine = this.navParams.data.configuredRoutine;
     this.params = this.navParams.data.params;
 
     this.allGoals = this.configuredRoutine['goals'] ? this.configuredRoutine['goals'] : [];
     this.selectedConfigData = this.configuredRoutine['selectedConfigData'];
     this.dataObject = this.params['dataPage'];
-    this.modifying = this.params['modifying'];
+    this.modifyGoal = this.params['modifyGoal'];
+    this.modifyData = this.params['modifyData'];
     this.getDataInfo(this.configuredRoutine['dataToTrack']);
 
-
-    if (!this.modifying) {
-      this.workoutProgress = Math.min( ( (this.selectedConfigData.indexOf(this.params['dataPage']) + 1)
-          / (this.selectedConfigData.length + 1) * 100), 100).toString() + '%';
-    } else {
+    if (this.modifyGoal) {
       this.workoutProgress = Math.min( ( (this.selectedConfigData.indexOf(this.params['dataPage']) + 1)
           / this.selectedConfigData.length * 100), 100).toString() + '%';
+    } else if (!this.modifyData) {
+      this.workoutProgress = "100%";
+    } else {
+        this.workoutProgress = Math.min( ( (this.selectedConfigData.indexOf(this.params['dataPage']) + 1)
+            / (this.selectedConfigData.length + 1) * 100), 100).toString() + '%'
     }
-
     this.startDate = this.dataObject.startDate ? new Date().toISOString() : null;
   }
 
@@ -97,22 +99,25 @@ export class DataConfigPage {
             selectedData[i]['startDate'] = this.startDate;
           }
         }
-        this.configuredRoutine['dataToTrack'][this.dataObject.dataType] = selectedData;
+        this.configuredRoutine['dataToTrack'][this.dataObject['dataType']] = selectedData;
       }
-
       let nextConfigData = this.dataDetailsServiceProvider.findNextConfigData(
           this.configuredRoutine['goals'], this.dataObject);
-      if (nextConfigData !== null) { // more data configure to do
-        this.params['dataPage'] = nextConfigData;
-        this.navCtrl.push(DataConfigPage,
+      if (this.modifyData) { // more data configure to do
+        this.navCtrl.setRoot(TrackingModificationPage,
             {'configuredRoutine': this.configuredRoutine, 'params': this.params}, {animate: false});
-      } else if (nextConfigData === null && !this.modifying) { // no more data to configure during init setup
-        delete this.params['dataPage'];
-        this.navCtrl.push(SelectTrackingFrequencyPage,
-            {'configuredRoutine': this.configuredRoutine, 'params': this.params}, {animate: false});
-      } else if (nextConfigData === null && this.modifying) { // no more data to configure during modification
-        this.navCtrl.setRoot(GoalModificationPage,
-            {'configuredRoutine': this.configuredRoutine, 'params': this.params}, {animate: false});
+      } else {
+        if (nextConfigData !== null) { // modify a single data
+          this.params['dataPage'] = nextConfigData;
+          this.navCtrl.push(DataConfigPage,
+              {'configuredRoutine': this.configuredRoutine, 'params': this.params}, {animate: false});
+        } else if (nextConfigData === null && !this.modifyGoal) { // no more data to configure during init setup
+          this.navCtrl.push(SelectTrackingFrequencyPage,
+              {'configuredRoutine': this.configuredRoutine, 'params': this.params}, {animate: false});
+        } else if (nextConfigData === null && this.modifyGoal) { // no more data to configure during modification
+          this.navCtrl.setRoot(GoalModificationPage,
+              {'configuredRoutine': this.configuredRoutine, 'params': this.params}, {animate: false});
+        }
       }
     } else {
       this.viewCtrl.dismiss({'selected': selectedData});
@@ -125,11 +130,11 @@ export class DataConfigPage {
    */
   getDataInfo(alreadyTracking : {[dataType:string]:DataElement[]}) {
     let dataInfo = this.dataDetailsServiceProvider.getDataLists(
-        alreadyTracking, this.dataObject.dataType, this.allGoals);
+        alreadyTracking, this.dataObject['dataType'], this.allGoals);
     this.recommendedData = dataInfo['recData'];
     this.otherData = dataInfo['otherData'];
     this.commonExpanded = dataInfo['expandOther'];
-    this.loadCustomData(alreadyTracking[this.dataObject.dataType]);
+    this.loadCustomData(alreadyTracking[this.dataObject['dataType']]);
   }
 
   /**
@@ -189,10 +194,10 @@ export class DataConfigPage {
     }
 
     let dataToSend = {'data': oldDataCopy,
-      'dataType': this.dataObject.dataType,
+      'dataType': this.dataObject['dataType'],
       'selectedGoals': this.allGoals,
-      'allowsDataGoals': this.dataObject.dataGoals,
-      'modifying': this.configuredRoutine['modifying']};
+      'allowsDataGoals': this.dataObject['dataGoals'],
+      'modifying': this.params['modifyGoal'] || this.params['modifyData']};
 
     let editDataModal = this.modalCtrl.create(EditDataPage, dataToSend,
         {showBackdrop: true, cssClass: 'modal-fullscreen'});

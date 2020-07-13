@@ -44,19 +44,24 @@ page-faq {
 
   .answer {
     background: var(--goal-card-background);
-    padding-left: 17pt;
-    font-size: 12pt;
+    padding-left: 7pt;
+    font-size: 11pt;
     line-height: 15pt;
+    padding-bottom: 10px;
   }
 
   .question{
     background-color: var(--goal-card-background);
     font-weight: bold;
-    font-size: 13pt;
+    font-size: 12pt;
     padding-top: 15px;
+    padding-bottom: 10px;
   }
 
   .question-header{
     background: none;
+    font-weight: bold;
+    font-size: 12pt;
+    color: white;
   }
 }

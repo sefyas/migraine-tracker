@@ -1,0 +1,348 @@
+page-notification-modification {
+  .footer-button {
+    background: none;
+    font-size: 8pt;
+    color: white;
+  }
+
+  .align-left {
+    float: left;
+    margin-left: 4%;
+  }
+
+  .align-right {
+    float: right;
+    margin-right: 4%;
+  }
+
+  .vertical-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+
+  .goal-card-header {
+    justify-content: center;
+    vertical-align: center;
+  }
+
+  .title-text-wrapper {
+    position: absolute;
+    top: 45pt;
+  }
+
+  .title-text {
+    font-size: 15pt;
+    font-weight: bold;
+    max-width: 40%;
+  }
+
+  .info-btn {
+    background: none;
+    position: relative;
+    right: -17px;
+    top: 2px;
+    width: 45px;
+  }
+
+  .title-card {
+    margin-bottom: 25px;
+  }
+
+  .goal-card {
+    margin-top: 20px;
+    background: var(--goal-card-background);
+    border-radius: 15px;
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .tracking-name-wrapper {
+    float: left;
+    text-align: left;
+    display: inline-block;
+    padding: 20px 10px 0 10px;
+  }
+
+  .tracking-name-recommended{
+    font-style: italic;
+    color: orange;
+    font-size: 10pt;
+    font-weight: bold;
+  }
+
+  .tracking-name {
+    font-size: 14pt;
+    font-weight: bold;
+  }
+
+  // ============ info popups START ============
+  .info-card {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 200px;
+    width: 86%;
+    margin: auto;
+    border: 1.5px solid var(--info-theme);
+    background: var(--goal-card-background);
+    border-radius: 10px;
+    min-height: 250px;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .info-card-short {
+    min-height: 170px;
+  }
+
+  .close-button {
+    background: none;
+    color: white;
+    float: right;
+    font-size: 10px;
+  }
+
+
+  .info-title {
+    font-size: 12pt;
+    position: relative;
+    top: 30px;
+  }
+  // ============ info popups END ============
+
+
+  // ============ tracking selected/expanded START ============
+  .tracking-selected-wrapper {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .tracking-options {
+    display: inline-block;
+    vertical-align: middle;
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+
+  .tracking-label {
+    font-size: 10pt;
+    font-weight: bold;
+    font-style: italic;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .tracking-btn-wrapper {
+    display: block;
+    vertical-align: middle;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .tracking-btn {
+    display: inline-block;
+    background: none;
+    width: 35px;
+    vertical-align: middle;
+  }
+
+  .tracking-btn-label {
+    font-size: 10pt;
+    font-weight: bold;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  // ============ tracking selected/expanded END ============
+
+
+  // ============ post symptom tracking selected/expanded START ============
+  .post-symptom-textfield {
+    display: inline-block;
+    font-size: 10pt;
+    font-weight: bold;
+    border: solid 2px white;
+    width: 50px;
+    border-radius: 10px;
+    padding-left: 10px;
+    vertical-align: middle;
+  }
+
+  .post-symptom-options {
+    margin-left: 8px;
+  }
+
+  .post-symptom-label {
+    margin-left: 8px;
+  }
+  // ============ post symptom tracking selected/expanded END ============
+
+  // ============ regular tracking selected/expanded START ============
+  .regular-label {
+    margin-left: 8px;
+  }
+
+  .regular-time-picker-wrapper {
+    //display: inline-block;
+    vertical-align: middle;
+    background: none;
+    width: 160px;
+    margin-left: 6px;
+    margin-top: -10pt;
+    margin-bottom: -10pt;
+  }
+
+  .regular-time-picker {
+    //display: inline-block;
+    vertical-align: middle;
+    background: none;
+    border-radius: 10px;
+    border: solid 2px white;
+    width: 160px;
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+    height: 45px;
+    font-size: 12pt;
+    font-weight: bold;
+  }
+
+  .datetime-ios {
+    padding: 10px 20px 10px 20px;
+    text-align: center;
+    //vertical-align: middle;
+    //justify-content: center;
+  }
+
+
+  // ============ regular tracking selected/expanded END ============
+
+
+  // ============ regular tracking time picker START ============
+  .regular-time-picker-popover {
+    display: inline-block;
+    vertical-align: middle;
+    background: none;
+    border-radius: 10px;
+    border: solid 2px white;
+    //width: 300px;
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+    height: 45px;
+    font-size: 12pt;
+    font-weight: bold;
+    padding: 10px 20px 10px 20px;
+  }
+
+  .regular-time-picker-popover-wrapper {
+    //display: inline-block;
+    vertical-align: middle;
+    background: none;
+    width: 160px;
+    margin-left: 6px;
+    margin-top: -10pt;
+    margin-bottom: -10pt;
+  }
+
+  .regular-options-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+    width: 160px;
+    //height: 100px;
+  }
+
+  // ============ regular tracking time picker END ============
+
+  .tracking-card-content{
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: -5px;
+  }
+
+  .tracking-explanation-text {
+    text-align: left;
+    width: 230px;
+    font-style: italic;
+    //font-weight: bold;
+    font-size: 12pt;
+    padding-left: 5px;
+  }
+
+  .tracking-add-btn {
+    background: none;
+    position: relative;
+    bottom: 15px;
+    right: -20px;
+    width: 45px;
+  }
+
+  .center {
+    display: inline-block;
+    justify-content: center;
+  }
+
+  .ion-content-wrapper {
+    padding: 10px;
+  }
+
+  .footer-button {
+    background: none;
+    font-size: 8pt;
+    color: white;
+  }
+
+  .footer-text {
+    color: white;
+    font-size: 10pt;
+    position: relative;
+    bottom: 10px;
+    font-weight: bold;
+  }
+
+  .vertical-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+
+  .footer-wrapper {
+    height: 60px;
+    vertical-align: center;
+    justify-content: center;
+    background: var(--ion-background-color);
+    overflow-y:auto;
+    padding-bottom: 30px;
+    padding-right: 10px;
+  }
+
+  .modify-footer-button {
+    height: 40px;
+    width: 150px;
+    border-radius: 8px;
+    background: none;
+    border: solid 2px white;
+    color: white;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-weight: bold;
+  }
+
+  .modify-footer-wrapper {
+    height: 60px;
+    vertical-align: center;
+    justify-content: center;
+    background: var(--ion-background-color);
+    overflow-y:auto;
+    padding: 10px 10px 10px 10px;
+  }
+
+  .save-button {
+    background: var(--goal-theme);
+    border: solid 2px var(--goal-theme);
+  }
+}

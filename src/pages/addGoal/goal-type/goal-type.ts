@@ -14,7 +14,7 @@ import { Goal } from "../../../interfaces/customTypes";
 
 export class GoalTypePage {
   private goalList : Goal[];
-  private modifying : boolean = false;
+  private modifyGoal : boolean = false;
   private selectedGoals : string[] = [];
   private textGoalExpand : boolean = false;
   private expandMonitor : boolean = false;
@@ -44,12 +44,12 @@ export class GoalTypePage {
     } else { // initialize the goal configuration
       this.configuredRoutine = {};
     }
-    if (this.params && this.params['modifying']) {
-      this.modifying = true;
+    if (this.params && this.params['modifyGoal']) {
+      this.modifyGoal = true;
       this.expandMonitor = true;
       this.expandLearn = true;
     } else {
-      this.modifying = false;
+      this.modifyGoal = false;
     }
     this.goalList = this.goalDetailsServiceProvider.getGoalList(); // load all goals
   }

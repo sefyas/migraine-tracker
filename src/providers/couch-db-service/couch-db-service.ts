@@ -145,19 +145,20 @@ export class CouchDbServiceProvider {
    * Get the current configured routine
    */
   async fetchConfiguredRoutine() {
-    var currentConfiguredRoutineID = await this.fetchCurrentConfiguredRoutineID();
-    if (currentConfiguredRoutineID != 0) {
-      try {
-        this.currentConfiguredRoutine = await this.db.get("configured-routine-" + currentConfiguredRoutineID);
-        this.currentConfiguredRoutine = this.currentConfiguredRoutine['configured_routine'];
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    if (this.currentConfiguredRoutine) {
-      return this.currentConfiguredRoutine;
-    }
-    return null;
+    // var currentConfiguredRoutineID = await this.fetchCurrentConfiguredRoutineID();
+    // if (currentConfiguredRoutineID != 0) {
+    //   try {
+    //     this.currentConfiguredRoutine = await this.db.get("configured-routine-" + currentConfiguredRoutineID);
+    //     this.currentConfiguredRoutine = this.currentConfiguredRoutine['configured_routine'];
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // }
+    // if (this.currentConfiguredRoutine) {
+    //   return this.currentConfiguredRoutine;
+    // }
+    // return null;
+    return this.getExampleGoal();
   }
 
   /**
@@ -202,6 +203,11 @@ export class CouchDbServiceProvider {
    * @param date
    */
   async logTrackedData(trackedData, date) {
+    console.log("trackedData ##############");
+    console.log(trackedData);
+    console.log("date ##############");
+    console.log(date);
+    console.log("$$$$$$$$$$$$$$$");
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
     try {
       var doc = await this.db.get(doc_id);
@@ -223,7 +229,7 @@ export class CouchDbServiceProvider {
   }
 
   /**
-   * Get the current configured routine
+   * Get the tracked data by date
    * @param date
    */
   async fetchTrackedData(date) {
@@ -239,6 +245,12 @@ export class CouchDbServiceProvider {
 
 
 
+  async fetchTrackedDataRange(startDate, endDate) {
+    console.log("@@@@@@@@@@@@");
+    console.log(startDate);
+    console.log(endDate);
+    return this.getExamplePreviouslyTracked();
+  }
 
 
 
@@ -434,330 +446,330 @@ export class CouchDbServiceProvider {
 
 
 
-  // getExampleGoal()  : ConfiguredRoutine {
-  //   let exGoal = {
-  //     "quickTrackers": [
-  //       {
-  //         "name": "Migraine",
-  //         "id": "migraineToday",
-  //         "explanation": "Migraine experienced",
-  //         "fieldDescription": "Whether you had a migraine (yes/no)",
-  //         "recommendedField": "binary",
-  //         "recommendingGoals": ["2a", "2b", "2c", "3", "1a", "1b", "1c"],
-  //         "quickTrack": true,
-  //         "alwaysQuickTrack": true,
-  //         "field": "binary",
-  //         "fieldSet": true,
-  //         "dataType": "Symptom"
-  //       },
-  //       {
-  //         "name": "As-needed medications today",
-  //         "id": "asNeededMeds",
-  //         "isMed": true,
-  //         "explanation": "Any medication you take on an as-needed basis (in response to symptoms).  For example: Advil, Excedrin, Tylenol, prescription medications you don't take regularly.",
-  //         "fieldDescription": "Whether you took any as-needed medication today",
-  //         "field": "binary",
-  //         "recommendingGoals": [
-  //           "1a",
-  //           "1b",
-  //           "1c",
-  //           "2a",
-  //           "2b",
-  //           "2c",
-  //           "3"
-  //         ],
-  //         "goal": {
-  //           "freq": "Less",
-  //           "threshold": 4,
-  //           "timespan": "Month"
-  //         },
-  //         "opts": {
-  //           "showBackdrop": true,
-  //           "enableBackdropDismiss": true
-  //         },
-  //         "selected": true,
-  //         "quickTrack": true,
-  //         "dataType": "Treatment"
-  //       }
-  //     ],
-  //       "goals": [
-  //         "1",
-  //         "2",
-  //         "3",
-  //         "2a",
-  //         "2b",
-  //         "2c",
-  //         "1a",
-  //         "1b",
-  //         "1c"
-  //       ],
-  //       "dataToTrack": {
-  //         "Change": [
-  //           {
-  //             "name": "Healthy Sleep Schedule",
-  //             "id": "sleepChange",
-  //             "explanation": "How much sleep you got today",
-  //             "fieldDescription": "Hours of sleep",
-  //             "field": "number",
-  //             "goal": {
-  //               "freq": "More",
-  //               "threshold": 8,
-  //               "timespan": "Day"
-  //             },
-  //             "recommendingGoals": [
-  //               "1c"
-  //             ],
-  //             "startDate": "2019-04-11T16:22:17.264Z",
-  //             "opts": {
-  //               "showBackdrop": true,
-  //               "enableBackdropDismiss": true
-  //             },
-  //             "selected": true
-  //           }
-  //         ],
-  //         "Symptom": [
-  //           {
-  //             "name": "Migraine today",
-  //             "id": "migraineToday",
-  //             "explanation": "Migraine experienced today",
-  //             "fieldDescription": "Whether you had a migraine (yes/no)",
-  //             "field": "binary",
-  //             "recommendingGoals": [
-  //               "1a",
-  //               "1b",
-  //               "1c",
-  //               "2a",
-  //               "2b",
-  //               "2c",
-  //               "3"
-  //             ],
-  //             "opts": {
-  //               "showBackdrop": true,
-  //               "enableBackdropDismiss": true
-  //             },
-  //             "selected": true,
-  //             "quickTrack": true,
-  //             "fieldSet": true
-  //           },
-  //           {
-  //             "name": "Peak Migraine Severity",
-  //             "id": "peakMigraineSeverity",
-  //             "explanation": "How bad the migraine was at its worst point",
-  //             "fieldDescription": "10-point Pain level (1=mild, 10=terrible)",
-  //             "recommendedField": "numeric scale",
-  //             "field": "numeric scale",
-  //             "recommendingGoals": ["1b", "1c"],
-  //             "selected": true
-  //           },
-  //           {
-  //             "name": "Quality of the Pain",
-  //             "id": "painQuality",
-  //             "explanation": "What the pain was like (pulsating/throbbing, pressure, tension, stabbing, sharp, dull, burning, other)",
-  //             "fieldDescription": "Text box where you can describe the pain",
-  //             "field": "note",
-  //             "recommendingGoals": [
-  //               "1b"
-  //             ],
-  //             "opts": {
-  //               "showBackdrop": true,
-  //               "enableBackdropDismiss": true
-  //             },
-  //             "selected": true
-  //           },
-  //           {
-  //             "name": "Start time",
-  //             "id": "migraineStartTime",
-  //             "explanation": "The time your migraine started",
-  //             "fieldDescription": "time",
-  //             "field": "time",
-  //             "recommendingGoals": [],
-  //             "opts": {
-  //               "showBackdrop": true,
-  //               "enableBackdropDismiss": true
-  //             },
-  //             "selected": true
-  //           },
-  //           {
-  //             "name": "Migraine duration",
-  //             "field": "time range",
-  //             "id": "custom_migraineduration",
-  //             "custom": true
-  //           }
-  //         ],
-  //         "Treatment": [
-  //           {
-  //             "name": "As-needed medications today",
-  //             "id": "asNeededMeds",
-  //             "isMed": true,
-  //             "fieldsAllowed": ["binary", "number", "time"],
-  //             "explanation": "Any medication you take on an as-needed basis (in response to symptoms).  For example: Advil, Excedrin, Tylenol, prescription medications you don't take regularly.",
-  //             "fieldDescription": "Whether you took any as-needed medication today",
-  //             "field": "binary",
-  //             "recommendingGoals": [
-  //               "1a",
-  //               "1b",
-  //               "1c",
-  //               "2a",
-  //               "2b",
-  //               "2c",
-  //               "3"
-  //             ],
-  //             "goal": {
-  //               "freq": "Less",
-  //               "threshold": 4,
-  //               "timespan": "Month"
-  //             },
-  //             "opts": {
-  //               "showBackdrop": true,
-  //               "enableBackdropDismiss": true
-  //             },
-  //             "selected": true,
-  //             "quickTrack": true
-  //           },
-  //           {
-  //             "name": "Exercise",
-  //             "id": "exerciseToday",
-  //             "explanation": "How much you exercised today",
-  //             "fieldDescription": "Number of minutes of exercise",
-  //             "field": "number",
-  //             "goal": {
-  //               "freq": "More",
-  //               "threshold": 180,
-  //               "timespan": "Week"
-  //             },
-  //             "recommendingGoals": [
-  //               "1b",
-  //               "2b"
-  //             ],
-  //             "opts": {
-  //               "showBackdrop": true,
-  //               "enableBackdropDismiss": true
-  //             },
-  //             "selected": true
-  //           },
-  //           {
-  //             "name": "Nutrition Today",
-  //             "id": "nutritionToday",
-  //             "explanation": "Whether you ate healthily today. For example, we recommend 4-5 servings of veggies, eating regular meals, avoiding sugar",
-  //             "fieldDescription": "Whether you ate healthily (yes/no)",
-  //             "field": "binary",
-  //             "recommendingGoals": [
-  //               "1b",
-  //               "2b"
-  //             ],
-  //             "opts": {
-  //               "showBackdrop": true,
-  //               "enableBackdropDismiss": true
-  //             },
-  //             "selected": true
-  //           },
-  //           {
-  //             "name": "Time took advil",
-  //             "field": "time",
-  //             "id": "custom_timetookadvil",
-  //             "custom": true
-  //           }
-  //         ],
-  //         "Contributor": [
-  //           {
-  //             "name": "Stress",
-  //             "id": "stressToday",
-  //             "explanation": "How stressed you were today",
-  //             "fieldDescription": "3-point stress rating",
-  //             "significance": "High stress levels can lead to more migraines",
-  //             "field": "category scale",
-  //             "recommendingGoals": [
-  //               "1b",
-  //               "2b"
-  //             ],
-  //             "opts": {
-  //               "showBackdrop": true,
-  //               "enableBackdropDismiss": true
-  //             },
-  //             "selected": true
-  //           },
-  //           {
-  //             "name": "Frequent Use of Medications",
-  //             "id": "frequentMedUse",
-  //             "explanation": "Calculated medication use, to let you know if you might want to think about cutting back.",
-  //             "fieldDescription": "Number of pills you took",
-  //             "field": "calculated medication use",
-  //             "condition": true,
-  //             "recommendingGoals": [
-  //               "1a",
-  //               "1b",
-  //               "1c",
-  //               "2a",
-  //               "2b",
-  //               "2c",
-  //               "3"
-  //             ],
-  //             "goal": {
-  //               "freq": "Less",
-  //               "threshold": 4,
-  //               "timespan": "Month"
-  //             },
-  //             "significance": "If you use as-needed medications too frequently, they can start causing more migraines.",
-  //             "opts": {
-  //               "showBackdrop": true,
-  //               "enableBackdropDismiss": true
-  //             },
-  //             "selected": true
-  //           },
-  //           {
-  //             "name": "Alcohol",
-  //             "id": "alcoholToday",
-  //             "explanation": "How much alcohol you had today",
-  //             "fieldDescription": "3-point alcohol rating",
-  //             "field": "category scale",
-  //             "recommendingGoals": [
-  //               "1b",
-  //               "2b"
-  //             ],
-  //             "opts": {
-  //               "showBackdrop": true,
-  //               "enableBackdropDismiss": true
-  //             },
-  //             "selected": true
-  //           }
-  //         ],
-  //         "Other": [
-  //           {
-  //             "name": "Other notes",
-  //             "id": "otherNotes",
-  //             "explanation": "Anything else you want to note about today ",
-  //             "fieldDescription": "Text box where you can record any notes",
-  //             "field": "note",
-  //             "recommendingGoals": [
-  //               "1a",
-  //               "1b",
-  //               "1c",
-  //               "2a",
-  //               "2b",
-  //               "2c",
-  //               "3"
-  //             ],
-  //             "opts": {
-  //               "showBackdrop": true,
-  //               "enableBackdropDismiss": true
-  //             },
-  //             "selected": true
-  //           }
-  //         ]
-  //       },
-  //       "textGoals":
-  //         "Get <1 migraine per week",
-  //       "dateAdded": "2019-04-11T16:22:17.264Z",
-  //       "notifications": {
-  //         "retroactive": {
-  //           "delayScale": "Day",
-  //           "delayNum": 1
-  //         }
-  //       },
-  //     };
-  //   this.currentConfiguredRoutine = exGoal;
-  //   return exGoal;
-  // }
+  getExampleGoal()  : ConfiguredRoutine {
+    let exGoal = {
+      "quickTrackers": [
+        {
+          "name": "Migraine",
+          "id": "migraineToday",
+          "explanation": "Migraine experienced",
+          "fieldDescription": "Whether you had a migraine (yes/no)",
+          "recommendedField": "binary",
+          "recommendingGoals": ["2a", "2b", "2c", "3", "1a", "1b", "1c"],
+          "quickTrack": true,
+          "alwaysQuickTrack": true,
+          "field": "binary",
+          "fieldSet": true,
+          "dataType": "Symptom"
+        },
+        {
+          "name": "As-needed Medications Today",
+          "id": "asNeededMeds",
+          "isMed": true,
+          "explanation": "Any medication you take on an as-needed basis (in response to symptoms).  For example: Advil, Excedrin, Tylenol, prescription medications you don't take regularly.",
+          "fieldDescription": "Whether you took any as-needed medication today",
+          "field": "binary",
+          "recommendingGoals": [
+            "1a",
+            "1b",
+            "1c",
+            "2a",
+            "2b",
+            "2c",
+            "3"
+          ],
+          "goal": {
+            "freq": "Less",
+            "threshold": 4,
+            "timespan": "Month"
+          },
+          "opts": {
+            "showBackdrop": true,
+            "enableBackdropDismiss": true
+          },
+          "selected": true,
+          "quickTrack": true,
+          "dataType": "Treatment"
+        }
+      ],
+        "goals": [
+          "1",
+          "2",
+          "3",
+          "2a",
+          "2b",
+          "2c",
+          "1a",
+          "1b",
+          "1c"
+        ],
+        "dataToTrack": {
+          "Change": [
+            {
+              "name": "Healthy Sleep Schedule",
+              "id": "sleepChange",
+              "explanation": "How much sleep you got today",
+              "fieldDescription": "Hours of sleep",
+              "field": "number",
+              "goal": {
+                "freq": "More",
+                "threshold": 8,
+                "timespan": "Day"
+              },
+              "recommendingGoals": [
+                "1c"
+              ],
+              "startDate": "2019-04-11T16:22:17.264Z",
+              "opts": {
+                "showBackdrop": true,
+                "enableBackdropDismiss": true
+              },
+              "selected": true
+            }
+          ],
+          "Symptom": [
+            {
+              "name": "Migraine Today",
+              "id": "migraineToday",
+              "explanation": "Migraine experienced today",
+              "fieldDescription": "Whether you had a migraine (yes/no)",
+              "field": "binary",
+              "recommendingGoals": [
+                "1a",
+                "1b",
+                "1c",
+                "2a",
+                "2b",
+                "2c",
+                "3"
+              ],
+              "opts": {
+                "showBackdrop": true,
+                "enableBackdropDismiss": true
+              },
+              "selected": true,
+              "quickTrack": true,
+              "fieldSet": true
+            },
+            {
+              "name": "Peak Migraine Severity",
+              "id": "peakMigraineSeverity",
+              "explanation": "How bad the migraine was at its worst point",
+              "fieldDescription": "10-point Pain level (1=mild, 10=terrible)",
+              "recommendedField": "numeric scale",
+              "field": "numeric scale",
+              "recommendingGoals": ["1b", "1c"],
+              "selected": true
+            },
+            {
+              "name": "Quality of the Pain",
+              "id": "painQuality",
+              "explanation": "What the pain was like (pulsating/throbbing, pressure, tension, stabbing, sharp, dull, burning, other)",
+              "fieldDescription": "Text box where you can describe the pain",
+              "field": "note",
+              "recommendingGoals": [
+                "1b"
+              ],
+              "opts": {
+                "showBackdrop": true,
+                "enableBackdropDismiss": true
+              },
+              "selected": true
+            },
+            {
+              "name": "Start Time",
+              "id": "migraineStartTime",
+              "explanation": "The time your migraine started",
+              "fieldDescription": "time",
+              "field": "time",
+              "recommendingGoals": [],
+              "opts": {
+                "showBackdrop": true,
+                "enableBackdropDismiss": true
+              },
+              "selected": true
+            },
+            {
+              "name": "Migraine Duration",
+              "field": "time range",
+              "id": "custom_migraineduration",
+              "custom": true
+            }
+          ],
+          "Treatment": [
+            {
+              "name": "As-needed Medications Today",
+              "id": "asNeededMeds",
+              "isMed": true,
+              "fieldsAllowed": ["binary", "number", "time"],
+              "explanation": "Any medication you take on an as-needed basis (in response to symptoms).  For example: Advil, Excedrin, Tylenol, prescription medications you don't take regularly.",
+              "fieldDescription": "Whether you took any as-needed medication today",
+              "field": "binary",
+              "recommendingGoals": [
+                "1a",
+                "1b",
+                "1c",
+                "2a",
+                "2b",
+                "2c",
+                "3"
+              ],
+              "goal": {
+                "freq": "Less",
+                "threshold": 4,
+                "timespan": "Month"
+              },
+              "opts": {
+                "showBackdrop": true,
+                "enableBackdropDismiss": true
+              },
+              "selected": true,
+              "quickTrack": true
+            },
+            {
+              "name": "Exercise",
+              "id": "exerciseToday",
+              "explanation": "How much you exercised today",
+              "fieldDescription": "Number of minutes of exercise",
+              "field": "number",
+              "goal": {
+                "freq": "More",
+                "threshold": 180,
+                "timespan": "Week"
+              },
+              "recommendingGoals": [
+                "1b",
+                "2b"
+              ],
+              "opts": {
+                "showBackdrop": true,
+                "enableBackdropDismiss": true
+              },
+              "selected": true
+            },
+            {
+              "name": "Nutrition Today",
+              "id": "nutritionToday",
+              "explanation": "Whether you ate healthily today. For example, we recommend 4-5 servings of veggies, eating regular meals, avoiding sugar",
+              "fieldDescription": "Whether you ate healthily (yes/no)",
+              "field": "binary",
+              "recommendingGoals": [
+                "1b",
+                "2b"
+              ],
+              "opts": {
+                "showBackdrop": true,
+                "enableBackdropDismiss": true
+              },
+              "selected": true
+            },
+            {
+              "name": "Time Took Advil",
+              "field": "time",
+              "id": "custom_timetookadvil",
+              "custom": true
+            }
+          ],
+          "Contributor": [
+            {
+              "name": "Stress",
+              "id": "stressToday",
+              "explanation": "How stressed you were today",
+              "fieldDescription": "3-point stress rating",
+              "significance": "High stress levels can lead to more migraines",
+              "field": "category scale",
+              "recommendingGoals": [
+                "1b",
+                "2b"
+              ],
+              "opts": {
+                "showBackdrop": true,
+                "enableBackdropDismiss": true
+              },
+              "selected": true
+            },
+            {
+              "name": "Frequent Use of Medications",
+              "id": "frequentMedUse",
+              "explanation": "Calculated medication use, to let you know if you might want to think about cutting back.",
+              "fieldDescription": "Number of pills you took",
+              "field": "calculated medication use",
+              "condition": true,
+              "recommendingGoals": [
+                "1a",
+                "1b",
+                "1c",
+                "2a",
+                "2b",
+                "2c",
+                "3"
+              ],
+              "goal": {
+                "freq": "Less",
+                "threshold": 4,
+                "timespan": "Month"
+              },
+              "significance": "If you use as-needed medications too frequently, they can start causing more migraines.",
+              "opts": {
+                "showBackdrop": true,
+                "enableBackdropDismiss": true
+              },
+              "selected": true
+            },
+            {
+              "name": "Alcohol",
+              "id": "alcoholToday",
+              "explanation": "How much alcohol you had today",
+              "fieldDescription": "3-point alcohol rating",
+              "field": "category scale",
+              "recommendingGoals": [
+                "1b",
+                "2b"
+              ],
+              "opts": {
+                "showBackdrop": true,
+                "enableBackdropDismiss": true
+              },
+              "selected": true
+            }
+          ],
+          "Other": [
+            {
+              "name": "Other Notes",
+              "id": "otherNotes",
+              "explanation": "Anything else you want to note about today ",
+              "fieldDescription": "Text box where you can record any notes",
+              "field": "note",
+              "recommendingGoals": [
+                "1a",
+                "1b",
+                "1c",
+                "2a",
+                "2b",
+                "2c",
+                "3"
+              ],
+              "opts": {
+                "showBackdrop": true,
+                "enableBackdropDismiss": true
+              },
+              "selected": true
+            }
+          ]
+        },
+        "textGoals":
+          "Get <1 migraine per week",
+        "dateAdded": "2019-04-11T16:22:17.264Z",
+        "notifications": {
+          "retroactive": {
+            "delayScale": "Day",
+            "delayNum": 1
+          }
+        },
+      };
+    this.currentConfiguredRoutine = exGoal;
+    return exGoal;
+  }
 
 
 

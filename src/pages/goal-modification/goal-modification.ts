@@ -15,31 +15,28 @@ export class GoalModificationPage {
   private configuredRoutine : any = {};
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
-              public couchDbService: CouchDbServiceProvider,
+              public couchDBService: CouchDbServiceProvider,
               public globalFunctionsService: GlobalFunctionsServiceProvider) {
   }
 
   async ionViewDidLoad() {
     // arrive here from goal/tracking routine modification page
-    if (this.navParams.data && this.navParams.data.params && this.navParams.data.params['modifying']) {
+    if (this.navParams.data && this.navParams.data.params && this.navParams.data.params['modifyGoal']) {
       this.configuredRoutine = this.navParams.data.configuredRoutine;
-      this.textGoals = this.configuredRoutine['textGoals'];
-      this.goalHierarchy = this.globalFunctionsService.getGoalHierarchy(this.configuredRoutine['goals']);
-      this.goalTypes = Object.keys(this.goalHierarchy);
-      this.couchDbService.logConfiguredRoutine(this.configuredRoutine);
+      this.couchDBService.logConfiguredRoutine(this.configuredRoutine);
     } else {
-      this.configuredRoutine = await this.couchDbService.fetchConfiguredRoutine().then((val) => {
-        return val;
-      });
-      let activeGoals = await this.couchDbService.fetchConfiguredRoutine();
-      this.goalHierarchy = this.globalFunctionsService.getGoalHierarchy(activeGoals.goals);
-      this.goalTypes = Object.keys(this.goalHierarchy);
-      this.textGoals = this.configuredRoutine['textGoals'];
+      this.configuredRoutine = await this.couchDBService.fetchConfiguredRoutine();
     }
+    this.textGoals = this.configuredRoutine['textGoals'];
+    this.goalHierarchy = this.globalFunctionsService.getGoalHierarchy(this.configuredRoutine['goals']);
+    this.goalTypes = Object.keys(this.goalHierarchy);
   }
 
-  addGoal() {
-    let params = {'modifying': true};
+  /**
+   * Edit goals
+   */
+  editGoal() {
+    let params = {'modifyGoal': true};
     this.navCtrl.push(GoalTypePage,
         {'configuredRoutine': this.configuredRoutine, 'params': params}, {animate: false});
   }

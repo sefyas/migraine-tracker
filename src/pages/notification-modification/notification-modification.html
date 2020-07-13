@@ -1,0 +1,209 @@
+<ion-header>
+  <ion-navbar text-right hideBackButton>
+    <button ion-button menuToggle show icon-only>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <span id="title" class="header-title-right">Modify Notifications</span>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content class="content vertical-center">
+
+  <div class="ion-content-wrapper" [class.transparent]="postSymptomInfoDisplayed || regularInfoDisplayed">
+    <!-- ======================================= 1. Post-Symptom Tracking ======================================= -->
+    <ion-card class="goal-card center">
+      <ion-card-header>
+        <div class="tracking-name-wrapper">
+          <p class="tracking-name-recommended" *ngIf="recommended === 'retroactive'">Recommended</p>
+          <p class="tracking-name">Post-Symptom Tracking</p>
+        </div>
+        <button class="align-right info-btn" (click)="onDisplayInfoClick('postSymptom')" icon-only>
+          <img [src]="'../../assets/pages/info_icon.svg'" alt="">
+        </button>
+      </ion-card-header>
+
+      <ion-card-content class="tracking-card-content">
+        <p class="tracking-explanation-text" text-wrap>Only indicate symptoms and track details later</p>
+
+        <div class="tracking-selected-wrapper" *ngIf="notificationData['retroactive']">
+          <ion-input class="post-symptom-textfield" type="number" text-right  no-padding no-border
+                     [placeholder]="notificationData['retroactive'].delayNum
+                               ? notificationData['retroactive'].delayNum : '---'"
+                     [(ngModel)]="notificationData['retroactive'].delayNum"></ion-input>
+
+          <div class="tracking-options post-symptom-options" text-left>
+            <div class="tracking-btn-wrapper">
+              <button *ngIf="!(notificationData['retroactive'].delayScale === 'Day')"
+                      class="tracking-btn" (click)="setPostSymptomDelayScale('Day')" icon-only>
+                <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+              </button>
+              <button *ngIf="(notificationData['retroactive'].delayScale === 'Day')"
+                      class="tracking-btn" (click)="setPostSymptomDelayScale('Day')" icon-only>
+                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+              </button>
+              <p class="tracking-btn-label" (click)="setPostSymptomDelayScale('Day')">Day</p>
+            </div>
+
+            <div class="tracking-btn-wrapper">
+              <button *ngIf="!(notificationData['retroactive'].delayScale === 'Hour')"
+                      class="tracking-btn" (click)="setPostSymptomDelayScale('Hour')" icon-only>
+                <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+              </button>
+              <button *ngIf="(notificationData['retroactive'].delayScale === 'Hour')"
+                      class="tracking-btn" (click)="setPostSymptomDelayScale('Hour')" icon-only>
+                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+              </button>
+              <p class="tracking-btn-label" (click)="setPostSymptomDelayScale('Hour')">Hour</p>
+            </div>
+          </div>
+          <p class="tracking-label post-symptom-label">after symptoms</p>
+        </div>
+
+        <button class="align-right tracking-add-btn" *ngIf="notificationData['retroactive']" (click)="selectPostSymptom()" icon-only>
+          <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+        </button>
+
+        <button class="align-right tracking-add-btn" *ngIf="!notificationData['retroactive']" (click)="selectPostSymptom()" icon-only>
+          <img [src]="'../../assets/pages/add_radio_icon.svg' " alt="">
+        </button>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- ======================================= 2. Regular Tracking ======================================= -->
+    <ion-card class="goal-card center">
+      <ion-card-header>
+        <div class="tracking-name-wrapper">
+          <p class="tracking-name-recommended" *ngIf="recommended === 'regular'">Recommended</p>
+          <p class="tracking-name">Regular Tracking</p>
+        </div>
+        <button class="align-right info-btn" (click)="onDisplayInfoClick('regular')" icon-only>
+          <img [src]="'../../assets/pages/info_icon.svg'" alt="">
+        </button>
+      </ion-card-header>
+
+      <ion-card-content class="tracking-card-content">
+        <p class="tracking-explanation-text" text-wrap>Track regularly get more consistent data</p>
+
+        <div class="tracking-selected-wrapper" *ngIf="notificationData['regular']">
+          <div class="tracking-options" text-left>
+            <div class="tracking-btn-wrapper">
+              <button *ngIf="!(notificationData['regular'].timescale === 'Daily')"
+                      class="tracking-btn" (click)="setRegularTimeScale('Daily')" icon-only>
+                <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+              </button>
+              <button *ngIf="(notificationData['regular'].timescale === 'Daily')"
+                      class="tracking-btn" (click)="setRegularTimeScale('Daily')" icon-only>
+                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+              </button>
+              <p class="tracking-btn-label" (click)="setRegularTimeScale('Daily')">Daily</p>
+            </div>
+
+            <div class="tracking-btn-wrapper">
+              <button *ngIf="!(notificationData['regular'].timescale === 'Weekly')"
+                      class="tracking-btn" (click)="setRegularTimeScale('Weekly')" icon-only>
+                <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+              </button>
+              <button *ngIf="(notificationData['regular'].timescale === 'Weekly')"
+                      class="tracking-btn" (click)="setRegularTimeScale('Weekly')" icon-only>
+                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+              </button>
+              <p class="tracking-btn-label" (click)="setRegularTimeScale('Weekly')">Weekly</p>
+            </div>
+
+            <div class="tracking-btn-wrapper">
+              <button *ngIf="!(notificationData['regular'].timescale === 'Monthly')"
+                      class="tracking-btn" (click)="setRegularTimeScale('Monthly')" icon-only>
+                <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+              </button>
+              <button *ngIf="(notificationData['regular'].timescale === 'Monthly')"
+                      class="tracking-btn" (click)="setRegularTimeScale('Monthly')" icon-only>
+                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+              </button>
+              <p class="tracking-btn-label" (click)="setRegularTimeScale('Monthly')">Monthly</p>
+            </div>
+          </div>
+          <p class="tracking-label regular-label">at</p>
+
+          <div class="regular-options-wrapper">
+            <ion-item class="regular-time-picker-wrapper"
+                      *ngIf="!(notificationData['regular'].timescale === 'Daily') &&
+                              !(notificationData['regular'].timescale === 'Weekly') &&
+                              !(notificationData['regular'].timescale === 'Monthly')" text-wrap text-center>
+              <ion-datetime class="regular-time-picker" disabled>
+              </ion-datetime>
+            </ion-item>
+
+            <ion-item class="regular-time-picker-wrapper"
+                      *ngIf="(notificationData['regular'].timescale === 'Daily') ||
+                                  (notificationData['regular'].timescale === 'Weekly') ||
+                                  (notificationData['regular'].timescale === 'Monthly')" text-wrap text-center>
+              <ion-datetime class="regular-time-picker" displayFormat="H:mm" placeholder="Select Time"
+                            pickerFormat="HH:mm" minuteValues="0,10,20,30,40,50"
+                            [(ngModel)]="notificationData['regular']['timeOfDay']">
+              </ion-datetime>
+            </ion-item>
+
+            <ion-item class="regular-time-picker-popover-wrapper" *ngIf="(notificationData['regular'].timescale === 'Weekly')" text-wrap text-center>
+              <ion-select class="regular-time-picker-popover" placeholder="Select Day" interface="popover"
+                          [(ngModel)]="notificationData['regular']['dayOfWeek']">
+                <ion-option>Monday</ion-option>
+                <ion-option>Tuesday</ion-option>
+                <ion-option>Wednesday</ion-option>
+                <ion-option>Thursday</ion-option>
+                <ion-option>Friday</ion-option>
+                <ion-option>Saturday</ion-option>
+                <ion-option>Sunday</ion-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item class="regular-time-picker-popover-wrapper" *ngIf="(notificationData['regular'].timescale === 'Monthly')" text-wrap text-center>
+              <ion-select class="regular-time-picker-popover" placeholder="Select Day" interface="popover"
+                          [(ngModel)]="notificationData['regular']['dayOfMonth']">
+                <div *ngFor="let day of days">
+                  <ion-option>{{day}}</ion-option>
+                </div>
+              </ion-select>
+            </ion-item>
+          </div>
+        </div>
+
+        <button class="align-right tracking-add-btn" *ngIf="notificationData['regular']"
+                (click)="selectRegular()" icon-only>
+          <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+        </button>
+
+        <button class="align-right tracking-add-btn" *ngIf="!notificationData['regular']" (click)="selectRegular()" icon-only>
+          <img [src]="'../../assets/pages/add_radio_icon.svg' " alt="">
+        </button>
+
+      </ion-card-content>
+
+    </ion-card>
+  </div>
+
+  <div class="info-card" [class.info-card-short]="regularInfoDisplayed" *ngIf="postSymptomInfoDisplayed || regularInfoDisplayed">
+    <ion-card-content class="reason-entry-card">
+      <button class="close-button" (click)="onCloseInfoClick()" icon-only>
+        <ion-icon name="custom-close"></ion-icon>
+      </button>
+      <p class="info-title" *ngIf="postSymptomInfoDisplayed">
+        To minimize screen interaction during a migraine,
+        you can indicate symptoms only and get a reminder to track details later.
+        Tracking after symptoms will allow less time tracking but may result in less consistent or accurate data.
+      </p>
+      <p class="info-title" *ngIf="regularInfoDisplayed">
+        Tracking regularly will allow more consistent and accurate data,
+        but you will have to spend more time tracking.
+      </p>
+    </ion-card-content>
+  </div>
+
+</ion-content>
+
+<ion-footer class="footer-wrapper">
+    <button class="align-right modify-footer-button save-button" [disabled]="saved || !canContinue()" (click)="onClickNext()" icon-only>
+      Save
+    </button>
+</ion-footer>

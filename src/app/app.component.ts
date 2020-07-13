@@ -6,11 +6,14 @@ import {SplashScreen} from '@ionic-native/splash-screen';
 import {HomePage} from '../pages/home/home';
 import {GoalModificationPage} from "../pages/goal-modification/goal-modification";
 import {TrackingModificationPage} from "../pages/tracking-modification/tracking-modification";
+import {NotificationModificationPage} from "../pages/notification-modification/notification-modification";
 import {CouchDbServiceProvider} from "../providers/couch-db-service/couch-db-service";
 import {FaqPage} from "../pages/faq/faq";
 import {DataSummaryPage} from "../pages/data-summary/data-summary";
 import {DataCalendarPage} from "../pages/data-calendar/data-calendar";
 import {BreakFromTrackingPage} from "../pages/break-from-tracking/break-from-tracking";
+import {SelectTrackingFrequencyPage} from "../pages/addGoal/select-tracking-frequency/select-tracking-frequency";
+
 import {DataVisPage} from "../pages/data-vis/data-vis";
 
 @Component({
@@ -36,6 +39,7 @@ export class MyApp {
         // { title: 'Data Visualizations', component: DataVisPage},
         { title: 'Modify Goals', component: GoalModificationPage},
         { title: 'Modify Tracking Routines', component: TrackingModificationPage},
+        { title: 'Modify Notifications', component: NotificationModificationPage},
         { title: 'Take a Break from Tracking', component: BreakFromTrackingPage},
       ];
     });
@@ -60,6 +64,7 @@ export class MyApp {
         // { title: 'Data Visualizations', component: DataVisPage},
         { title: 'Modify Goals', component: GoalModificationPage},
         { title: 'Modify Tracking Routines', component: TrackingModificationPage},
+        { title: 'Modify Notifications', component: NotificationModificationPage},
         { title: 'Take a Break from Tracking', component: BreakFromTrackingPage},
       ];
     }

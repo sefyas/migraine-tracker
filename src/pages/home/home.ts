@@ -193,26 +193,33 @@ export class HomePage {
    */
   changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
               dataType: string) {
+
+    console.log('componentEvent ((((((((((((((((');
+    console.log(componentEvent);
+    console.log('data ****************');
+    console.log(data);
+    // this.tracked['field'] = data['field'];
+
     if (dataType === 'quickTracker') {
-      dataType = data.dataType;
+      dataType = data['dataType'];
     }
     if (!this.tracked.hasOwnProperty(dataType)) {
       this.tracked[dataType] = {};
     }
-    if (componentEvent.dataVal) {
-      this.tracked[dataType][data.id] = componentEvent.dataVal;
+    if (componentEvent['dataVal']) {
+      this.tracked[dataType][data['id']] = componentEvent['dataVal'];
     }
-    if (componentEvent.dataStart) {
-      if (!this.tracked[dataType].hasOwnProperty(data.id)) {
-        this.tracked[dataType][data.id] = {};
+    if (componentEvent['dataStart']) {
+      if (!this.tracked[dataType].hasOwnProperty(data['id'])) {
+        this.tracked[dataType][data['id']] = {};
       }
-      this.tracked[dataType][data.id]['start'] = componentEvent.dataStart;
+      this.tracked[dataType][data['id']]['start'] = componentEvent['dataStart'];
     }
-    if (componentEvent.dataEnd) {
-      if (!this.tracked[dataType].hasOwnProperty(data.id)) {
-        this.tracked[dataType][data.id] = {};
+    if (componentEvent['dataEnd']) {
+      if (!this.tracked[dataType].hasOwnProperty(data['id'])) {
+        this.tracked[dataType][data['id']] = {};
       }
-      this.tracked[dataType][data.id]['end'] = componentEvent.dataEnd;
+      this.tracked[dataType][data['id']]['end'] = componentEvent['dataEnd'];
     }
     this.saveTrackedData();
   }
@@ -231,7 +238,7 @@ export class HomePage {
       return 'over'
     } else if(timesTracked === data.goal.threshold) {
       if (data.goal.freq === 'More') {
-return 'met';
+        return 'met';
       }
       return 'at limit';
     } else {

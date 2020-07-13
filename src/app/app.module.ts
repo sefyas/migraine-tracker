@@ -23,6 +23,7 @@ import { SelectTrackingFrequencyPage } from "../pages/addGoal/select-tracking-fr
 import { EditDataPage } from "../pages/addGoal/edit-data/edit-data";
 import { GoalModificationPage } from "../pages/goal-modification/goal-modification";
 import { TrackingModificationPage } from "../pages/tracking-modification/tracking-modification";
+import { NotificationModificationPage } from "../pages/notification-modification/notification-modification";
 import { DataCalendarPage } from "../pages/data-calendar/data-calendar";
 import { DataSummaryPage } from "../pages/data-summary/data-summary";
 import { FaqPage } from "../pages/faq/faq";
@@ -49,6 +50,7 @@ import { DataElementTrackingComponent } from "../components/data-element-trackin
     EditDataPage,
     GoalModificationPage,
     TrackingModificationPage,
+    NotificationModificationPage,
     DataCalendarPage,
     DataSummaryPage,
     FaqPage,
@@ -79,6 +81,7 @@ import { DataElementTrackingComponent } from "../components/data-element-trackin
     EditDataPage,
     GoalModificationPage,
     TrackingModificationPage,
+    NotificationModificationPage,
     DataCalendarPage,
     DataSummaryPage,
     FaqPage,

@@ -11,14 +11,20 @@ import {DataElement, DataReport} from "../../interfaces/customTypes";
   templateUrl: 'data-summary.html',
 })
 export class DataSummaryPage {
+  private fromDate : string;
+  private toDate : string;
+  private today : any;
+  private allTrackedData : any;
+  private currentlyTracking : any;
+  private dataTypeColor = {"Change" : "#8052AF",
+    "Symptom" : "#32A1C3",
+    "Treatment" : "#E09845",
+    "Contributor" : "#30916C",
+    "Other" : "#D09595"
+  };
 
-  private currentlyTracking : {[dataType:string] : DataElement[]};
-  private allTrackedData : DataReport[];
   private filteredDataByID : {[dataID: string] : {[reportProps: string] : any}[]};
   private dataTypes : string[];
-  private earliestDateFilter : string;
-  private latestDateFilter : string;
-  private today : any;
   private expanded: {[dataType:string] : boolean} = {};
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
@@ -27,57 +33,59 @@ export class DataSummaryPage {
   }
 
   ionViewDidLoad() {
+    this.initDates();
     this.setDataTypes();
-    this.setDates();
   }
 
-  setDates(){
+  initDates(){
     let today = new Date();
     this.today = today.toISOString();
-    this.latestDateFilter = new Date().toISOString();
-    this.earliestDateFilter = this.dateFunctions.getMonthAgo(today).toISOString();
+    this.toDate = new Date().toISOString();
+    this.fromDate = this.dateFunctions.getMonthAgo(today).toISOString();
+
+    this.fromDate = new Date('2018-07-06').toISOString();
   }
 
-  setDataTypes(){
-    // this.allTrackedData = this.couchDBService.fetchTrackedData();
-    this.currentlyTracking = this.couchDBService.fetchConfiguredRoutine()['dataToTrack'];
+  async setDataTypes(){
+    this.allTrackedData = await this.couchDBService.fetchTrackedDataRange(this.fromDate, this.toDate);
+    this.currentlyTracking = await this.couchDBService.fetchConfiguredRoutine();
+    this.currentlyTracking = this.currentlyTracking['dataToTrack'];
     let allDataTypes = Object.keys(this.currentlyTracking);
-    console.log(this.currentlyTracking)
-    for(let i=0; i<allDataTypes.length; i++){ // we won't report notes, so if it's all they have for a datatype, remove
+
+    for (let i=0; i<allDataTypes.length; i++) { // we won't report notes, so if it's all they have for a datatype, remove
       this.currentlyTracking[allDataTypes[i]] = this.currentlyTracking[allDataTypes[i]].filter(function(dataItem){
         return dataItem.field !== 'note';
       });
-      if(this.currentlyTracking[allDataTypes[i]].length === 0){
+      if (this.currentlyTracking[allDataTypes[i]].length === 0) {
         delete this.currentlyTracking[allDataTypes[i]];
+      } else {
+        this.expanded[allDataTypes[i]] = true;
       }
-      else this.expanded[allDataTypes[i]] = true;
     }
     this.dataTypes = Object.keys(this.currentlyTracking);
     this.filterData();
   }
 
-
   filterData(filterDate : string = undefined, filterDir : string=undefined){
     let append = false; // if we only EXPAND the filter we want to ADD values; otherwise, just start over
     // (with bigger data it would be better to always adjust instead of redoing, but here I think it's ok)
 
-    let filterStart = this.earliestDateFilter;
-    let filterEnd = this.latestDateFilter;
+    let filterStart = this.fromDate;
+    let filterEnd = this.toDate;
 
-    if(filterDir === 'early'){ // because of dumb ionic bug it doesn't bind
-      if(this.dateFunctions.dateGreaterOrEqual(this.earliestDateFilter, filterDate)){
+    if (filterDir === 'early') { // because of dumb ionic bug it doesn't bind
+      if (this.dateFunctions.dateGreaterOrEqual(this.fromDate, filterDate)) {
         append = true;
-        filterEnd = this.earliestDateFilter;
+        filterEnd = this.fromDate;
       }
-      this.earliestDateFilter = filterDate;
+      this.fromDate = filterDate;
       filterStart = filterDate;
-    }
-    else if(filterDir === 'late'){
-      if(this.dateFunctions.dateGreaterOrEqual(filterDate, this.latestDateFilter)){
+    } else if (filterDir === 'late') {
+      if (this.dateFunctions.dateGreaterOrEqual(filterDate, this.toDate)) {
         append = true;
-        filterStart = this.latestDateFilter;
+        filterStart = this.toDate;
       }
-      this.latestDateFilter = filterDate;
+      this.toDate = filterDate;
       filterEnd = filterDate;
     }
     let actualThis = this;
@@ -85,110 +93,137 @@ export class DataSummaryPage {
       return actualThis.dateFunctions.dateGreaterOrEqual(datapoint.startTime, filterStart) &&
         actualThis.dateFunctions.dateGreaterOrEqual(filterEnd, datapoint.startTime);
     });
+
+    // console.log("~~~~~~ filteredData");
+    // console.log(filteredData);
+    //
+    // console.log("~~~~~~ append");
+    // console.log(append);
+
     this.aggregateData(filteredData, append);
   }
 
-
   aggregateData(filteredData : DataReport[], append: boolean) {
     let trackedDict;
-    if (!append) { // just initializes the dicts for each datapoint
+    if (!append) { //initializes the dicts for each datapoint
       trackedDict = {};
       for (let i = 0; i < this.dataTypes.length; i++) {
         let trackingOfType = this.currentlyTracking[this.dataTypes[i]] ? this.currentlyTracking[this.dataTypes[i]] : [];
         for (let t = 0; t < trackingOfType.length; t++) {
-          if (!trackedDict[trackingOfType[t].id])
+          if (!trackedDict[trackingOfType[t]['id']])
             trackedDict[trackingOfType[t].id] = {
-              'name': trackingOfType[t].name, 'field': trackingOfType[t].field,
-              'vals': [], 'goal': trackingOfType[t].goal
+              'name': trackingOfType[t]['name'],
+              'field': trackingOfType[t]['field'],
+              'vals': {'binary': [], 'number': [], 'numeric scale': [],
+                'category scale': [], 'time': [], 'duration': [], 'calculated medication use': []},
+              'goal': trackingOfType[t]['goal']
             };
         }
       }
-    }
-
-    else{
+    } else{
       trackedDict = this.filteredDataByID;
     }
 
-    for(let i=0; i<filteredData.length; i++){
+    for (let i=0; i<filteredData.length; i++) {
       let trackedDataTypes = Object.keys(filteredData[i]);
-      for(let j=0; j<trackedDataTypes.length; j++){
-        if(this.dataTypes.indexOf(trackedDataTypes[j]) > -1){ // if we're not still tracking we assume we don't care
+      for (let j=0; j<trackedDataTypes.length; j++) {
+        if (this.dataTypes.indexOf(trackedDataTypes[j]) > -1) { // if we're not still tracking we assume we don't care
           let dataItems = filteredData[i][trackedDataTypes[j]];
-          for(let dataID in dataItems) { // aggregate all of the values for each datatype into a single list
+          for (let dataID in dataItems) { // aggregate all of the values for each datatype into a single list
             if (trackedDict[dataID]) {
-              if(trackedDict[dataID].field === 'time range'){
-                trackedDict[dataID]['vals'].push(this.getDuration(dataItems[dataID]))
+              if (trackedDict[dataID]['field'] === 'time range') {
+                // console.log("field", trackedDict[dataID]['field']);
+                // console.log("vals", trackedDict[dataID]['vals']);
+                trackedDict[dataID]['vals']['duration'].push(this.getDuration(dataItems[dataID]))
+              } else {
+                // console.log("field", trackedDict[dataID]['field']);
+                // console.log("vals", trackedDict[dataID]['vals']);
+                trackedDict[dataID]['vals'][trackedDict[dataID]['field']].push(dataItems[dataID]);
               }
-              else{
-                trackedDict[dataID]['vals'].push(dataItems[dataID]);
-              }
-            }
-            else{
+            } else {
               console.log("Not currently tracking " + dataID);
             }
           }
         }
       }
     }
+
+    console.log("~~~~~~~~~~~~~ trackedDict");
+    console.log(trackedDict);
     this.getDataToReport(trackedDict);
   }
 
 
+
   getDataToReport(trackedDict : {[dataID: string] : {[reportProps: string] : any}[]}){
     let dataIDs = Object.keys(trackedDict);
+    let allAggregatedDataByTypes = {};
 
-    for(let i=0; i<dataIDs.length; i++) {
-      trackedDict[dataIDs[i]]['timesReported'] = trackedDict[dataIDs[i]]['vals'].length;
+    console.log("@@@@@@@@@@ dataIDs");
+    console.log(dataIDs);
 
-      if(trackedDict[dataIDs[i]]['vals'].length > 0){
+    for (let i=0; i<dataIDs.length; i++) {
+      let serialDataByTypes = trackedDict[dataIDs[i]]['vals'];
+      let aggregatedDataByTypes = {};
 
-        if (trackedDict[dataIDs[i]]['field'] === 'binary') {
-          trackedDict[dataIDs[i]]['timesSaidTrue'] =
-            trackedDict[dataIDs[i]]['vals'].filter(function(data){return data === 'Yes'}).length;
-        }
+      // console.log("~~~~~~~~~~ dataTrackingTypes");
+      // console.log(serialDataByTypes);
 
-        else if(trackedDict[dataIDs[i]]['field'] === 'number') {
-          let addedVals = this.getSum(trackedDict[dataIDs[i]]['vals']);
-          trackedDict[dataIDs[i]]['totalReported'] = addedVals;
-          trackedDict[dataIDs[i]]['average'] = (addedVals/trackedDict[dataIDs[i]]['vals'].length).toFixed(2);
-        }
+      for (let j = 0; j < Object.keys(serialDataByTypes).length; j++) {
+        let type = Object.keys(serialDataByTypes)[j];
 
-        else if(trackedDict[dataIDs[i]]['field'] === 'numeric scale') {
-          let addedVals = this.getSum(trackedDict[dataIDs[i]]['vals']);
-          trackedDict[dataIDs[i]]['average'] = (addedVals/trackedDict[dataIDs[i]]['vals'].length).toFixed(2);
-        }
+        // console.log("~~~~~~~~~~~~~~~~~", serialDataByTypes[type]);
+        // aggregatedDataByTypes[Object.keys(serialDataByTypes)[j]] = 0;
 
-
-        else if(trackedDict[dataIDs[i]]['field'] === 'category scale') {
-          trackedDict[dataIDs[i]]['counts'] = {};
-          for(let j=0; j<trackedDict[dataIDs[i]]['vals'].length; j++){
-            if(trackedDict[dataIDs[i]]['vals'][j] in trackedDict[dataIDs[i]]['counts']){
-              trackedDict[dataIDs[i]]['counts'][trackedDict[dataIDs[i]]['vals'][j]] ++;
+        if (serialDataByTypes[type].length > 0) {
+          aggregatedDataByTypes[type] = {};
+          aggregatedDataByTypes[type]["totalDayReported"] = serialDataByTypes[type].length;
+          if (type === "binary") {
+            aggregatedDataByTypes[type]["totalValReported"] = serialDataByTypes[type].length;
+            aggregatedDataByTypes[type]["yes"] = serialDataByTypes[type].filter(function (data) {
+              return data === 'Yes'
+            }).length;
+          } else if (type === "number") {
+            aggregatedDataByTypes[type]["totalValReported"] = this.getSum(serialDataByTypes[type]);
+            aggregatedDataByTypes[type]["averageValReported"] = (aggregatedDataByTypes[type]["totalValReported"]
+                / serialDataByTypes[type].length).toFixed(2);
+          } else if(type === 'numeric scale') {
+            aggregatedDataByTypes[type]["totalValReported"] = this.getSum(serialDataByTypes[type]);
+            aggregatedDataByTypes[type]["averageValReported"] = (aggregatedDataByTypes[type]["totalValReported"]
+                / serialDataByTypes[type].length).toFixed(2);
+          } else if(type === 'category scale') {
+            aggregatedDataByTypes[type]["catCountsReported"] = {"Some": 0, "None": 0, "Lots": 0};
+            for (let j=0; j<serialDataByTypes[type].length; j++) {
+              aggregatedDataByTypes[type]["catCountsReported"][serialDataByTypes[type][j]]++;
             }
-            else{
-              trackedDict[dataIDs[i]]['counts'][trackedDict[dataIDs[i]]['vals'][j]] = 1;
-            }
+          } else if(trackedDict[dataIDs[i]]['field'] === 'time range') {
+            let addedDurations = this.getSum(serialDataByTypes[type]);
+            aggregatedDataByTypes[type]["averageValReported"] = (addedDurations
+                / serialDataByTypes[type].length).toFixed(2);
+            aggregatedDataByTypes[type]["averageTimeReported"] =
+                this.dateFunctions.milisecondsToPrettyTime(aggregatedDataByTypes[type]["averageValReported"]);
+          } else {
+            console.log("#########");
+            console.log(type);
           }
-          trackedDict[dataIDs[i]]['counts']['keys'] = Object.keys(trackedDict[dataIDs[i]]['counts']); // dumb ionic binding thing
-        }
-
-        else if(trackedDict[dataIDs[i]]['field'] === 'time range') {
-          let addedDurations = this.getSum(trackedDict[dataIDs[i]]['vals']);
-          let averageDuration =  addedDurations / trackedDict[dataIDs[i]]['vals'].length;
-          trackedDict[dataIDs[i]]['average'] = this.dateFunctions.milisecondsToPrettyTime(averageDuration);
         }
       }
-    }
+      allAggregatedDataByTypes[dataIDs[i]] = aggregatedDataByTypes;
 
-    this.filteredDataByID = trackedDict;
+      // this.filteredDataByID = trackedDict;
+    }
+    console.log("~~~~~~~~~~ allAggregatedDataByTypes");
+    console.log(allAggregatedDataByTypes);
 
   }
 
 
-  getSum(dataVals) : number{
-    if(dataVals.length===0) return null;
-    return dataVals.reduce(function(a, b){
-      return Number(a) + Number(b)
+
+
+  getSum(dataVals) : number {
+    if (dataVals.length === 0) return null;
+    return dataVals.reduce(function(a, b) {
+      return Number(a) + Number(b);
     });
   }
 
@@ -200,8 +235,7 @@ export class DataSummaryPage {
     let lateTime = timeRangeDict['end'];
     if(earlyTime===undefined || lateTime === undefined){
       return 0;
-    }
-    else{
+    } else{
       return this.dateFunctions.getDuration(earlyTime, lateTime);
     }
   }

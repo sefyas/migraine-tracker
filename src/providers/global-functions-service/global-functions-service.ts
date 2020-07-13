@@ -8,7 +8,7 @@ import {DateFunctionServiceProvider} from "../date-function-service/date-functio
 export class GlobalFunctionsServiceProvider {
 
 
-  private contactEmail = "jesscs@cs.washington.edu or lwjiang@cs.washington.edu";
+  private contactEmail = "lwjiang@cs.washington.edu or jesscs@cs.washington.edu";
 
   constructor(private goalDetails: GoalDetailsServiceProvider,
               private dataDetailsProvider: DataDetailsServiceProvider,

@@ -13,7 +13,7 @@
         <ion-card-header class="goal-header-wrapper" text-wrap >
             <img class="goal-title-icon"  [src]="'../../assets/pages/' + dataType.toLowerCase() + '_icon.svg' " alt="">
             <p class="goal-title-text">{{dataType}} Data</p>
-            <button class="align-right edit-button" icon-only>
+            <button class="align-right edit-button" (click)="editData(dataType)" icon-only>
                 <img [src]="'../../assets/pages/edit_icon.svg'" alt="">
             </button>
         </ion-card-header>

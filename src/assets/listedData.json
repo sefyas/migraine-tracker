@@ -136,7 +136,7 @@
     "Treatment":
         [
             {
-                "name": "As-needed medications",
+                "name": "As-needed Medications",
                 "id": "asNeededMeds",
                 "explanation": "Medication taken in response to symptoms (for example, Advil, Excedrin, prescription rescue)",
                 "fieldDescription": "Whether you took any as-needed medication",
@@ -476,21 +476,21 @@
     "Other":
         [
             {
-                    "name": "If as-needed medication worked",
-                    "id": "whetherMedsWorked",
-                    "explanation": "Whether your as-needed medication improved your symptoms",
-                    "fieldDescription": "3-point symptoms improvement scale",
-                    "recommendedField": "category scale",
-                    "condition": true,
-                    "recommendingGoals": ["2b", "1c"]
-                },
-                {
-                    "name": "Other notes",
-                    "id": "otherNotes",
-                    "explanation": "Anything else you want to note",
-                    "fieldDescription": "Text box where you can record any notes",
-                    "recommendedField": "note",
-                    "recommendingGoals": ["2a", "2b", "2c", "3", "1a", "1b", "1c"]
-                }
+                "name": "If As-needed Medication Worked",
+                "id": "whetherMedsWorked",
+                "explanation": "Whether your as-needed medication improved your symptoms",
+                "fieldDescription": "3-point symptoms improvement scale",
+                "recommendedField": "category scale",
+                "condition": true,
+                "recommendingGoals": ["2b", "1c"]
+            },
+            {
+                "name": "Other Notes",
+                "id": "otherNotes",
+                "explanation": "Anything else you want to note",
+                "fieldDescription": "Text box where you can record any notes",
+                "recommendedField": "note",
+                "recommendingGoals": ["2a", "2b", "2c", "3", "1a", "1b", "1c"]
+            }
         ]
 }

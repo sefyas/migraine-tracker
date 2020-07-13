@@ -1,39 +1,96 @@
 page-data-summary {
-
-  .trackedItem{
-    margin-bottom: 1em;
-    //background-color: var(--sublist-color);
+  // ============ date picker ============
+  .date-picker-wrapper {
+    margin: 20px 10px 20px 10px;
   }
 
-  .dataName{
-    font-size: 1.9rem;
-    padding-bottom: 0.25em;
+  .date-picker-title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.6);
   }
 
-  .dataTypeHeader{
-    font-size:2.15rem;
+  .date-picker {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-right: -20px;
   }
 
-  .dataReport{
-    padding-left: 1em;
-    padding-bottom: 0.25em;
-    font-size: 1.7rem;
+  .date-picker-item {
+    border-bottom: solid 1px rgba(255, 255, 255, 0.4);
   }
 
-  .timesReported{
-    padding-left: 1em;
-    padding-bottom: 0.25em;
+  .item-ios.item-block .item-inner {
+    border: none;
+  }
+
+  // ============ data summary ============
+  .data-type-card {
+    background: var(--goal-card-background);
+    border-radius: 12px;
+    vertical-align: middle;
+  }
+
+  .data-type-icon {
+    position: relative;
+    left: 5px;
+    width: 55px;
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  .data-type-header {
+    font-size: 18pt;
+    font-weight: bold;
+    position: relative;
+    left: 20px;
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  .data-type-expanded-icon {
+    position: relative;
+    top: 14px;
+    right: 5px;
+    float: right;
+    font-size: 25pt;
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  .data-item{
+    margin: 0 10px 20px 50px;
+  }
+
+  .data-name{
+    font-size: 14pt;
+    font-weight: bold;
+    padding-bottom: 10px;
+  }
+
+
+  .data-report{
+    //padding-left: 1em;
+    padding-bottom: 5px;
+    font-size: 12pt;
+  }
+
+
+
+  .times-reported{
+    //padding-left: 1em;
+    padding-bottom: 5px;
     font-size: 1.5rem;
     font-style: italic;
   }
 
-  .catResponses{
-    padding-left: 1em;
+  .cat-responses{
+    //padding-left: 1em;
     font-style: italic;
   }
 
-  .dataGoal{
-    padding-left: 1em;
+  .data-goal{
+    //padding-left: 1em;
     font-style: italic;
   }
 
