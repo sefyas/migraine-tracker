@@ -6,7 +6,7 @@ import * as moment from 'moment';
 @Injectable()
 export class DateFunctionServiceProvider {
 
-  constructor(public http: HttpClient) {
+  constructor (public http: HttpClient) {
   }
 
   compareTimes(time1, time2){
@@ -17,7 +17,7 @@ export class DateFunctionServiceProvider {
 
   dateToPrettyDate(dateString, utc=false){
     let date = moment(dateString);
-    if(utc){
+    if (utc) {
       date = date.utc()
     }
     return date.format("MM/DD/YYYY");
@@ -29,6 +29,10 @@ export class DateFunctionServiceProvider {
     console.log(prettyDate1);
     console.log(prettyDate2);
     return (prettyDate1 === prettyDate2)
+  }
+
+  getDayAgo(date){
+    return moment(date).subtract(1, 'day');
   }
 
   getMonthAgo(date){
@@ -115,5 +119,14 @@ export class DateFunctionServiceProvider {
     let nextDay = moment(dateTracked).add(1, "day").toDate();
     let endDate = new Date(Date.UTC(nextDay.getFullYear(), nextDay.getMonth(), nextDay.getDate()));
     return [startDate, endDate]
+  }
+
+  getTimePartition(time) {
+    let hour : number = +time.split(":")[0];
+    let ifNight = hour >= 0 && hour < 6;
+    let ifMorning = hour >= 6 && hour < 12;
+    let ifAfternoon = hour >= 12 && hour < 18;
+    let ifEvening = hour >= 18 && hour < 24;
+    return [ifNight, ifMorning, ifAfternoon, ifEvening];
   }
 }

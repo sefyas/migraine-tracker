@@ -38,6 +38,12 @@ export class DataConfigPage {
     this.configuredRoutine = this.navParams.data.configuredRoutine;
     this.params = this.navParams.data.params;
 
+    // this.navParams.data && Object.keys(this.navParams.data).length !== 0
+
+    console.log("@@@@@@@@@@~~~~~~~~~~~~");
+    console.log(this.configuredRoutine);
+    console.log(this.params);
+
     this.allGoals = this.configuredRoutine['goals'] ? this.configuredRoutine['goals'] : [];
     this.selectedConfigData = this.configuredRoutine['selectedConfigData'];
     this.dataObject = this.params['dataPage'];
@@ -129,6 +135,7 @@ export class DataConfigPage {
    * @param alreadyTracking
    */
   getDataInfo(alreadyTracking : {[dataType:string]:DataElement[]}) {
+    if (!alreadyTracking) alreadyTracking = {};
     let dataInfo = this.dataDetailsServiceProvider.getDataLists(
         alreadyTracking, this.dataObject['dataType'], this.allGoals);
     this.recommendedData = dataInfo['recData'];

@@ -30,7 +30,7 @@ export class GoalTypePage {
               private dataDetails: DataDetailsServiceProvider) {}
 
   async ionViewDidLoad() {
-    if (this.navParams.data.length !== 0 && this.navParams.data) { // from the goal modification page
+    if (this.navParams.data && Object.keys(this.navParams.data).length !== 0) { // from the goal modification page
       this.configuredRoutine = this.navParams.data.configuredRoutine;
       this.params = this.navParams.data.params;
     } else { // from the initial setup page
@@ -92,7 +92,7 @@ export class GoalTypePage {
   /**
    * Called when the previous navigation button is clicked
    */
-  async onClickNext(exit=false) {
+  async onClickNext(exit: false) {
     let selectedConfigData = this.dataDetails.getSelectedConfigData(this.selectedGoals);
     this.configuredRoutine['goals'] = this.selectedGoals;
     this.configuredRoutine['selectedConfigData'] = selectedConfigData;

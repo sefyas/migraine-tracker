@@ -34,7 +34,7 @@ page-data-summary {
   .data-type-icon {
     position: relative;
     left: 5px;
-    width: 55px;
+    width: 45px;
     vertical-align: middle;
     display: inline-block;
   }
@@ -50,7 +50,7 @@ page-data-summary {
 
   .data-type-expanded-icon {
     position: relative;
-    top: 14px;
+    top: 5px;
     right: 5px;
     float: right;
     font-size: 25pt;
@@ -59,7 +59,7 @@ page-data-summary {
   }
 
   .data-item{
-    margin: 0 10px 20px 50px;
+    margin: 0 10px 20px 70px;
   }
 
   .data-name{
@@ -68,12 +68,25 @@ page-data-summary {
     padding-bottom: 10px;
   }
 
-
   .data-report{
     //padding-left: 1em;
     padding-bottom: 5px;
     font-size: 12pt;
   }
+
+  .data-field {
+    font-size: 12pt;
+    font-weight: bold;
+    margin: 10px 0 10px 0;
+  }
+
+  .data-text {
+    font-size: 12pt;
+    //font-weight: bold;
+    margin-left: 10px;
+  }
+
+
 
 
 

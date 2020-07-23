@@ -2,9 +2,7 @@ import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import {CouchDbServiceProvider} from "../../providers/couch-db-service/couch-db-service";
 import {DateFunctionServiceProvider} from "../../providers/date-function-service/date-function-service";
-import {DataElement, DataReport} from "../../interfaces/customTypes";
-
-
+import {DataReport} from "../../interfaces/customTypes";
 
 @Component({
   selector: 'page-data-summary',
@@ -24,12 +22,14 @@ export class DataSummaryPage {
   };
 
   private filteredDataByID : {[dataID: string] : {[reportProps: string] : any}[]};
+  private filteredDataFieldByID: any = {};
   private dataTypes : string[];
   private expanded: {[dataType:string] : boolean} = {};
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,
-              public couchDBService: CouchDbServiceProvider, public dateFunctions: DateFunctionServiceProvider) {
-
+  constructor(public navCtrl: NavController,
+              public navParams: NavParams,
+              public couchDBService: CouchDbServiceProvider,
+              public dateFunctions: DateFunctionServiceProvider) {
   }
 
   ionViewDidLoad() {
@@ -37,17 +37,23 @@ export class DataSummaryPage {
     this.setDataTypes();
   }
 
+  /**
+   * Initialize dates
+   */
   initDates(){
     let today = new Date();
     this.today = today.toISOString();
     this.toDate = new Date().toISOString();
     this.fromDate = this.dateFunctions.getMonthAgo(today).toISOString();
-
-    this.fromDate = new Date('2018-07-06').toISOString();
+    // this.fromDate = new Date('2018-07-06').toISOString();
   }
 
-  async setDataTypes(){
+  /**
+   * Organize data by data types
+   */
+  async setDataTypes() {
     this.allTrackedData = await this.couchDBService.fetchTrackedDataRange(this.fromDate, this.toDate);
+    console.log(this.allTrackedData);
     this.currentlyTracking = await this.couchDBService.fetchConfiguredRoutine();
     this.currentlyTracking = this.currentlyTracking['dataToTrack'];
     let allDataTypes = Object.keys(this.currentlyTracking);
@@ -63,117 +69,65 @@ export class DataSummaryPage {
       }
     }
     this.dataTypes = Object.keys(this.currentlyTracking);
-    this.filterData();
+    this.aggregateData(this.allTrackedData);
   }
 
-  filterData(filterDate : string = undefined, filterDir : string=undefined){
-    let append = false; // if we only EXPAND the filter we want to ADD values; otherwise, just start over
-    // (with bigger data it would be better to always adjust instead of redoing, but here I think it's ok)
-
-    let filterStart = this.fromDate;
-    let filterEnd = this.toDate;
-
-    if (filterDir === 'early') { // because of dumb ionic bug it doesn't bind
-      if (this.dateFunctions.dateGreaterOrEqual(this.fromDate, filterDate)) {
-        append = true;
-        filterEnd = this.fromDate;
+  /**
+   * Aggregate data by data types and in time sequences
+   * @param filteredData
+   */
+  aggregateData(filteredData : DataReport[]) {
+    let trackedDict = {};
+    for (let i = 0; i < this.dataTypes.length; i++) {
+      let trackingOfType = this.currentlyTracking[this.dataTypes[i]] ? this.currentlyTracking[this.dataTypes[i]] : [];
+      for (let t = 0; t < trackingOfType.length; t++) {
+        if (!trackedDict[trackingOfType[t]['id']])
+          trackedDict[trackingOfType[t].id] = {
+            'name': trackingOfType[t]['name'],
+            'field': trackingOfType[t]['field'],
+            'vals': {'binary': [], 'number': [], 'numeric scale': [],
+              'category scale': [], 'time': [], 'duration': [], 'calculated medication use': []},
+            'goal': trackingOfType[t]['goal']
+          };
       }
-      this.fromDate = filterDate;
-      filterStart = filterDate;
-    } else if (filterDir === 'late') {
-      if (this.dateFunctions.dateGreaterOrEqual(filterDate, this.toDate)) {
-        append = true;
-        filterStart = this.toDate;
-      }
-      this.toDate = filterDate;
-      filterEnd = filterDate;
     }
-    let actualThis = this;
-    let filteredData = this.allTrackedData.filter(function (datapoint) {
-      return actualThis.dateFunctions.dateGreaterOrEqual(datapoint.startTime, filterStart) &&
-        actualThis.dateFunctions.dateGreaterOrEqual(filterEnd, datapoint.startTime);
-    });
-
-    // console.log("~~~~~~ filteredData");
-    // console.log(filteredData);
-    //
-    // console.log("~~~~~~ append");
-    // console.log(append);
-
-    this.aggregateData(filteredData, append);
-  }
-
-  aggregateData(filteredData : DataReport[], append: boolean) {
-    let trackedDict;
-    if (!append) { //initializes the dicts for each datapoint
-      trackedDict = {};
-      for (let i = 0; i < this.dataTypes.length; i++) {
-        let trackingOfType = this.currentlyTracking[this.dataTypes[i]] ? this.currentlyTracking[this.dataTypes[i]] : [];
-        for (let t = 0; t < trackingOfType.length; t++) {
-          if (!trackedDict[trackingOfType[t]['id']])
-            trackedDict[trackingOfType[t].id] = {
-              'name': trackingOfType[t]['name'],
-              'field': trackingOfType[t]['field'],
-              'vals': {'binary': [], 'number': [], 'numeric scale': [],
-                'category scale': [], 'time': [], 'duration': [], 'calculated medication use': []},
-              'goal': trackingOfType[t]['goal']
-            };
-        }
-      }
-    } else{
-      trackedDict = this.filteredDataByID;
-    }
-
     for (let i=0; i<filteredData.length; i++) {
-      let trackedDataTypes = Object.keys(filteredData[i]);
+      let trackedDataTypes = Object.keys(filteredData[i][0]);
       for (let j=0; j<trackedDataTypes.length; j++) {
-        if (this.dataTypes.indexOf(trackedDataTypes[j]) > -1) { // if we're not still tracking we assume we don't care
-          let dataItems = filteredData[i][trackedDataTypes[j]];
+          let dataItems = filteredData[i][0][trackedDataTypes[j]];
+          let dataFields = filteredData[i][1][trackedDataTypes[j]];
           for (let dataID in dataItems) { // aggregate all of the values for each datatype into a single list
+            let dataItem = dataItems[dataID];
+            let dataType = dataFields[dataID];
+
             if (trackedDict[dataID]) {
-              if (trackedDict[dataID]['field'] === 'time range') {
-                // console.log("field", trackedDict[dataID]['field']);
-                // console.log("vals", trackedDict[dataID]['vals']);
-                trackedDict[dataID]['vals']['duration'].push(this.getDuration(dataItems[dataID]))
+              if (dataType === 'time range') {
+                trackedDict[dataID]['vals']['duration'].push(this.getDuration(dataItem))
               } else {
-                // console.log("field", trackedDict[dataID]['field']);
-                // console.log("vals", trackedDict[dataID]['vals']);
-                trackedDict[dataID]['vals'][trackedDict[dataID]['field']].push(dataItems[dataID]);
+                trackedDict[dataID]['vals'][dataType].push(dataItem);
               }
             } else {
-              console.log("Not currently tracking " + dataID);
+              // console.log("Not currently tracking " + dataID);
             }
           }
-        }
       }
     }
-
-    console.log("~~~~~~~~~~~~~ trackedDict");
-    console.log(trackedDict);
     this.getDataToReport(trackedDict);
   }
 
-
-
+  /**
+   * Calculate data to report
+   * @param trackedDict
+   */
   getDataToReport(trackedDict : {[dataID: string] : {[reportProps: string] : any}[]}){
     let dataIDs = Object.keys(trackedDict);
     let allAggregatedDataByTypes = {};
 
-    console.log("@@@@@@@@@@ dataIDs");
-    console.log(dataIDs);
-
     for (let i=0; i<dataIDs.length; i++) {
       let serialDataByTypes = trackedDict[dataIDs[i]]['vals'];
       let aggregatedDataByTypes = {};
-
-      // console.log("~~~~~~~~~~ dataTrackingTypes");
-      // console.log(serialDataByTypes);
-
       for (let j = 0; j < Object.keys(serialDataByTypes).length; j++) {
         let type = Object.keys(serialDataByTypes)[j];
-
-        // console.log("~~~~~~~~~~~~~~~~~", serialDataByTypes[type]);
-        // aggregatedDataByTypes[Object.keys(serialDataByTypes)[j]] = 0;
 
         if (serialDataByTypes[type].length > 0) {
           aggregatedDataByTypes[type] = {};
@@ -187,7 +141,7 @@ export class DataSummaryPage {
             aggregatedDataByTypes[type]["totalValReported"] = this.getSum(serialDataByTypes[type]);
             aggregatedDataByTypes[type]["averageValReported"] = (aggregatedDataByTypes[type]["totalValReported"]
                 / serialDataByTypes[type].length).toFixed(2);
-          } else if(type === 'numeric scale') {
+          } else if (type === 'numeric scale') {
             aggregatedDataByTypes[type]["totalValReported"] = this.getSum(serialDataByTypes[type]);
             aggregatedDataByTypes[type]["averageValReported"] = (aggregatedDataByTypes[type]["totalValReported"]
                 / serialDataByTypes[type].length).toFixed(2);
@@ -196,30 +150,45 @@ export class DataSummaryPage {
             for (let j=0; j<serialDataByTypes[type].length; j++) {
               aggregatedDataByTypes[type]["catCountsReported"][serialDataByTypes[type][j]]++;
             }
-          } else if(trackedDict[dataIDs[i]]['field'] === 'time range') {
+          } else if (trackedDict[dataIDs[i]]['field'] === 'time range') {
             let addedDurations = this.getSum(serialDataByTypes[type]);
             aggregatedDataByTypes[type]["averageValReported"] = (addedDurations
                 / serialDataByTypes[type].length).toFixed(2);
             aggregatedDataByTypes[type]["averageTimeReported"] =
-                this.dateFunctions.milisecondsToPrettyTime(aggregatedDataByTypes[type]["averageValReported"]);
-          } else {
-            console.log("#########");
-            console.log(type);
+                this.dateFunctions.milisecondsToTime(aggregatedDataByTypes[type]["averageValReported"]);
+          } else if (trackedDict[dataIDs[i]]['field'] === 'time') {
+            aggregatedDataByTypes[type]["timePartitionCountsReported"] = {"Morning": 0, "Afternoon": 0, "Evening": 0, "Night": 0};
+            for (let j=0; j<serialDataByTypes[type].length; j++) {
+              let timePartition = this.dateFunctions.getTimePartition(serialDataByTypes[type][j]);
+              if (timePartition[0]) {
+                aggregatedDataByTypes[type]["timePartitionCountsReported"]['Night']++;
+              } else if (timePartition[1]) {
+                aggregatedDataByTypes[type]["timePartitionCountsReported"]['Morning']++;
+              } else if (timePartition[2]) {
+                aggregatedDataByTypes[type]["timePartitionCountsReported"]['Afternoon']++;
+              } else if (timePartition[3]) {
+                aggregatedDataByTypes[type]["timePartitionCountsReported"]['Evening']++;
+              }
+            }
           }
+          // else {
+            // console.log("#########");
+            // console.log(type);
+          // }
         }
       }
       allAggregatedDataByTypes[dataIDs[i]] = aggregatedDataByTypes;
-
-      // this.filteredDataByID = trackedDict;
     }
-    console.log("~~~~~~~~~~ allAggregatedDataByTypes");
-    console.log(allAggregatedDataByTypes);
-
+    for(let i=0; i<dataIDs.length; i++) {
+      this.filteredDataFieldByID[dataIDs[i]] = Object.keys(allAggregatedDataByTypes[dataIDs[i]]);
+    }
+    this.filteredDataByID = allAggregatedDataByTypes;
   }
 
-
-
-
+  /**
+   * Sum an array of data values
+   * @param dataVals
+   */
   getSum(dataVals) : number {
     if (dataVals.length === 0) return null;
     return dataVals.reduce(function(a, b) {
@@ -227,26 +196,17 @@ export class DataSummaryPage {
     });
   }
 
-
-
-
+  /**
+   * Get time duration given a start and an end date
+   * @param timeRangeDict
+   */
   getDuration(timeRangeDict : {[timeEnds: string] : string}) : number{
     let earlyTime = timeRangeDict['start'];
     let lateTime = timeRangeDict['end'];
-    if(earlyTime===undefined || lateTime === undefined){
+    if(earlyTime === undefined || lateTime === undefined){
       return 0;
     } else{
       return this.dateFunctions.getDuration(earlyTime, lateTime);
     }
   }
-
-
-
-
-
-
-
-
-
-
 }

@@ -20,7 +20,9 @@ import {DateFunctionServiceProvider} from "../../providers/date-function-service
 })
 export class TrackingPage {
   private tracked : {[dataType : string] : any} = {};
+  private trackedFields : any = {};
   private goalProgresses : {[dataType : string] : any} = {};
+  private previouslyTracked : any;
   dataToTrack : {[dataType : string] : DataElement[]} = {};
   dateSelected : any;
   goal : any;
@@ -34,12 +36,14 @@ export class TrackingPage {
               public viewCtrl: ViewController,
               private dataDetialsProvider: DataDetailsServiceProvider,
               private dateFunctionsProvider: DateFunctionServiceProvider,
+              public dateFunctions: DateFunctionServiceProvider,
               private globalFuns: GlobalFunctionsServiceProvider) {
     this.dataToTrack = navParams.get('dataToTrack');
     this.dateSelected = navParams.get('dateSelected');
     this.goal = navParams.get('goal');
     this.neighborData = navParams.get('neighborData');
     this.loadTrackedData();
+    this.calculatePriorDataProgresses();
   }
 
   ionViewDidLoad() {
@@ -80,7 +84,7 @@ export class TrackingPage {
   }
 
   saveTrackedData() {
-    this.couchDbService.logTrackedData(this.tracked, this.dateSelected);
+    this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected);
   }
 
   getTrackedMeds(){
@@ -139,6 +143,10 @@ export class TrackingPage {
       }
       this.tracked[dataType][data.id]['end'] = componentEvent.dataEnd;
     }
+    if (!this.trackedFields.hasOwnProperty(dataType)) {
+      this.trackedFields[dataType] = {};
+    }
+    this.trackedFields[dataType][data['id']] = data['field'];
     this.saveTrackedData();
   }
 
@@ -183,7 +191,7 @@ export class TrackingPage {
 
   totalTrackedTimes(data: {[dataProps : string] : any}, dataType : string) : Number{
     if (dataType === 'quickTracker') dataType = data.dataType;
-    let timesSoFar = this.goalProgresses[dataType] ? this.goalProgresses[dataType][data.id] : 0;
+    let timesSoFar = this.goalProgresses ? this.goalProgresses[data.id] : 0;
     if (data.id === 'frequentMedUse') { // we pull from the 'treatments' dict!
       timesSoFar += (this.getTrackedMeds() ? 1 : 0);
     } else if (this.tracked[dataType] && this.tracked[dataType][data.id]) {
@@ -196,27 +204,23 @@ export class TrackingPage {
     return timesSoFar;
   }
 
-  // calculateGoalProgresses() { // todo: rename, since we do the dataToTrack work here too...
-  //   for(let i=0; i<this.dataTypes.length; i++){
-  //     let dataType = this.dataTypes[i];
-  //     if(dataType === 'quickTracker') continue;
-  //     this.goalProgresses[dataType] = {};
-  //     this.dataList[dataType] = this.dataToTrack[dataType].filter(function(x){
-  //       if(!x.quickTrack) return x;
-  //     }).map(x => x.name).join(", ");
-  //     console.log(this.dataList[dataType]);
-  //     for(let j=0; j<this.dataToTrack[dataType].length; j++){
-  //       let data = this.dataToTrack[dataType][j];
-  //       if(data.id === 'frequentMedUse'){
-  //         this.goalProgresses[dataType][data.id] =
-  //           this.globalFuns.calculatePriorGoalProgress(data, '', this.previouslyTracked);
-  //       }
-  //       else if(data.goal && data.goal.freq) {
-  //         this.goalProgresses[dataType][data.id] =
-  //           this.globalFuns.calculatePriorGoalProgress(data, dataType, this.previouslyTracked);
-  //       }
-  //     }
-  //   }
-  // }
-
+  /**
+   * For data with configured goal, calculate its prior progresses
+   * @param dataType
+   */
+  async calculatePriorDataProgresses() {
+    this.previouslyTracked = await this.couchDbService.fetchTrackedDataRange(
+        this.dateFunctions.getMonthAgo(new Date()).toISOString(),
+        this.dateFunctions.getDayAgo(new Date()).toISOString());
+    for (let j = 0; j < this.dataToTrack[this.goal].length; j++) {
+      let data = this.dataToTrack[this.goal][j];
+      if (data.id === 'frequentMedUse') {
+        this.goalProgresses[data.id] =
+          this.globalFuns.calculatePriorGoalProgress(data, '', this.previouslyTracked);
+      } else if (data.goal && data.goal.freq) {
+        this.goalProgresses[data.id] =
+          this.globalFuns.calculatePriorGoalProgress(data, this.goal, this.previouslyTracked);
+      }
+    }
+  }
 }

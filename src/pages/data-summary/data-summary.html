@@ -33,7 +33,7 @@
                 <p class="date-picker-title">From</p>
             </ion-label>
             <ion-datetime class="date-picker" displayFormat="MMM DD, YYYY" pickerFormat="MMM DD, YYYY"
-                          placeholder="Select Date" (ngModelChange)="filterData($event, 'early')"
+                          placeholder="Select Date" (ionChange)="setDataTypes()"
                           [max]="toDate" [(ngModel)]="fromDate"></ion-datetime>
         </ion-item>
 
@@ -42,7 +42,7 @@
                 <p class="date-picker-title">To</p>
             </ion-label>
             <ion-datetime class="date-picker" displayFormat="MMM DD, YYYY" pickerFormat="MMM DD, YYYY"
-                          placeholder="Select Date" (ngModelChange)="filterData($event, 'late')"
+                          placeholder="Select Date" (ionChange)="setDataTypes()"
                           [min]="fromDate" [max]="today" [(ngModel)]="toDate"></ion-datetime>
         </ion-item>
     </div>
@@ -96,5 +96,113 @@
 <!--        </ion-card-content>-->
 
 <!--  </ion-card>-->
+
+    <ion-card class="data-type-card" *ngFor="let dataType of dataTypes">
+        <ion-card-header (click)="expanded[dataType] = !expanded[dataType]">
+            <img class="data-type-icon"  [src]="'../../assets/pages/' + dataType.toLowerCase() + '_icon.svg'" alt="">
+            <span class="data-type-header">{{dataType}}s</span>
+            <ion-icon class="data-type-expanded-icon" item-right *ngIf="expanded[dataType]" name="arrow-dropup"></ion-icon>
+            <ion-icon class="data-type-expanded-icon" item-right *ngIf="!expanded[dataType]" name="arrow-dropdown"></ion-icon>
+        </ion-card-header>
+
+        <ion-card-content *ngIf="expanded[dataType]">
+            <div class="data-item" *ngFor="let data of currentlyTracking[dataType]">
+                <p class="data-name" [style.color]="dataTypeColor[dataType]">{{data['name']}}</p>
+
+                <div class="data-field" *ngIf="filteredDataFieldByID[data['id']].length === 0" text-wrap>
+                    Not reported
+                </div>
+
+                <div *ngFor="let dataField of filteredDataFieldByID[data['id']]">
+                    <div class="data-field">
+                        {{dataField.toUpperCase()}}
+                    </div>
+                    <div class="data-text">
+                        <b>Total reported:</b> {{filteredDataByID[data['id']][dataField]['totalDayReported']}} days
+                    </div>
+
+                    <div *ngIf="dataField === 'binary'">
+                        <div class="data-text">
+                            <b>Yes: </b> {{filteredDataByID[data['id']][dataField]['yes']}} days
+                        </div>
+                        <div class="data-text">
+                            <b>No: </b> {{filteredDataByID[data['id']][dataField]['totalDayReported'] - filteredDataByID[data['id']][dataField]['yes']}} days
+                        </div>
+                    </div>
+
+                    <div *ngIf="dataField === 'number' || dataField === 'numeric scale'">
+                        <div class="data-text">
+                            <b>Average: </b> {{filteredDataByID[data['id']][dataField]['averageValReported']}}
+                        </div>
+                    </div>
+
+                    <div *ngIf="dataField === 'category scale'">
+                        <div class="data-text">
+                            <b>None: </b> {{filteredDataByID[data['id']][dataField]["catCountsReported"]['None']}} days
+                        </div>
+                        <div class="data-text">
+                            <b>Some: </b> {{filteredDataByID[data['id']][dataField]["catCountsReported"]['Some']}} days
+                        </div>
+                        <div class="data-text">
+                            <b>Lots: </b> {{filteredDataByID[data['id']][dataField]["catCountsReported"]['Lots']}} days
+                        </div>
+                    </div>
+
+                    <div *ngIf="dataField === 'duration'">
+                        <div class="data-text">
+                            <b>Average: </b> {{filteredDataByID[data['id']]['duration']['averageTimeReported']}}
+                        </div>
+                    </div>
+
+                    <div *ngIf="dataField === 'time'">
+                        <div class="data-text">
+                            <b>Morning: </b> {{filteredDataByID[data['id']]['time']["timePartitionCountsReported"]['Morning']}} days
+                        </div>
+                        <div class="data-text">
+                            <b>Afternoon: </b> {{filteredDataByID[data['id']]['time']["timePartitionCountsReported"]['Afternoon']}} days
+                        </div>
+                        <div class="data-text">
+                            <b>Evening: </b> {{filteredDataByID[data['id']]['time']["timePartitionCountsReported"]['Evening']}} days
+                        </div>
+                        <div class="data-text">
+                            <b>Night: </b> {{filteredDataByID[data['id']]['time']["timePartitionCountsReported"]['Night']}} days
+                        </div>
+                    </div>
+                </div>
+
+
+<!--                <div class="data-report"  *ngIf="filteredDataByID[data.id]['timesSaidTrue']">-->
+<!--                    True: {{filteredDataByID[data.id]['timesSaidTrue']}} times-->
+<!--                </div>-->
+
+<!--                <div class="data-report"  *ngIf="filteredDataByID[data.id]['totalReported']">-->
+<!--                    Total: {{filteredDataByID[data.id]['totalReported']}}-->
+<!--                </div>-->
+
+<!--                <div class="data-report" *ngIf="filteredDataByID[data.id]['average']">-->
+<!--                    Average: {{filteredDataByID[data.id]['average']}}-->
+<!--                </div>-->
+
+<!--                <div class="data-report" *ngIf="filteredDataByID[data.id]['counts'] && filteredDataByID[data.id]['counts']['keys'].length > 0">-->
+<!--                    <div>Total Responses:</div>-->
+<!--                    <div class="cat-responses" *ngFor="let key of filteredDataByID[data.id]['counts']['keys']">-->
+<!--                        {{key}}: {{filteredDataByID[data.id]['counts'][key]}}-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <div class="times-reported"  *ngIf="filteredDataByID[data.id]['timesReported'] > 0" text-wrap>-->
+<!--                    Reported {{filteredDataByID[data.id]['timesReported']}} times total-->
+<!--                </div>-->
+
+<!--                <div class="data-goal" text-wrap *ngIf="filteredDataByID[data.id]['goal'] &&-->
+<!--                                                               filteredDataByID[data.id]['goal'].freq">-->
+<!--                    Goal: <span text-lowercase>{{filteredDataByID[data.id]['goal'].freq}}-->
+<!--                    than {{filteredDataByID[data.id]['goal'].threshold}}-->
+<!--                    per {{filteredDataByID[data.id]['goal'].timespan}}</span>-->
+<!--                </div>-->
+            </div>
+        </ion-card-content>
+
+    </ion-card>
 
 </ion-content>

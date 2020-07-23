@@ -60,7 +60,6 @@ export class GlobalFunctionsServiceProvider {
     return false;
   }
 
-
   getGoalHierarchy(currentGoalIDs : string[]) : {[goal:string] : string[]} {
     currentGoalIDs.sort();
     let goalHierarchy = {};
@@ -83,44 +82,43 @@ export class GlobalFunctionsServiceProvider {
     return goalHierarchy;
   }
 
-
-
+  /**
+   * Calculate prior progress for the data with a set goal
+   * @param data
+   * @param dataType
+   * @param previouslyTracked
+   * @param timespan
+   */
   calculatePriorGoalProgress(data : {[dataConfigDetails: string] : any},
                              dataType : string,
-                             previouslyTracked : {[dataType:string] : any}[], timespan : string=undefined) {
+                             previouslyTracked : {[dataType:string] : any}[],
+                             timespan : string=undefined) {
+    console.log("$$$$$$$$$$@@@@@@@@@ previouslyTracked", previouslyTracked)
     let timesTracked = 0;
-    if(!timespan){
+    if (!timespan) {
       timespan = data.goal.timespan;
     }
-    for(let i=0; i<previouslyTracked.length; i++){
-      if(data.id !== 'frequentMedUse' && (previouslyTracked[i][dataType] === undefined
-        || previouslyTracked[i][dataType][data.id] === undefined)) {
+    for (let i = 0; i < previouslyTracked.length; i++) {
+      let cutoff;
+      if (timespan.toLowerCase() === "week") {
+        cutoff = this.dateFuns.dateArithmatic(new Date(), 'subtract', 1, 'week');
+      } else if (timespan.toLowerCase() === "month") {
+        cutoff = this.dateFuns.dateArithmatic(new Date(), 'subtract', 1, 'month');
+      } else {
         continue;
       }
-      let cutoff;
-      if(timespan === "Week") {
-        this.dateFuns.dateArithmatic(new Date(), 'subtract', 1, 'week');
-      }
-      else if(timespan === "Month"){
-        cutoff = this.dateFuns.dateArithmatic(new Date(), 'subtract', 1, 'month');
-      }
-      else{
-        continue; // if it's daily we don't bother, since they can see what they entered
-      }
-      if(new Date(previouslyTracked[i]['startTime']) > cutoff) {
-        if(data.id === 'frequentMedUse'){ // the one calculated field
-          timesTracked += this.getWhetherTrackedMeds(previouslyTracked[i]) ? 1 : 0;
-        }
-        else if(data.field === 'number'){
-          timesTracked += Number(previouslyTracked[i][dataType][data.id]);
-        }
-        else if(data.field !== 'binary' || previouslyTracked[i][dataType][data.id] === 'Yes'){
-          timesTracked += 1;
+      if (previouslyTracked[i][2] > cutoff) {
+        if (previouslyTracked[i][1][dataType]) {
+          let field = previouslyTracked[i][1][dataType][data.id];
+          let value = previouslyTracked[i][0][dataType][data.id];
+          if (field === 'number') {
+            timesTracked += Number(previouslyTracked[i][dataType][data.id]);
+          } else if (field === 'binary' && value === 'Yes') {
+            timesTracked += 1;
+          }
         }
       }
     }
     return timesTracked;
   }
-
-
 }

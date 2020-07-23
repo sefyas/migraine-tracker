@@ -21,7 +21,7 @@ export class HomePage {
   private activeGoals : ConfiguredRoutine;
   private quickTrackers : DataElement[] = [];
   private tracked : {[dataType : string] : any} = {};
-  private goalProgresses : {[dataType : string] : any} = {};
+  private trackedFields : any = {};
   private dataToTrack : {[dataType : string] : DataElement[]} = {};
   private dataList : {[dataType : string] : string} = {};
   private dataTypes : string[];
@@ -29,15 +29,18 @@ export class HomePage {
   private cardExpanded : {[dataType : string] : boolean} = {};
   private dateSelected : any;
 
-  constructor(public navCtrl: NavController,
-              private couchDbService: CouchDbServiceProvider,
-              public navParams: NavParams,
-              private dataDetialsProvider: DataDetailsServiceProvider,
-              private dateFunctionsProvider: DateFunctionServiceProvider,
-              private globalFuns: GlobalFunctionsServiceProvider,
-              private modalCtrl: ModalController,
-              public events: Events,
-              private storage: Storage) {
+  private goalProgresses : {[dataType : string] : any} = {};
+
+  constructor (public navCtrl: NavController,
+               private couchDbService: CouchDbServiceProvider,
+               public navParams: NavParams,
+               private dataDetialsProvider: DataDetailsServiceProvider,
+               public dateFunctions: DateFunctionServiceProvider,
+               private dateFunctionsProvider: DateFunctionServiceProvider,
+               private globalFuns: GlobalFunctionsServiceProvider,
+               private modalCtrl: ModalController,
+               public events: Events,
+               private storage: Storage) {
     if (this.navParams.data['dateSelected']) { // return from the sub tracking pages
       this.dateSelected = this.navParams.data['dateSelected'];
     } else {
@@ -92,7 +95,7 @@ export class HomePage {
    * Save tracked data to the database
    */
   saveTrackedData() {
-    this.couchDbService.logTrackedData(this.tracked, this.dateSelected);
+    this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected);
   }
 
   /**
@@ -117,7 +120,6 @@ export class HomePage {
       }
     }
     nonEmptyDataTypes.push("");
-
     var neighborData = {};
     for (i = 1; i < (nonEmptyDataTypes.length - 1); i++) {
       dt = nonEmptyDataTypes[i];
@@ -193,13 +195,6 @@ export class HomePage {
    */
   changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
               dataType: string) {
-
-    console.log('componentEvent ((((((((((((((((');
-    console.log(componentEvent);
-    console.log('data ****************');
-    console.log(data);
-    // this.tracked['field'] = data['field'];
-
     if (dataType === 'quickTracker') {
       dataType = data['dataType'];
     }
@@ -221,6 +216,10 @@ export class HomePage {
       }
       this.tracked[dataType][data['id']]['end'] = componentEvent['dataEnd'];
     }
+    if (!this.trackedFields.hasOwnProperty(dataType)) {
+      this.trackedFields[dataType] = {};
+    }
+    this.trackedFields[dataType][data['id']] = data['field'];
     this.saveTrackedData();
   }
 
@@ -250,6 +249,27 @@ export class HomePage {
   }
 
   /**
+   * Set up the trackers
+   */
+  async setupTrackers() {
+    if (this.activeGoals['dataToTrack']) {
+      this.previouslyTracked = await this.couchDbService.fetchTrackedDataRange(
+        this.dateFunctions.getMonthAgo(new Date()).toISOString(),
+        this.dateFunctions.getDayAgo(new Date()).toISOString());
+      this.quickTrackers = this.activeGoals['quickTrackers'];
+      if (this.quickTrackers && this.quickTrackers.length > 0) {
+        this.dataTypes = ['quickTracker'];
+      } else {
+        console.log("NO QUICK TRACKERS?!")
+      }
+      this.dataToTrack = Object.assign({}, this.activeGoals['dataToTrack']); // otherwise we modify it >.<
+      this.dataTypes = this.dataTypes.concat(Object.keys(this.dataToTrack));
+      this.dataToTrack["quickTracker"] = this.quickTrackers;
+      this.setupPriorDataRecord();
+    }
+  }
+
+  /**
    * Calculate the total tracked times given data
    * @param data
    * @param dataType
@@ -270,45 +290,42 @@ export class HomePage {
   }
 
   /**
-   * Set up the trackers
+   * For each data type, store its data name
+   * For data with configured goal, calculate its prior progresses
    */
-  setupTrackers() {
-    if (this.activeGoals['dataToTrack']) {
-      this.previouslyTracked = this.couchDbService.fetchTrackedData([this.dateSelected['date'],
-        this.dateSelected['month'], this.dateSelected['year']]); // todo: only need to grab this month's
-      this.quickTrackers = this.activeGoals['quickTrackers'];
-
-      if (this.quickTrackers && this.quickTrackers.length > 0) {
-        this.dataTypes = ['quickTracker'];
-      } else {
-        console.log("NO QUICK TRACKERS?!")
-      }
-      this.dataToTrack = Object.assign({}, this.activeGoals['dataToTrack']); // otherwise we modify it >.<
-      this.dataTypes = this.dataTypes.concat(Object.keys(this.dataToTrack));
-      this.dataToTrack["quickTracker"] = this.quickTrackers;
-      this.calculateGoalProgresses();
+  setupPriorDataRecord() {
+    for (let i = 0; i < this.dataTypes.length; i++) {
+      let dataType = this.dataTypes[i];
+      if (dataType === 'quickTracker') continue;
+      this.goalProgresses[dataType] = {};
+      this.setupDataList(dataType);
+      this.calculatePriorDataProgresses(dataType);
     }
   }
 
-  calculateGoalProgresses() { // todo: rename, since we do the dataToTrack work here too...
-    for(let i=0; i<this.dataTypes.length; i++){
-      let dataType = this.dataTypes[i];
-      if(dataType === 'quickTracker') continue;
-      this.goalProgresses[dataType] = {};
-      this.dataList[dataType] = this.dataToTrack[dataType].filter(function(x){
-        if(!x.quickTrack) return x;
-      }).map(x => x.name).join(", ");
-      console.log(this.dataList[dataType]);
-      for(let j=0; j<this.dataToTrack[dataType].length; j++){
-        let data = this.dataToTrack[dataType][j];
-        if(data.id === 'frequentMedUse'){
-          this.goalProgresses[dataType][data.id] =
-            this.globalFuns.calculatePriorGoalProgress(data, '', this.previouslyTracked);
-        }
-        else if(data.goal && data.goal.freq) {
-          this.goalProgresses[dataType][data.id] =
-            this.globalFuns.calculatePriorGoalProgress(data, dataType, this.previouslyTracked);
-        }
+  /**
+   * Store data names in a list
+   * @param dataType
+   */
+  setupDataList(dataType) {
+    this.dataList[dataType] = this.dataToTrack[dataType].filter(function(x) {
+      if (!x.quickTrack) return x;
+    }).map(x => x.name).join(", ");
+  }
+
+  /**
+   * For data with configured goal, calculate its prior progresses
+   * @param dataType
+   */
+  calculatePriorDataProgresses(dataType) {
+    for (let j = 0; j < this.dataToTrack[dataType].length; j++) {
+      let data = this.dataToTrack[dataType][j];
+      if (data.id === 'frequentMedUse') {
+        this.goalProgresses[dataType][data.id] =
+          this.globalFuns.calculatePriorGoalProgress(data, '', this.previouslyTracked);
+      } else if (data.goal && data.goal.freq) {
+        this.goalProgresses[dataType][data.id] =
+          this.globalFuns.calculatePriorGoalProgress(data, dataType, this.previouslyTracked);
       }
     }
   }

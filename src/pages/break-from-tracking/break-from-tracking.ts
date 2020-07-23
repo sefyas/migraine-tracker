@@ -18,10 +18,9 @@ import { Break } from "../../interfaces/customTypes";
   templateUrl: 'break-from-tracking.html',
 })
 export class BreakFromTrackingPage {
-
   private displayBreakInfo : boolean = false;
   private displayReasonInfo : boolean = false;
-  private currentBreak : Break;
+  private currentBreak : any;
   private currentBreakStarted : string;
   private selected : string = '';
   private dateToSnoozeTo : string = '';
@@ -47,16 +46,14 @@ export class BreakFromTrackingPage {
               public navParams: NavParams,
               public couchDBProvider: CouchDbServiceProvider,
               private dateFuns: DateFunctionServiceProvider) {
-    // this.currentBreak = this.couchDBProvider.getCurrentBreak();
-    this.currentBreak = {
-      // "started": "2019-02-27",
-      // "ended": "2020-05-10",
-      // "checkInDate": "2020-04-01",
-      // "notifyDate" : "2020-05-10",
-      // "reasonForBreak": "I am traveling to another country for a vacation."
-    };
+  }
 
-    if (!this.currentBreak){
+  async ionViewDidLoad() {
+    this.currentBreak = await this.couchDBProvider.fetchBreak();
+    // this.currentBreak = {};
+    console.log("#################", this.currentBreak);
+
+    if (!this.currentBreak) {
       this.dateToCheckIn = moment().add(1, "month").toISOString();
     }
     if (this.currentBreak.started) {
@@ -70,8 +67,6 @@ export class BreakFromTrackingPage {
       this.selectedDateToCheckIn = this.currentBreak.checkInDate;
     }
   }
-
-  ionViewDidLoad() {}
 
   scheduleBreakDate() {
     this.scheduleBreakDatePicker.open();
@@ -108,7 +103,7 @@ export class BreakFromTrackingPage {
     this.breakSkip = false;
   }
 
-  updateBreak(){
+  updateBreak() {
     this.currentBreak['notifyDate'] = this.dateToSnoozeTo;
     this.currentBreak['reasonForBreak'] = this.reasonForBreak;
     if(this.dateToSnoozeTo){
@@ -118,13 +113,12 @@ export class BreakFromTrackingPage {
       this.currentBreak['checkInDate'] = this.dateToCheckIn;
     }
     this.breakChanged=false;
-    this.couchDBProvider.updateBreak(this.currentBreak);
+    this.couchDBProvider.logBreak(this.currentBreak);
   }
 
-  endBreak(){
-    //todo: push to couch, deal with notifications, etc
+  endBreak() {
     this.currentBreak['ended'] = new Date();
-    this.couchDBProvider.updateBreak(this.currentBreak);
+    this.couchDBProvider.logBreak(this.currentBreak);
     this.currentBreak = undefined;
     this.dateToSnoozeTo = undefined;
     this.dateToCheckIn = undefined;
@@ -208,7 +202,7 @@ export class BreakFromTrackingPage {
     } else if (this.selected ==='Unsure' && this.dateToCheckIn) {
       newBreak['checkInDate'] = this.dateToCheckIn;
     }
-    this.couchDBProvider.setBreak(newBreak);
+    this.couchDBProvider.logBreak(newBreak);
     this.currentBreak = newBreak;
     this.currentBreakStarted = this.dateFuns.dateToPrettyDate(this.currentBreak.started);
   }

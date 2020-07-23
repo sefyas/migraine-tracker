@@ -42,12 +42,12 @@ categories = {
           "id": "peakMigraineSeverity",
           "explanation": "How bad your migraine was at its worst point",
           "fieldDescription": "10-point Pain level (1=mild, 10=terrible)",
-          "field": "numeric scale",
+          "field": "number",
           "recommendingGoals": ["3b", "3c"]
       },
       {
         "name": "Migraine duration",
-        "field": "time range",
+        "field": "number",
         "id": "custom_migraineduration",
         "custom": True
       }
@@ -71,7 +71,7 @@ categories = {
         "id": "exerciseToday",
         "explanation": "How much you exercised today",
         "fieldDescription": "Number of minutes of exercise",
-        "field": "number",
+        "field": "binary",
         "goal": {
             "freq": "More",
             "threshold": 180,
@@ -88,7 +88,7 @@ categories = {
       },
       {
         "name": "Time took advil",
-        "field": "time",
+        "field": "binary",
         "id": "custom_timetookadvil",
         "custom": True
       }
@@ -123,7 +123,7 @@ categories = {
           "id": "alcoholToday",
           "explanation": "How much alcohol you had today",
           "fieldDescription": "3-point alcohol rating",
-          "field": "category scale",
+          "field": "numeric scale",
       }
     ],
     "Other": [
@@ -132,7 +132,7 @@ categories = {
         "id": "whetherMedsWorked",
         "explanation": "Whether your as-needed medication improved your symptoms",
         "fieldDescription": "3-point symptoms improvement scale",
-        "field": "category scale",
+        "field": "numeric scale",
         "recommendingGoals": ["1b", "3c"]
       },
       {
@@ -147,7 +147,7 @@ categories = {
 
 
 trackedData = []
-numDataPoints = 35
+numDataPoints = 10
 
 def makeTime(hour, min):
     timeString = ''
@@ -168,8 +168,8 @@ def getRandomData(dataObject):
           return "Yes"
         return "No"
     elif field == "number":
-        if "small" in dataObject['fieldDescription']:
-            return random.randrange(4)
+        # if "small" in dataObject['fieldDescription']:
+        #     return random.randrange(4)
         return random.randrange(20) # dunno 
     elif field == "numeric scale":
         return random.randrange(1,11)
@@ -199,8 +199,8 @@ def getRandomData(dataObject):
 
 def getRandomDate():
     randMonth = random.randrange(1, 5)
-    randDay = random.randrange(1,29)
-    randHour = random.randrange(0,24)
+    randDay = random.randrange(1, 29)
+    randHour = random.randrange(0, 24)
     randMin = random.randrange(0, 60)
     dateTracked = datetime.datetime(2019, randMonth, randDay, \
                                     randHour, randMin)
@@ -214,18 +214,21 @@ def isoFormat(date):
 
 def addDatapoint():
     dataPoint = {}
+    dataTypes = {}
     for dataType, dataObjectList in categories.items():
         dataPoint[dataType] = {}
+        dataTypes[dataType] = {}
         for dataObject in dataObjectList:
+            dataTypes[dataType][dataObject['id']] = dataObject['field']
             rand = random.randrange(5)
             if rand != 0: # to have some null data 
-                dataPoint[dataType][dataObject['id']] =\
+                dataPoint[dataType][dataObject['id']] = \
                                      getRandomData(dataObject)
     dateTracked, startDate, endDate = getRandomDate()
     dataPoint['startTime'] = isoFormat(startDate) # "2019-03-07T00:00:00.000Z",
     dataPoint['endTime'] = isoFormat(endDate) # "2019-03-06T00:00:00.000Z",
     dataPoint['allDay'] = 'true'
-    return dataPoint
+    return dataPoint, dataTypes
     
 
 def addDatapoints():
