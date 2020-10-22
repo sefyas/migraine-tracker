@@ -20,15 +20,15 @@ export class DataConfigPage {
   modifyGoal : boolean = false;
   modifyData : boolean = false;
   startDate : any = null;
-  private workoutProgress : string = '0' + '%';
-  private selectedConfigData : string[];
-  private today = moment().toISOString();
-  private nextYear = moment().add(1, "year").toISOString();
-  private customData : DataElement[]= [];
-  private recommendedData : DataElement[]= [];
-  private otherData : DataElement[] = [];
-  private recommendExpanded : boolean = true;
-  private commonExpanded : boolean = false;
+  workoutProgress : string = '0' + '%';
+  selectedConfigData : string[];
+  today = moment().toISOString();
+  nextYear = moment().add(1, "year").toISOString();
+  customData : DataElement[]= [];
+  recommendedData : DataElement[]= [];
+  otherData : DataElement[] = [];
+  recommendExpanded : boolean = true;
+  commonExpanded : boolean = false;
 
   constructor(public navCtrl: NavController,
               public navParams: NavParams,
@@ -37,13 +37,6 @@ export class DataConfigPage {
               public modalCtrl: ModalController) {
     this.configuredRoutine = this.navParams.data.configuredRoutine;
     this.params = this.navParams.data.params;
-
-    // this.navParams.data && Object.keys(this.navParams.data).length !== 0
-
-    console.log("@@@@@@@@@@~~~~~~~~~~~~");
-    console.log(this.configuredRoutine);
-    console.log(this.params);
-
     this.allGoals = this.configuredRoutine['goals'] ? this.configuredRoutine['goals'] : [];
     this.selectedConfigData = this.configuredRoutine['selectedConfigData'];
     this.dataObject = this.params['dataPage'];

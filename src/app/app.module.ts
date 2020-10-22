@@ -6,9 +6,9 @@ import { MyApp } from './app.component';
 import { NgCalendarModule  } from 'ionic2-calendar';
 import { IonicStorageModule } from '@ionic/storage';
 import { Calendar } from '../components/calendar/calendar';
-
 import { HomePage } from '../pages/home/home';
 import { StatusBar } from '@ionic-native/status-bar';
+// import { Keyboard } from '@ionic-native/keyboard';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { CouchDbServiceProvider } from '../providers/couch-db-service/couch-db-service';
 import { GoalTypePage } from "../pages/addGoal/goal-type/goal-type";
@@ -34,8 +34,6 @@ import { ViewDatapointPage } from "../pages/view-datapoint/view-datapoint";
 import { DataVisPage } from "../pages/data-vis/data-vis";
 import { ChartsModule } from 'ng2-charts-x';
 import { DataElementTrackingComponent } from "../components/data-element-tracking/data-element-tracking";
-
-
 
 @NgModule({
   declarations: [
@@ -63,6 +61,7 @@ import { DataElementTrackingComponent } from "../components/data-element-trackin
   imports: [
     BrowserModule,
     NgCalendarModule,
+    // IonicModule.forRoot(MyApp, { scrollAssist: false, autoFocusAssist: false }),
     IonicModule.forRoot(MyApp),
     HttpClientModule,
     ChartsModule,
@@ -91,6 +90,7 @@ import { DataElementTrackingComponent } from "../components/data-element-trackin
   ],
   providers: [
     StatusBar,
+    // Keyboard,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     CouchDbServiceProvider,

@@ -7,7 +7,6 @@ import { Storage } from '@ionic/storage';
 import { GlobalFunctionsServiceProvider } from "../../providers/global-functions-service/global-functions-service";
 import { HomePage } from "../home/home";
 
-
 @Component({
   selector: 'page-signup',
   templateUrl: 'signup.html'
@@ -28,13 +27,12 @@ export class SignUpPage {
     this.loginPage = new LoginPage(nav, http, globalFuns, couchDbService, storage);
   }
 
-  signUp() {
+  async signUp() {
     let credentials = {
       username: this.username,
       password: this.password,
     };
     this.couchDbService.signUp(credentials).then(response => {
-      console.log("Sign up as " + this.username);
       this.storage.set('credentials', credentials);
       this.couchDbService.initializeUserInfoDoc(this.username);
       this.nav.push(HomePage);

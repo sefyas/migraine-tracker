@@ -18,16 +18,16 @@ import * as moment from 'moment';
 })
 
 export class HomePage {
-  private activeGoals : ConfiguredRoutine;
+  private previouslyTracked : any;
   private quickTrackers : DataElement[] = [];
   private tracked : {[dataType : string] : any} = {};
   private trackedFields : any = {};
-  private dataToTrack : {[dataType : string] : DataElement[]} = {};
-  private dataList : {[dataType : string] : string} = {};
-  private dataTypes : string[];
-  private previouslyTracked : any;
-  private cardExpanded : {[dataType : string] : boolean} = {};
-  private dateSelected : any;
+  dataToTrack : {[dataType : string] : DataElement[]} = {};
+  dataList : {[dataType : string] : string} = {};
+  dataTypes : string[];
+  activeGoals : ConfiguredRoutine;
+  cardExpanded : {[dataType : string] : boolean} = {};
+  dateSelected : any;
 
   private goalProgresses : {[dataType : string] : any} = {};
 

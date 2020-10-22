@@ -28,6 +28,9 @@ export class CouchDbServiceProvider {
     // this.remote.logIn("migraine-tracker-admin", "migraine-tracker-admin", function (err, response) {
     //   console.log("Log in as an admin");
     // });
+    // this.remote.logIn("lwjiang2", "lwjiang2", function (err, response) {
+    //   console.log("Log in as an admin");
+    // });
   }
 
 
@@ -233,6 +236,8 @@ export class CouchDbServiceProvider {
    */
   async fetchTrackedData(date) {
     var trackedDataDocID = CouchDbServiceProvider.getTrackedDataDocID(date);
+    console.log("############");
+    console.log(trackedDataDocID)
     try {
       var trackedDataDoc = await this.db.get(trackedDataDocID);
       return trackedDataDoc['tracked_data'];
@@ -316,207 +321,54 @@ export class CouchDbServiceProvider {
   /**
    * Log the break to the database
    * @param data
+   * @param end
    */
-  async logBreak(data) {
+  async logBreak(data, end : boolean=false) {
     var currentBreakID = await this.fetchCurrentBreakID();
-    currentBreakID = currentBreakID + 1;
     try {
-      var doc = await this.db.get("break");
+      var doc = await this.db.get('break-' + currentBreakID);
       let break_data = doc['break'];
-      break_data[currentBreakID] = data;
+      break_data[doc.id + 1] = data;
       var response = await this.db.put({
-        _id: "break",
+        _id: doc._id,
         _rev: doc._rev,
         break: break_data,
+        id: doc.id + 1,
       });
+      if (end) {
+        this.logCurrentBreakID(currentBreakID + 1);
+      }
       console.log("Break saved!");
     } catch (err) {
       let break_data = {};
-      break_data[currentBreakID] = data;
-      this.db.put({_id: "break", break: break_data}, function(err, response) {
+      break_data[0] = data;
+      this.db.put({_id: "break-" + currentBreakID, break: break_data, id: 0}, function(err, response) {
         if (err) {
           return console.log(err);
         }
       });
       console.log("Break added!");
     }
-    this.logCurrentBreakID(currentBreakID);
-
-    //
-    // this.db.put({_id: "break",
-    //   date_added: new Date(), break: data}, function(err, response) {
-    //   if (err) { return console.log(err); }
-    // });
   }
-
-  // /**
-  //  * Get the current break
-  //  */
-  // async fetchBreak() {
-  //   var currentBreakID = await this.fetchCurrentBreakID();
-  //   if (currentBreakID != 0) {
-  //     try {
-  //       let break_doc = await this.db.get("break");
-  //       return break_doc['break-' + currentBreakID];
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   }
-  //   return null;
-  // }
 
   /**
    * Get the current break
    */
   async fetchBreak() {
     var currentBreakID = await this.fetchCurrentBreakID();
-    // if (currentBreakID != 0) {
-      try {
-        let break_doc = await this.db.get("break");
-        return break_doc['break'][currentBreakID];
-      } catch (err) {
-        console.log("####", err);
-        return {};
-      }
-    // }
+    try {
+      let break_doc = await this.db.get('break-' + currentBreakID);
+      return break_doc['break'][break_doc.id];
+    } catch (err) {
+      return {};
+    }
   }
 
 
 
+
+
   // ============================================= Old =============================================
-
-  // updateBreak(currentBreak: Break) {
-  //   console.log("!!!!!!!!!!!!!! updateBreak !!!!!!!!!!!!!");
-  //   // todo: push to db
-  //   console.log(currentBreak);
-  // }
-  //
-  // setBreak(newBreak: Break) {
-  //   console.log("!!!!!!!!!!!!!! setBreak !!!!!!!!!!!!!");
-  //   //todo: push to db
-  //   console.log(newBreak);
-  // }
-
-
-
-  // addGoalFromSetup(setupDict : {[configInfo: string] : any}) : ConfiguredRoutine{
-  //   console.log("!!!!!!!!!!!!!! addGoalFromSetup !!!!!!!!!!!!!");
-  //   // todo: actually push to database; make sure it's doing the right thing when we JUST modify goals!!!!
-  //   let newGoals = setupDict['goalIDs'];
-  //   if(this.currentConfiguredRoutine) { // we need to deactivate the previous goals
-  //     this.currentConfiguredRoutine['deactivated'] = new Date(); // todo: push
-  //     this.currentConfiguredRoutine = null; // since we're creating a new one
-  //   }
-  //   this.currentConfiguredRoutine = {'goals': newGoals,
-  //                           'dataToTrack': setupDict.selectedData,
-  //                           'quickTrackers': setupDict.quickTrackers,
-  //                           'textGoals': setupDict.textGoals,
-  //                           'dateAdded': new Date(),
-  //                           'notifications': setupDict.notifications}; // todo: push
-  //
-  //   console.log(this.currentConfiguredRoutine);
-  //   return this.currentConfiguredRoutine;
-  // }
-  //
-  // combineDataToTrack(oldDataToTrack : {[dataType:string]: any;},
-  //                    newDataToTrack : {[dataType:string]: any;}) : {[dataType:string]: any;} {
-  //   console.log("!!!!!!!!!!!!!! combineDataToTrack !!!!!!!!!!!!!");
-  //   // should return all data to track
-  //   if(newDataToTrack) {
-  //     // @ts-ignore
-  //     for (const [dataType, newData] of Object.entries(newDataToTrack)) {
-  //       if (dataType in oldDataToTrack) {
-  //         oldDataToTrack[dataType] = oldDataToTrack[dataType].concat(newData)
-  //       } else {
-  //         oldDataToTrack[dataType] = newData;
-  //       }
-  //     }
-  //   }
-  //   console.log(oldDataToTrack);
-  //   return oldDataToTrack;
-  // }
-  //
-  //
-  //
-  // modifyQuickTrackers(quickTrackers){
-  //   console.log("!!!!!!!!!!!!!! modifyQuickTrackers !!!!!!!!!!!!!");
-  //   // todo: push!
-  //
-  //   console.log(quickTrackers);
-  //   this.currentConfiguredRoutine.quickTrackers = quickTrackers;
-  // }
-  //
-  // modifyTrackingRoutine(dataType, newRoutine) {
-  //   console.log("!!!!!!!!!!!!!! modifyTrackingRoutine !!!!!!!!!!!!!");
-  //   // todo: push!  And maybe change date added??
-  //   console.log(dataType);
-  //   console.log(newRoutine);
-  //   this.currentConfiguredRoutine.dataToTrack[dataType] = newRoutine;
-  // }
-  //
-  // modifyFrequency(newNotifications) {
-  //   console.log("!!!!!!!!!!!!!! modifyFrequency !!!!!!!!!!!!!");
-  //   // todo: push!  And maybe change date added??
-  //   console.log(newNotifications);
-  //   this.currentConfiguredRoutine.notifications = newNotifications;
-  // }
-  //
-  // modifyGoals(newGoalsObject) {
-  //   console.log("!!!!!!!!!!!!!! modifyGoals !!!!!!!!!!!!!");
-  //   // todo: push!  And maybe change date added??
-  //   this.currentConfiguredRoutine.goals = newGoalsObject['goalIDs'];
-  //   this.currentConfiguredRoutine.textGoals = newGoalsObject['textGoals'];
-  // }
-  //
-  // removeGoal(goal: string) {
-  //   console.log("!!!!!!!!!!!!!! removeGoal !!!!!!!!!!!!!");
-  //   //todo: dunno if we need this
-  //   // todo: push to database
-  //   if(goal === 'textGoal'){
-  //     this.currentConfiguredRoutine['textGoals'] = undefined;
-  //   }
-  //   else{
-  //     // TODO: nope; we want to make a copy and make the old one the active one
-  //     this.currentConfiguredRoutine['goals'].splice(this.currentConfiguredRoutine['goals'].indexOf(goal), 1);
-  //   }
-  // }
-  //
-  // editTextGoal(newGoal: string) {
-  //   console.log("!!!!!!!!!!!!!! editTextGoal !!!!!!!!!!!!!");
-  //   // todo: again, dunno if needed
-  //   // todo: push to database
-  //   this.currentConfiguredRoutine['textGoals'] = newGoal;
-  // }
-
-
-
-
-
-
-
-  // getCurrentBreak(): Break {
-  //   // console.log("!!!!!!!!!!!!!! getCurrentBreak !!!!!!!!!!!!!");
-  //   // todo: pull from db, make sure it's current
-  //   // return null;
-  //   return {
-  //     "reasonForBreak": "I want to",
-  //     "started": "2019-02-27",
-  //     "ended": "2020-05-10",
-  //     "checkInDate": "2020-05-10",
-  //     "notifyDate" : "2020-05-10"
-  //   };
-  // }
-
-// export interface Break {
-//   notifyDate?: string,
-//   dateToCheckIn?: string,
-//   started: Date,
-//   ended?: Date,
-//   noDates?: boolean,
-//   reasonForBreak?: string
-// }
-//
-
   getExampleGoal()  : ConfiguredRoutine {
     let exGoal = {
       "quickTrackers": [
@@ -2995,8 +2847,5 @@ export class CouchDbServiceProvider {
         }
       ]
     ]
-
   }
-
-
 }

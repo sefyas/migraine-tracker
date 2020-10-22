@@ -1,6 +1,7 @@
 import {Component, ViewChild} from '@angular/core';
 import {Events, Nav, Platform} from 'ionic-angular';
 import {StatusBar} from '@ionic-native/status-bar';
+// import {Keyboard} from '@ionic-native/keyboard/ngx';
 import {SplashScreen} from '@ionic-native/splash-screen';
 
 import {HomePage} from '../pages/home/home';
@@ -13,8 +14,8 @@ import {DataSummaryPage} from "../pages/data-summary/data-summary";
 import {DataCalendarPage} from "../pages/data-calendar/data-calendar";
 import {BreakFromTrackingPage} from "../pages/break-from-tracking/break-from-tracking";
 import {SelectTrackingFrequencyPage} from "../pages/addGoal/select-tracking-frequency/select-tracking-frequency";
-
 import {DataVisPage} from "../pages/data-vis/data-vis";
+
 
 @Component({
   templateUrl: 'app.html'
@@ -26,9 +27,12 @@ export class MyApp {
   pages: Array<{title: string, component: any}>;
   activePage: any;
 
+  // constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen,
+  //             private couchDBService: CouchDbServiceProvider, public keyboard: Keyboard,
+  //             public events: Events) {
+
   constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen,
-              private couchDBService: CouchDbServiceProvider,
-              public events: Events) {
+              private couchDBService: CouchDbServiceProvider, public events: Events) {
 
     events.subscribe('configSeen', () => {
       this.pages = [
@@ -77,6 +81,7 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      // this.keyboard.disableScroll(true);
     });
   }
 

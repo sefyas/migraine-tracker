@@ -15,11 +15,11 @@ import {HomePage} from "../home/home";
 export class NotificationModificationPage {
   private configuredRoutine : any = {};
   private allGoals : any;
-  private notificationData : {[notificationType:string]: Notification} = {};
-  private recommended : string = "retroactive";
-  private postSymptomInfoDisplayed : any = false;
-  private regularInfoDisplayed : any = false;
-  private saved : boolean = true;
+  notificationData : {[notificationType:string]: Notification} = {};
+  recommended : string = "retroactive";
+  postSymptomInfoDisplayed : any = false;
+  regularInfoDisplayed : any = false;
+  saved : boolean = true;
 
 
   days : number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
@@ -36,7 +36,7 @@ export class NotificationModificationPage {
 
   async ionViewDidLoad() {
     this.configuredRoutine = await this.couchDBService.fetchConfiguredRoutine();
-    this.notificationData = this.configuredRoutine['notifications'];
+    this.notificationData = this.configuredRoutine['notifications'] ? this.configuredRoutine['notifications'] : {};
 
     this.allGoals = this.configuredRoutine ? this.configuredRoutine['goals'] : [];
     this.allGoals = this.allGoals.concat(this.configuredRoutine['goals'] ? this.configuredRoutine['goals'] : []);
@@ -55,6 +55,7 @@ export class NotificationModificationPage {
   }
 
   onClickNext() {
+    this.configuredRoutine['notifications'] = this.notificationData;
     this.couchDBService.logConfiguredRoutine(this.configuredRoutine);
     this.saved = true;
   }

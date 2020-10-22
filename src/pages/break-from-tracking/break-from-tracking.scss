@@ -25,8 +25,8 @@ page-break-from-tracking {
   .break-info-button {
     background: none;
     position: absolute;
-    right: 45px;
-    top: 45px;
+    right: 40px;
+    top: 40px;
     width: 40px;
   }
 
@@ -57,9 +57,18 @@ page-break-from-tracking {
   .reason-info-button {
     background: none;
     position: absolute;
-    right: 45px;
-    top: 305px;
+    right: 40px;
+    top: 300px;
     width: 40px;
+  }
+
+  .info-button {
+    background: none;
+    position: relative;
+    top: -10px;
+    width: 40px;
+    float: right;
+    margin-top: 10px;
   }
 
   .reason-entry {
@@ -246,10 +255,6 @@ page-break-from-tracking {
     float: right;
     margin-top: -35px;
     margin-right: 5px;
-  }
-
-  .edit-info-button {
-    margin-top: 10px;
   }
 
   .last-break-item {

@@ -211,6 +211,16 @@ ion-select {
 .select-ios .select-placeholder {
   color: white;
 }
+
+.scroll-content {
+  padding-bottom: 0 !important;
+  --offset-bottom: 0 !important;
+}
+
+ion-content {
+  min-height: 100%;
+}
+
 // ================== select END ==================
 
 ion-icon {

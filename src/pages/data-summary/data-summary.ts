@@ -55,6 +55,7 @@ export class DataSummaryPage {
     this.allTrackedData = await this.couchDBService.fetchTrackedDataRange(this.fromDate, this.toDate);
     console.log(this.allTrackedData);
     this.currentlyTracking = await this.couchDBService.fetchConfiguredRoutine();
+    console.log("#########", this.currentlyTracking);
     this.currentlyTracking = this.currentlyTracking['dataToTrack'];
     let allDataTypes = Object.keys(this.currentlyTracking);
 

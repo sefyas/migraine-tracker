@@ -18,29 +18,28 @@ import { Break } from "../../interfaces/customTypes";
   templateUrl: 'break-from-tracking.html',
 })
 export class BreakFromTrackingPage {
-  private displayBreakInfo : boolean = false;
-  private displayReasonInfo : boolean = false;
-  private currentBreak : any;
-  private currentBreakStarted : string;
-  private selected : string = '';
-  private dateToSnoozeTo : string = '';
-  private dateToCheckIn : string = '';
-  private selectedDateToCheckIn : string = '';
-  private reasonForBreak : string;
-  private breakChanged : boolean = false;
-  private today : string = moment().toISOString();
-  private nextYear : string = moment().add(1, "year").toISOString();
-  private breakSkip : boolean = false;
-  // private checkInSkip : boolean = false;
-  private displayReasonEditBtn : boolean = true;
-  private displayBreakEditBtn : boolean = true;
+  currentBreak : any;
+  selected : string = '';
 
+  currentBreakStarted : string;
+  dateToSnoozeTo : string = '';
+  dateToCheckIn : string = '';
+  reasonForBreak : string = '';
+
+  displayBreakInfo : boolean = false;
+  displayReasonInfo : boolean = false;
+  displayReasonEditBtn : boolean = true;
+  displayBreakEditBtn : boolean = true;
+  displayCheckInEditBtn : boolean = true;
+
+  today : string = moment().toISOString();
+  nextYear : string = moment().add(1, "year").toISOString();
   monthNames: string[] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   @ViewChild('breakDatePicker') breakDatePicker;
-  @ViewChild('reminderDatePicker') reminderDatePicker;
+  @ViewChild('checkInDatePicker') checkInDatePicker;
   @ViewChild('updateBreakDatePicker') updateBreakDatePicker;
-  @ViewChild('scheduleBreakDatePicker') scheduleBreakDatePicker;
+  @ViewChild('updateCheckInDatePicker') updateCheckInDatePicker;
 
   constructor(public navCtrl: NavController,
               public navParams: NavParams,
@@ -50,8 +49,6 @@ export class BreakFromTrackingPage {
 
   async ionViewDidLoad() {
     this.currentBreak = await this.couchDBProvider.fetchBreak();
-    // this.currentBreak = {};
-    console.log("#################", this.currentBreak);
 
     if (!this.currentBreak) {
       this.dateToCheckIn = moment().add(1, "month").toISOString();
@@ -63,21 +60,53 @@ export class BreakFromTrackingPage {
       this.dateToSnoozeTo = this.currentBreak.notifyDate;
     }
     if (this.currentBreak.checkInDate) {
-      this.selected = "Unsure";
-      this.selectedDateToCheckIn = this.currentBreak.checkInDate;
+      this.dateToCheckIn = this.currentBreak.checkInDate;
     }
-  }
-
-  scheduleBreakDate() {
-    this.scheduleBreakDatePicker.open();
+    if (this.currentBreak.reasonForBreak) {
+      this.reasonForBreak = this.currentBreak.reasonForBreak;
+    }
   }
 
   updateBreakDate() {
     this.updateBreakDatePicker.open();
   }
 
+  updateCheckInDate() {
+    this.updateCheckInDatePicker.open();
+  }
+
+  editDateToCheckIn() {
+    this.checkInDatePicker.open();
+  }
+
+  editDateToSnoozeTo() {
+    this.breakDatePicker.open();
+  }
+
+  onEditBreakFocus() {
+    this.displayBreakEditBtn = false;
+  }
+
+  onEditCheckInFocus() {
+    this.displayCheckInEditBtn = false;
+  }
+
   onEditBreakReasonFocus() {
     this.displayReasonEditBtn = false;
+  }
+
+  onEditBreakBlur() {
+    this.displayBreakEditBtn = true;
+    if (this.dateToSnoozeTo !== '') {
+      this.dateToCheckIn = '';
+    }
+  }
+
+  onEditCheckInBlur() {
+    this.displayCheckInEditBtn = true;
+    if (this.dateToCheckIn !== '') {
+      this.dateToSnoozeTo = '';
+    }
   }
 
   onEditBreakReasonBlur() {
@@ -85,48 +114,31 @@ export class BreakFromTrackingPage {
     this.updateBreak();
   }
 
-  onEditBreakFocus() {
-    this.displayBreakEditBtn = false;
-  }
-
-  onEditBreakBlur() {
-    this.displayBreakEditBtn = true;
-    this.updateBreak();
-  }
-
-  editDateToCheckIn() {
-    this.reminderDatePicker.open();
-  }
-
-  editDateToSnoozeTo() {
-    this.breakDatePicker.open();
-    this.breakSkip = false;
-  }
 
   updateBreak() {
-    this.currentBreak['notifyDate'] = this.dateToSnoozeTo;
-    this.currentBreak['reasonForBreak'] = this.reasonForBreak;
-    if(this.dateToSnoozeTo){
+    if (this.currentBreakStarted) this.currentBreak['started'] = this.currentBreakStarted;
+    if (this.dateToSnoozeTo !== '') {
+      this.currentBreak['notifyDate'] = this.dateToSnoozeTo;
       delete this.currentBreak['checkInDate'];
     }
-    else{
+    if (this.dateToCheckIn !== '') {
       this.currentBreak['checkInDate'] = this.dateToCheckIn;
+      delete this.currentBreak['notifyDate'];
     }
-    this.breakChanged=false;
+    if (this.reasonForBreak !== '') this.currentBreak['reasonForBreak'] = this.reasonForBreak;
     this.couchDBProvider.logBreak(this.currentBreak);
   }
 
   endBreak() {
     this.currentBreak['ended'] = new Date();
-    this.couchDBProvider.logBreak(this.currentBreak);
+    this.couchDBProvider.logBreak(this.currentBreak, true);
     this.currentBreak = undefined;
-    this.dateToSnoozeTo = undefined;
-    this.dateToCheckIn = undefined;
-    this.selected = undefined;
+    this.dateToSnoozeTo = '';
+    this.dateToCheckIn = '';
+    this.selected = '';
     this.reasonForBreak = undefined;
-    this.dateToCheckIn = moment().add(1, "month").toISOString();
+    this.currentBreakStarted = undefined;
   }
-
 
   // =========== Info Button Handling Start ===========
   onClickDisplayBreakInfo() {
@@ -144,38 +156,34 @@ export class BreakFromTrackingPage {
   // =========== Info Button Handling End ===========
 
   // =========== NOT current break ===========
-  setSelected(val : string){
+  setSelected(val : string) {
     if (this.selected === val) {
       this.selected = '';
     } else {
       this.selected = val;
     }
     if (this.selected === "Yes") {
+
       this.breakDatePicker.open();
-      this.selectedDateToCheckIn = '';
-      // this.checkInSkip = false;
+      this.dateToCheckIn = '';
     } else if (this.selected === "Unsure") {
-      this.reminderDatePicker.open();
+      this.checkInDatePicker.open();
       this.dateToSnoozeTo = '';
-      this.breakSkip = false;
     } else if (this.selected === '') {
       this.selected = '';
       this.dateToSnoozeTo = '';
-      this.selectedDateToCheckIn = '';
-      this.breakSkip = false;
-      // this.checkInSkip = false;
+      this.dateToCheckIn = '';
     }
   }
 
   onBreakDatePickerCancel() {
     this.dateToSnoozeTo = '';
-    this.breakSkip = true;
+    this.selected = '';
   }
 
-  onReminderDatePickerCancel() {
-    this.selectedDateToCheckIn = '';
+  onCheckInDatePickerCancel() {
+    this.dateToCheckIn = '';
     this.selected = '';
-    // this.checkInSkip = true;
   }
 
   formatDateString(dateString, format="-") {
@@ -194,17 +202,15 @@ export class BreakFromTrackingPage {
   }
 
   takeBreak() {
-    //todo: push to couch, deal with notifications, etc
     let newBreak = {'started': new Date()};
-    newBreak['reasonForBreak'] = this.reasonForBreak;
-    if (this.selected==='Yes' && this.dateToSnoozeTo) {
+    if (this.reasonForBreak !== '') newBreak['reasonForBreak'] = this.reasonForBreak;
+    if (this.selected === 'Yes' && this.dateToSnoozeTo !== '') {
       newBreak['notifyDate'] = this.dateToSnoozeTo;
-    } else if (this.selected ==='Unsure' && this.dateToCheckIn) {
+    } else if (this.selected ==='Unsure' && this.dateToCheckIn !== '') {
       newBreak['checkInDate'] = this.dateToCheckIn;
     }
     this.couchDBProvider.logBreak(newBreak);
     this.currentBreak = newBreak;
     this.currentBreakStarted = this.dateFuns.dateToPrettyDate(this.currentBreak.started);
   }
-
 }
