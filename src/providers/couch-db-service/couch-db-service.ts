@@ -16,7 +16,7 @@ let options = {
 
 @Injectable()
 export class CouchDbServiceProvider {
-  private baseUrl: string = 'https://migraine-tracker.com:6984/'; // http://127.0.0.1:5984/
+  private baseUrl: string = 'http://migraine-tracker.com:5984/'; //'https://migraine-tracker.com:6984/';// http://127.0.0.1:5984/
   private db: any;
   private remote: any;
   private currentConfiguredRoutine : any = null;
@@ -40,10 +40,18 @@ export class CouchDbServiceProvider {
    * @param credentials
    */
   signUp(credentials) {
+    console.log("YSS debugs sign-up", this.baseUrl + 'migraine-tracker-' + credentials.username)
     this.remote = new PouchDB(this.baseUrl + 'migraine-tracker-' + credentials.username);
+    this.db.info(function (err, info) {
+      console.log("YSS checks db err of sign-up", JSON.stringify(err));
+      console.log("YSS checks db info of sign-up", JSON.stringify(info));
+    });
     this.db.sync(this.remote, options).on('error', console.log.bind(console));
     return this.remote.signUp(credentials.username, credentials.password,
-      {metadata : {register_time : new Date()}}, function (err, response) {}); // sign up as a new user
+      {metadata : {register_time : new Date()}}, function (err, response) {
+        console.log("YSS checks err of sign-up", JSON.stringify(err));
+        console.log("YSS checks response of sign-up", JSON.stringify(response));
+      }); // sign up as a new user
   }
 
   /**
@@ -52,7 +60,12 @@ export class CouchDbServiceProvider {
    * @param credentials
    */
   login(credentials) {
+    console.log("YSS debugs login", this.baseUrl + 'migraine-tracker-' + credentials.username)
     this.remote = new PouchDB(this.baseUrl + 'migraine-tracker-' + credentials.username);
+    this.db.info(function (err, info) {
+      console.log("YSS checks db err of login", JSON.stringify(err));
+      console.log("YSS checks db info of login", JSON.stringify(info));
+    });
     this.db.sync(this.remote, options).on('error', console.log.bind(console));
     return this.remote.logIn(credentials.username, credentials.password, function (err, response) {});
   }
@@ -220,6 +233,8 @@ export class CouchDbServiceProvider {
         tracked_data_field: trackedDataField,
       });
       console.log("Tracked data saved!");
+      console.log("YSS checks db: ", this.baseUrl);
+      console.log("YSS checks response: ", JSON.stringify(response));
     } catch (err) {
       this.db.put({_id: doc_id, tracked_data: trackedData,
         tracked_data_field: trackedDataField}, function(err, response) {
