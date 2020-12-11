@@ -34,22 +34,26 @@ export class LoginPage {
       password: this.password
     };
     
+    /**** YSS GET REQUEST TEST ****/
     console.log('YSS tests new db with GET')
     //let get_url = 'https://b9c6a1ec-b33d-467d-99b7-63e02c7bb018.mock.pstmn.io/test' // the mock server does not have any headers in its response and the get request is successful
     let get_url = 'https://tractdb.org/';  
-    let get_headers1 = new HttpHeaders()
-    get_headers1 = get_headers1.set('Accept', '*/*');
-    get_headers1 = get_headers1.set('Content-Type','text/plain')
-    console.log('YSS GET headers 1', JSON.stringify(get_headers1))
-    let get_headers2 = new HttpHeaders({
-     'Accept': '*/*',
-     'Content-Type': 'text/plain'
-    })
-    console.log('YSS GET headers 2', JSON.stringify(get_headers2))
-    let get_headers3 = new HttpHeaders()
-    get_headers3 = get_headers3.append('Accept', '*/*');
-    get_headers3 = get_headers3.append('Content-Type', 'text/plain');
-    console.log('YSS GET headers 3', JSON.stringify(get_headers3))
+    
+    /* None of these headers worked */
+    // let get_headers1 = new HttpHeaders()
+    // get_headers1 = get_headers1.set('Accept', '*/*');
+    // get_headers1 = get_headers1.set('Content-Type','text/plain')
+    // console.log('YSS GET headers 1', JSON.stringify(get_headers1))
+    // let get_headers2 = new HttpHeaders({
+    //  'Accept': '*/*',
+    //  'Content-Type': 'text/plain'
+    // })
+    // console.log('YSS GET headers 2', JSON.stringify(get_headers2))
+    // let get_headers3 = new HttpHeaders()
+    // get_headers3 = get_headers3.append('Accept', '*/*');
+    // get_headers3 = get_headers3.append('Content-Type', 'text/plain');
+    // console.log('YSS GET headers 3', JSON.stringify(get_headers3))
+    
     this.http.get(get_url, {observe: 'body', responseType: 'text'})
     .subscribe({
       next: data => {
@@ -60,6 +64,7 @@ export class LoginPage {
       }
     })
     // {observe: 'body', responseType: 'text', headers: get_headers1} did not work
+    /**** YSS GET REQUEST TEST ****/
 
     this.couchDbService.login(credentials).then(response => {
       console.log("Log in as " + credentials['username']);
