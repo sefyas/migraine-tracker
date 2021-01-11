@@ -16,7 +16,7 @@ let options = {
 
 @Injectable()
 export class CouchDbServiceProvider {
-  private baseUrl: string = 'https://migraine-tracker.com:6984/'; // http://127.0.0.1:5984/
+  private baseUrl: string = 'http://migraine-tracker.com:5984/'; //'https://migraine-tracker.com:6984/'; // http://127.0.0.1:5984/
   private db: any;
   private remote: any;
   private currentConfiguredRoutine : any = null;

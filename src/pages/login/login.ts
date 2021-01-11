@@ -31,6 +31,28 @@ export class LoginPage {
       username: this.username,
       password: this.password
     };
+
+    /**** YSS GET REQUEST TEST ****/
+    //let get_url = 'https://b9c6a1ec-b33d-467d-99b7-63e02c7bb018.mock.pstmn.io/test'; // the mock server does not have any headers in its response and the get request is successful
+    //let get_url = 'https://www.googleapis.com/discovery/v1/apis?fields=';
+    let get_url = 'https://tractdb.org/';  
+    
+    console.log('YSS GET URL', get_url)
+    this.http.get(get_url, {observe: 'body', responseType: 'text'})
+    .subscribe({
+      next: data => {
+        console.log('YSS GET success', JSON.stringify(data))
+      },
+      error: error => {
+        console.error('YSS GET error', JSON.stringify(error))
+      },
+      complete: () => {
+        console.log('YSS GET complete!')
+      }
+    })
+    // {observe: 'body', responseType: 'text', headers: get_headers1} did not work
+    /**** YSS GET REQUEST TEST ****/
+
     this.couchDbService.login(credentials).then(response => {
       console.log("Log in as " + credentials['username']);
       this.storage.set('credentials', credentials);
