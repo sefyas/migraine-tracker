@@ -27,7 +27,7 @@
       </ion-card-header>
 
       <ion-card-content class="goal-card-content">
-        <p class="goal-reason-text" text-wrap>I want suggestions of relevant symptoms to track</p>
+        <p class="goal-reason-text" text-wrap>Based on the goals you selected we recommend tracking:</p>
 
         <!-- If no data tracking is necessary based on the goals selected -->
 <!--          <div *ngIf="recommendedData.length==0 && !recommendTracking">-->
@@ -150,7 +150,7 @@
       </ion-card-header>
 
       <ion-card-content class="custom-data-content">
-        <p class="goal-reason-text" text-wrap>{{'I want to add my own ' + dataObject['dataType'].toLowerCase() + 's'}}</p>
+        <p class="goal-reason-text" text-wrap>{{'You can add your own ' + dataObject['dataType'].toLowerCase() + 's'}}</p>
 
         <div class="custom-data-wrapper" *ngIf="customData.length > 0">
           <ion-list no-lines class="sub-goal-chosen-list" *ngFor="let data of customData" text-wrap>
