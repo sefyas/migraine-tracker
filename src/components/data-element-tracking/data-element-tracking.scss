@@ -40,6 +40,16 @@ data-element-tracking {
     font-size: 12pt;
   }
 
+  .inactive-knob .range-knob {
+    background-color: rgba(255, 255, 255, 0.6);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'%3E%3Ctitle%3ERadio Button On%3C/title%3E%3Cpath d='M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z' fill='none' stroke='white' stroke-miterlimit='10' stroke-width='32'/%3E%3Ccircle cx='256' cy='256' r='144' fill='white'/%3E%3C/svg%3E");
+  }
+
+  .active-knob .range-knob {
+    background-color: infoTheme;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'%3E%3Ctitle%3ECheckmark%3C/title%3E%3Cpath fill='none' stroke='navy' stroke-linecap='round' stroke-linejoin='round' stroke-width='32' d='M416 128L192 384l-96-96'/%3E%3C/svg%3E");
+  }
+
   .num-range {
     margin-top: -20px;
     padding-left: 0 !important;
@@ -102,4 +112,5 @@ data-element-tracking {
     text-align: center;
     vertical-align: middle;
   }
+
 }

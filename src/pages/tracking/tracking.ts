@@ -92,6 +92,7 @@ export class TrackingPage {
   }
 
   getDataVal(dataID) {
+    //console.log('YSS dataVal setup for goal ', this.goal, ' by the associated tracked content', this.tracked[this.goal], 'for data ID ', dataID);
     if (this.tracked[this.goal] && this.tracked[this.goal][dataID] && (typeof this.tracked[this.goal][dataID]
         !== typeof {})) {
       return this.tracked[this.goal][dataID];
@@ -120,8 +121,7 @@ export class TrackingPage {
 
   changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
               dataType: string) {
-    console.log("@@@@@");
-    console.log(data);
+    console.log("YSS tracking page with event ", componentEvent, " and data ", data);
     if (dataType === 'quickTracker') {
       dataType = data.dataType;
     }
