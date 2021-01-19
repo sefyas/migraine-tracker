@@ -29,11 +29,41 @@
       <ion-row class="calendar-row" *ngFor="let week of weekArray; let i = index">
         <ion-col class="center calendar-col" (click)="daySelect(day, i, j)"
                  *ngFor="let day of week; let j = index"
-                 [ngClass]="[day['isThisMonth'] ? 'this-month' : 'not-this-month',
-                 day['isToday'] ? 'today' : '',
-                 day['isSelect'] ? 'select' : '',
-                 day['year'] === currentDate['year'] && day['month'] === currentDate['month'] &&
-                 day['date'] > currentDate['date'] ? 'not-this-month' : 'this-month']">
+                 [ngClass]="[
+                             day['isThisMonth'] ? 'this-month' : 'not-this-month',
+                             day['isToday'] ? 'today' : '',
+                             day['isSelect'] ? 'select' : '',
+                             day['year'] === currentDate['year'] 
+                               && day['month'] === currentDate['month'] 
+                               && day['date'] > currentDate['date'] ? 'not-this-month' : 'this-month'
+                            ]"> 
+                  <!-- YSS NOTE
+                    add a class based on whether anything is tracked on a particular data within [ngClass]
+                    [ngClass] = [day['hasTrackedData'] ? 'tracked'+day['trackedData']: '', 
+                                 day['isThisMonth'] ? 'this-month' : 'not-this-month', ...]
+                    .tracked1   only symptoms
+                    .tracked2   only treatments
+                    .tracked4   only contributors
+                    .tracked8   only change
+                    .tracked3   symptoms and treatments
+                    .tracked5   symptoms and contributors
+                    .tracked9   symptoms and change
+                    .tracked6   treatments and contributors
+                    .tracked10  treatments and change
+                    .tracked12  contributors and change
+                    .tracked7   symptoms, treatments, and contributors
+                    .tracked11  symptoms, treatments, and change
+                    .tracked13  symptoms, contributors, and change
+                    .tracked14  treatments, contributors, and change
+                    .tracked15  symptoms, treatments, contributors, and change
+
+                    Another idea is to add an icon next to {{day['date']}} depending on day['trackedData'],
+                    although adding a colored circled underneath {{day['date']}} is more preferred. I think 
+                    this can be achieved by
+                      <some-circle-element [ngClass]="day['hasTrackedData'] ? 'tracked'+day['trackedData']: ''">
+                        {{day['date']}}
+                      <\some-circle-element>
+                  -->
           {{day['date']}}
         </ion-col>
       </ion-row>

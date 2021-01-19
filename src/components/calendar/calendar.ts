@@ -27,7 +27,7 @@ export class Calendar {
 
     constructor() {
         this.currentDate = {'date': moment().date(), 'month': moment().month(), 'year': moment().year()};
-        this.isExpandCalendar = false;
+        this.isExpandCalendar = true;
     }
 
     ngOnInit() {
@@ -147,6 +147,11 @@ export class Calendar {
             }
         }
         // all date data are added to the dateArray
+
+        //YSS NOTE all this.dateArray.push(...) calls should be modifed to include hasTrackedData: boolean and trackedData: number
+        //         either at the beginning of this function or right before it is called, there should be a DB call to obtain this
+        //         information (basically an array of days containing tracked data where each element is a type such as 'symptom',
+        //         'treatment', 'contributor', or 'change')
 
         // add the dates as groups of 7 days to the weekArray
         for (let i = 0; i < this.dateArray.length / 7; i++) {
