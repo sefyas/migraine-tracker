@@ -29,14 +29,14 @@
 <!---------------------- numeric scale ---------------------->
 <ng-container class="num-scale-wrapper" text-wrap *ngIf="data.field === 'numeric scale'">
     <ion-item class="num-scale" *ngIf="dataVal">
-        <ion-range class="num-range" [(ngModel)]="dataVal" pin="true" step="1" snaps="true" min="1" max="10"
+        <ion-range class="num-range" [ngClass]="'active-knob'+dataVal" [(ngModel)]="dataVal" pin="true" step="1" snaps="true" min="1" max="10"
                    color="infoTheme" (ngModelChange)="itemTracked($event,'val')">
             <ion-label slot="start">1</ion-label>
             <ion-label slot="end">10</ion-label>
         </ion-range>
     </ion-item>
     <ion-item class="num-scale" *ngIf="dataVal === null">
-        <ion-range class="num-range inactive-knob" [(ngModel)]="dataVal" pin="true" step="1" snaps="true" min="1" max="10"
+        <ion-range class="num-range null-knob" [(ngModel)]="dataVal" pin="true" step="1" snaps="true" min="1" max="10"
                    (ngModelChange)="itemTracked($event,'val')">
             <ion-label slot="start">1</ion-label>
             <ion-label slot="end">10</ion-label>
