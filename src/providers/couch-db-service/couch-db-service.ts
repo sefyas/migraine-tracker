@@ -236,10 +236,11 @@ export class CouchDbServiceProvider {
    */
   async fetchTrackedData(date) {
     var trackedDataDocID = CouchDbServiceProvider.getTrackedDataDocID(date);
-    console.log("############");
-    console.log(trackedDataDocID)
+    //console.log("############");
+    //console.log(trackedDataDocID)
     try {
       var trackedDataDoc = await this.db.get(trackedDataDocID);
+      //console.log("YSS in fetchTrackedData", trackedDataDoc['tracked_data'], "then", 'Symptom' in trackedDataDoc['tracked_data'] ? Object.keys(trackedDataDoc['tracked_data']['Symptom']).length : -1);
       return trackedDataDoc['tracked_data'];
     } catch (err) {
       console.log(err);
