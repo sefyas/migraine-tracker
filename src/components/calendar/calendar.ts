@@ -2,6 +2,7 @@
 // Author: Liwei Jiang
 
 import {Component, Output, EventEmitter, Input} from '@angular/core';
+import { CouchDbServiceProvider } from "../../providers/couch-db-service/couch-db-service";
 import * as moment from 'moment';
 import * as _ from "lodash";
 
@@ -25,7 +26,7 @@ export class Calendar {
     monthNames: string[] = ["January", "February", "March", "April", "May", "June", "July",
       "August", "September", "October", "November", "December"];
 
-    constructor() {
+    constructor(private couchDBService: CouchDbServiceProvider) {
         this.currentDate = {'date': moment().date(), 'month': moment().month(), 'year': moment().year()};
         this.isExpandCalendar = true;
     }
@@ -36,9 +37,9 @@ export class Calendar {
         this.displayDate['isToday'] = this.isToday();
     }
 
-    initCalendar(dateSelected) {
+    async initCalendar(dateSelected) {
         this.displayDate = {'date': dateSelected[0], 'month': dateSelected[1], 'year': dateSelected[2]};
-        this.createMonth(this.displayDate['year'], this.displayDate['month']);
+        await this.createMonth(this.displayDate['year'], this.displayDate['month']);
         let selectedIndex = _.findIndex(this.dateArray, {
             year: this.displayDate['year'],
             month: this.displayDate['month'],
@@ -54,7 +55,7 @@ export class Calendar {
             this.displayDate['year'] === this.currentDate['year'];
     }
 
-    createMonth(year: number, month: number) {
+    async createMonth(year: number, month: number) {
         this.dateArray = []; // dump last month's data
         this.weekArray = []; // dump data
         let firstDay; // first day of this current month
@@ -151,14 +152,21 @@ export class Calendar {
         // add the dates as groups of 7 days to the weekArray
         for (let i = 0; i < this.dateArray.length / 7; i++) {
             for (let j = 0; j < 7; j++) {
-                weekDays.push(this.dateArray[i * 7 + j]);
+                var day = this.dateArray[i * 7 + j];
+                var trackingData = await this.getTrackingData(day);
+                day['change'] = 'Change' in trackingData ? Object.keys(trackingData['Change']).length : 0;
+                day['symptom'] = 'Symptom' in trackingData ? Object.keys(trackingData['Symptom']).length : 0;
+                day['treatment'] = 'Treatment' in trackingData ? Object.keys(trackingData['Treatment']).length : 0;
+                day['contributor'] = 'Contributor' in trackingData ? Object.keys(trackingData['Contributor']).length : 0;
+                day['other'] = 'Other' in trackingData ? Object.keys(trackingData['Other']).length : 0;
+                weekDays.push(day);
             }
             this.weekArray.push(weekDays);
             weekDays = [];
         }
     }
 
-    back() {
+    async back() {
         // deal with cross-year case
         if (this.displayDate['month'] === 0) {
             this.displayDate['year']--;
@@ -166,10 +174,10 @@ export class Calendar {
         } else {
             this.displayDate['month']--;
         }
-        this.createMonth(this.displayDate['year'], this.displayDate['month']);
+        await this.createMonth(this.displayDate['year'], this.displayDate['month']);
     }
 
-    forward() {
+    async forward() {
         // deal with cross-year case
         if (this.displayDate['month'] === 11) {
             this.displayDate['year']++;
@@ -177,7 +185,7 @@ export class Calendar {
         } else {
             this.displayDate['month']++;
         }
-        this.createMonth(this.displayDate['year'], this.displayDate['month']);
+        await this.createMonth(this.displayDate['year'], this.displayDate['month']);
     }
 
     // select a day
@@ -196,8 +204,27 @@ export class Calendar {
     trackingDataExist(day, type) {
         var exist: boolean;
 
-        // YSS TO-DO this should be modified to query the database on a specific day
-        //           to decide whether or not data for a particular goal exists
+        switch(type){
+            case 'change':
+                exist = day['change'] > 0;
+                break;
+            case 'symptom':
+                exist = day['symptom'] > 0;
+                break;
+            case 'treatment':
+                exist = day['treatment'] > 0;
+                break;
+            case 'contributor':
+                exist = day['contributor'] > 0;
+                break;
+            case 'other':
+                exist = day['other'] > 0;
+                break;
+            default:
+                exist = false;
+        }
+
+        /*
         switch(type){
             case 'change':
                 exist = day['date'] % 6 === 0;
@@ -219,14 +246,47 @@ export class Calendar {
         }
 
         if (day['date'] === 13){
+            //var trackedData = this.getData([day['date'], day['month'], day['year']]);
+            //console.log(trackedData);
             exist = true;
         }
+        */
 
         return exist;
     }
 
+    noDataExists(day){
+        if (day['change'] > 0){
+            return false;
+        }
+
+        if (day['symptom'] > 0){
+            return false;
+        }
+
+        if (day['treatment'] > 0){
+            return false;
+        }
+
+        if (day['contributor'] > 0){
+            return false;
+        }
+
+        if (day['other'] > 0){
+            return false;
+        }
+
+        return true;
+    }
+
+    async getTrackingData(day) {
+        var date = [day['date'], day['month'], day['year']];
+        var trackingData = await this.couchDBService.fetchTrackedData(date);
+        return trackingData
+    }
+
     expandCalendar() {
-      this.isExpandCalendar = !this.isExpandCalendar;
+        this.isExpandCalendar = !this.isExpandCalendar;
     }
 }
 
