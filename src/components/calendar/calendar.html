@@ -37,52 +37,19 @@
                                && day['month'] === currentDate['month'] 
                                && day['date'] > currentDate['date'] ? 'not-this-month' : 'this-month'
                             ]"> 
-                  <!-- YSS NOTE
-                    add a class based on whether anything is tracked on a particular data within [ngClass]
-                    [ngClass] = [day['hasTrackedData'] ? 'tracked'+day['trackedData']: '', 
-                                 day['isThisMonth'] ? 'this-month' : 'not-this-month', ...]
-                    .tracked1   only symptoms
-                    .tracked2   only treatments
-                    .tracked4   only contributors
-                    .tracked8   only change
-                    .tracked3   symptoms and treatments
-                    .tracked5   symptoms and contributors
-                    .tracked9   symptoms and change
-                    .tracked6   treatments and contributors
-                    .tracked10  treatments and change
-                    .tracked12  contributors and change
-                    .tracked7   symptoms, treatments, and contributors
-                    .tracked11  symptoms, treatments, and change
-                    .tracked13  symptoms, contributors, and change
-                    .tracked14  treatments, contributors, and change
-                    .tracked15  symptoms, treatments, contributors, and change
-
-                    Another idea is to add an icon next to {{day['date']}} depending on day['trackedData'],
-                    although adding a colored circled underneath {{day['date']}} is more preferred. I think 
-                    this can be achieved by
-                      <some-circle-element [ngClass]="day['hasTrackedData'] ? 'tracked'+day['trackedData']: ''">
-                        {{day['date']}}
-                      <\some-circle-element>
-                  -->
           <div class="calendar-day">
             <div class="day-text">{{day['date'] | number:'2.0'}}</div>
+            <!-- 
+              it is intentional that I do not use *ngFor over the selected goals and instead have
+              five different div elements, each associated with a goal type: selected goals may change
+              over time but the visualization should represent what exists in the data 
+             -->
             <div class="tracking-data change" *ngIf="trackingDataExist(day, 'change')"></div>
             <div class="tracking-data symptom" *ngIf="trackingDataExist(day, 'symptom')"></div>
             <div class="tracking-data treatment" *ngIf="trackingDataExist(day, 'treatment')"></div>
             <div class="tracking-data contributor" *ngIf="trackingDataExist(day, 'contributor')"></div>
             <div class="tracking-data other" *ngIf="trackingDataExist(day, 'other')"></div>
           </div>
-          <!-- <div class="calendar-day">
-            <div class="tracking-data" [ngClass]="trackingDataExist(day, 'change') ? 'change' : ''"></div>
-            <div class="tracking-data" [ngClass]="trackingDataExist(day, 'symptom') ? 'symptom' : ''"></div>
-            <div class="tracking-data" [ngClass]="trackingDataExist(day, 'treatment')  ? 'treatment' : ''"></div>
-            <div class="tracking-data" [ngClass]="trackingDataExist(day, 'contributor')  ? 'contributor' : ''"></div>
-            <div class="tracking-data" [ngClass]="trackingDataExist(day, 'other')  ? 'other' : ''"></div>
-          </div> -->
-          <!-- <div class="yss-circle" *ngIf="evenDay(day)"></div>
-          <div class="yss-div">
-            {{day['date'] | number:'2.0'}}
-          </div> -->
         </ion-col>
       </ion-row>
   </ion-grid>

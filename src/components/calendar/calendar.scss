@@ -2,13 +2,17 @@ ion-calendar {
   .calendar-day {
 
     .day-text {
+      line-height: 70%;
+      padding-top: 5px;
       display: block;
     }
 
     .tracking-data {
-      width: 5px;
-      height: 5px;
-      border-radius: 5px;
+      width: 4px;
+      height: 4px;
+      border-radius: 4px;
+      margin-left: -1px;
+      margin-right: -1px;
       display: inline-block;
     }
 
@@ -37,13 +41,6 @@ ion-calendar {
       background: var(--other-theme);
     }
     
-  }
-
-  .yss-div { // adds background
-    padding: 5px;
-    background-color: yellow;
-    border-radius: 15px;
-    //position: absolute
   }
 
   .center {

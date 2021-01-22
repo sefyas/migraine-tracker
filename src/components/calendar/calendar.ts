@@ -148,11 +148,6 @@ export class Calendar {
         }
         // all date data are added to the dateArray
 
-        //YSS NOTE all this.dateArray.push(...) calls should be modifed to include hasTrackedData: boolean and trackedData: number
-        //         either at the beginning of this function or right before it is called, there should be a DB call to obtain this
-        //         information (basically an array of days containing tracked data where each element is a type such as 'symptom',
-        //         'treatment', 'contributor', or 'change')
-
         // add the dates as groups of 7 days to the weekArray
         for (let i = 0; i < this.dateArray.length / 7; i++) {
             for (let j = 0; j < 7; j++) {
@@ -199,9 +194,10 @@ export class Calendar {
     }
 
     trackingDataExist(day, type) {
-        //console.log("YSS is even day?", (day['date'] % 2 === 0));
         var exist: boolean;
 
+        // YSS TO-DO this should be modified to query the database on a specific day
+        //           to decide whether or not data for a particular goal exists
         switch(type){
             case 'change':
                 exist = day['date'] % 6 === 0;
@@ -219,7 +215,11 @@ export class Calendar {
                 exist = day['date'] % 5 === 0;
                 break;
             default:
-                exist = false
+                exist = false;
+        }
+
+        if (day['date'] === 13){
+            exist = true;
         }
 
         return exist;
