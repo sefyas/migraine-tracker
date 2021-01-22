@@ -198,6 +198,33 @@ export class Calendar {
         }
     }
 
+    trackingDataExist(day, type) {
+        //console.log("YSS is even day?", (day['date'] % 2 === 0));
+        var exist: boolean;
+
+        switch(type){
+            case 'change':
+                exist = day['date'] % 6 === 0;
+                break;
+            case 'symptom':
+                exist = day['date'] % 2 === 0;
+                break;
+            case 'treatment':
+                exist = day['date'] % 3 === 0;
+                break;
+            case 'contributor':
+                exist = day['date'] % 4 === 0;
+                break;
+            case 'other':
+                exist = day['date'] % 5 === 0;
+                break;
+            default:
+                exist = false
+        }
+
+        return exist;
+    }
+
     expandCalendar() {
       this.isExpandCalendar = !this.isExpandCalendar;
     }

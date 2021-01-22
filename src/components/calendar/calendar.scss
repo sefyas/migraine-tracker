@@ -1,4 +1,51 @@
 ion-calendar {
+  .calendar-day {
+
+    .day-text {
+      display: block;
+    }
+
+    .tracking-data {
+      width: 5px;
+      height: 5px;
+      border-radius: 5px;
+      display: inline-block;
+    }
+
+    .change {
+      //background: purple;
+      background: var(--change-theme);
+    }
+
+    .symptom {
+      background: red;
+      //background: var(--symptom-theme);
+    }
+
+    .treatment {
+      background: green;
+      //background: var(--treatment-theme);
+    }
+
+    .contributor {
+      background: orange;
+      //background: var(--contributor-them);
+    }
+
+    .other {
+      //background: pink;
+      background: var(--other-theme);
+    }
+    
+  }
+
+  .yss-div { // adds background
+    padding: 5px;
+    background-color: yellow;
+    border-radius: 15px;
+    //position: absolute
+  }
+
   .center {
     text-align: center;
   }

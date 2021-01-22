@@ -64,7 +64,25 @@
                         {{day['date']}}
                       <\some-circle-element>
                   -->
-          {{day['date']}}
+          <div class="calendar-day">
+            <div class="day-text">{{day['date'] | number:'2.0'}}</div>
+            <div class="tracking-data change" *ngIf="trackingDataExist(day, 'change')"></div>
+            <div class="tracking-data symptom" *ngIf="trackingDataExist(day, 'symptom')"></div>
+            <div class="tracking-data treatment" *ngIf="trackingDataExist(day, 'treatment')"></div>
+            <div class="tracking-data contributor" *ngIf="trackingDataExist(day, 'contributor')"></div>
+            <div class="tracking-data other" *ngIf="trackingDataExist(day, 'other')"></div>
+          </div>
+          <!-- <div class="calendar-day">
+            <div class="tracking-data" [ngClass]="trackingDataExist(day, 'change') ? 'change' : ''"></div>
+            <div class="tracking-data" [ngClass]="trackingDataExist(day, 'symptom') ? 'symptom' : ''"></div>
+            <div class="tracking-data" [ngClass]="trackingDataExist(day, 'treatment')  ? 'treatment' : ''"></div>
+            <div class="tracking-data" [ngClass]="trackingDataExist(day, 'contributor')  ? 'contributor' : ''"></div>
+            <div class="tracking-data" [ngClass]="trackingDataExist(day, 'other')  ? 'other' : ''"></div>
+          </div> -->
+          <!-- <div class="yss-circle" *ngIf="evenDay(day)"></div>
+          <div class="yss-div">
+            {{day['date'] | number:'2.0'}}
+          </div> -->
         </ion-col>
       </ion-row>
   </ion-grid>
