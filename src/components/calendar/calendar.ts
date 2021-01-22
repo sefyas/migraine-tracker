@@ -37,9 +37,9 @@ export class Calendar {
         this.displayDate['isToday'] = this.isToday();
     }
 
-    async initCalendar(dateSelected) {
+    initCalendar(dateSelected) {
         this.displayDate = {'date': dateSelected[0], 'month': dateSelected[1], 'year': dateSelected[2]};
-        await this.createMonth(this.displayDate['year'], this.displayDate['month']);
+        this.createMonth(this.displayDate['year'], this.displayDate['month']);
         let selectedIndex = _.findIndex(this.dateArray, {
             year: this.displayDate['year'],
             month: this.displayDate['month'],
@@ -55,7 +55,7 @@ export class Calendar {
             this.displayDate['year'] === this.currentDate['year'];
     }
 
-    async createMonth(year: number, month: number) {
+    createMonth(year: number, month: number) {
         this.dateArray = []; // dump last month's data
         this.weekArray = []; // dump data
         let firstDay; // first day of this current month
@@ -153,20 +153,36 @@ export class Calendar {
         for (let i = 0; i < this.dateArray.length / 7; i++) {
             for (let j = 0; j < 7; j++) {
                 var day = this.dateArray[i * 7 + j];
-                var trackingData = await this.getTrackingData(day);
-                day['change'] = 'Change' in trackingData ? Object.keys(trackingData['Change']).length : 0;
-                day['symptom'] = 'Symptom' in trackingData ? Object.keys(trackingData['Symptom']).length : 0;
-                day['treatment'] = 'Treatment' in trackingData ? Object.keys(trackingData['Treatment']).length : 0;
-                day['contributor'] = 'Contributor' in trackingData ? Object.keys(trackingData['Contributor']).length : 0;
-                day['other'] = 'Other' in trackingData ? Object.keys(trackingData['Other']).length : 0;
+                day['change'] = -1;
+                day['symptom'] = -1;
+                day['treatment'] = -1;
+                day['contributor'] = -1;
+                day['other'] = -1;
                 weekDays.push(day);
             }
             this.weekArray.push(weekDays);
             weekDays = [];
         }
+
+        // get tracking data for each date
+        // NOTE it is important to first create weekArray then update it based on data availability;
+        //      otherwise, there is a change that we do not access what we intend (we unlikely though).
+        //      Therefore the code below is not within the loop above but after it.
+        for (let i = 0; i < this.weekArray.length; i++) {
+            for (let j = 0; j < this.weekArray[i].length; j++) {
+                this.getTrackingData(this.weekArray[i][j]).then((trackingData) => {
+                    this.weekArray[i][j]['change'] = 'Change' in trackingData ? Object.keys(trackingData['Change']).length : 0;
+                    this.weekArray[i][j]['symptom'] = 'Symptom' in trackingData ? Object.keys(trackingData['Symptom']).length : 0;
+                    this.weekArray[i][j]['treatment'] = 'Treatment' in trackingData ? Object.keys(trackingData['Treatment']).length : 0;
+                    this.weekArray[i][j]['contributor'] = 'Contributor' in trackingData ? Object.keys(trackingData['Contributor']).length : 0;
+                    this.weekArray[i][j]['other'] = 'Other' in trackingData ? Object.keys(trackingData['Other']).length : 0;
+                });             
+            }
+        }
+
     }
 
-    async back() {
+    back() {
         // deal with cross-year case
         if (this.displayDate['month'] === 0) {
             this.displayDate['year']--;
@@ -174,10 +190,10 @@ export class Calendar {
         } else {
             this.displayDate['month']--;
         }
-        await this.createMonth(this.displayDate['year'], this.displayDate['month']);
+        this.createMonth(this.displayDate['year'], this.displayDate['month']);
     }
 
-    async forward() {
+    forward() {
         // deal with cross-year case
         if (this.displayDate['month'] === 11) {
             this.displayDate['year']++;
@@ -185,7 +201,7 @@ export class Calendar {
         } else {
             this.displayDate['month']++;
         }
-        await this.createMonth(this.displayDate['year'], this.displayDate['month']);
+        this.createMonth(this.displayDate['year'], this.displayDate['month']);
     }
 
     // select a day
