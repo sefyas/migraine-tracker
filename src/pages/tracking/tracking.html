@@ -28,7 +28,7 @@
   <ion-card text-center>
       <ion-card-content class="goal-card center">
         <ng-container *ngFor=" let data of dataToTrack[goal]">
-          <p class="data-name" *ngIf="!data['quickTrack']">{{data['name']}}</p>
+          <p class="data-name" *ngIf="!data['quickTrack']">{{data['name']}} <ion-icon class="align-right" name="custom-eraser" role="button" (click)="onEraseClick(goal, data)"></ion-icon> </p>
           <data-element-tracking *ngIf="!data['quickTrack']" [data]="data" [dataVal]="getDataVal(data['id'])"
                                  [dataStart]="getDataStart(data['id'])" [dataEnd]="getDataEnd(data['id'])"
                                  [trackedMedsToday] = getTrackedMeds() (valueChanged) = 'changeVals($event, data, goal)'>

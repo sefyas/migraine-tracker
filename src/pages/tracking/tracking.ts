@@ -78,6 +78,14 @@ export class TrackingPage {
   onClearClick() {
     this.tracked = {};
   }
+
+  onEraseClick(goal, data) {
+    //console.log("eraser icon clicked for goal", goal, " and data", data);
+    //console.log("value for this goal-data is", this.tracked[goal][data['id']], "among tracked data", this.tracked);
+    delete this.tracked[goal][data['id']];
+    //console.log("which is erased and tracked data is now", this.tracked);
+    // YSS TO-DO investigate whether delete this.tracked[goal] is also applicable when all data under a certain goal is erased
+  }
   // ================= BUTTONS Ends =================
   async loadTrackedData() {
     this.tracked = await this.couchDbService.fetchTrackedData(this.dateSelected);
