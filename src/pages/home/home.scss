@@ -14,6 +14,11 @@ page-home {
     justify-content: center;
   }
 
+  .align-right {
+    float: right;
+    margin-right: 4%;
+  }
+
   .goal-examples-header {
     display: block;
     text-align: left;
@@ -45,7 +50,9 @@ page-home {
     text-align: left;
   }
 
-  .data-name{
+  .data-name{ 
+    text-align: left; //YSS added this to be consistent with how items appear under Track Symptom Data, Track Treatment Data, ...
+                      //    NOTE that adding the eraser would otherwise look very different which is undesirable.
     font-size: 13pt !important;
     font-weight: bold;
     padding-bottom: 15pt;

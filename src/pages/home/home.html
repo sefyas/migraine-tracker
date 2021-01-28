@@ -40,7 +40,9 @@
         <div class="center">
           <ion-card-content *ngIf="cardExpanded[dataType] || dataType === 'quickTracker'">
             <ng-container *ngFor=" let data of dataToTrack[dataType]" text-center>
-                <h2 class="data-name">{{data.name}}</h2>
+                <h2 class="data-name">{{data.name}} <ion-icon class="align-right" name="custom-eraser" role="button" (click)="onEraseClick(data)"></ion-icon></h2>
+                <!--YSS TO-DO I belive I should not include ion-icon within <h2> tag. The two elements (i.e. <h2> and <ion-icon> should be encolsed
+                  in a div and their relative positioning should be handled via CSS rules or by using some other existing layout class)-->
                 <data-element-tracking [data]="data" [dataVal]="getDataVal(data)"
                                        [dataStart]="getDataStart(data)" [dataEnd]="getDataEnd(data)"
                                        [trackedMedsToday] = getTrackedMeds() (valueChanged) = 'changeVals($event, data, dataType)'>

@@ -137,6 +137,13 @@ export class HomePage {
     this.navCtrl.push(TrackingPage, dataToSend, {animate: false});
   }
 
+  onEraseClick(data) {
+    //console.log("eraser icon clicked for goal", data['dataType'], " and data", data['name']);
+    //console.log("among tracked data", this.tracked, "with value", this.tracked[data['dataType']][data['id']]);
+    delete this.tracked[data['dataType']][data['id']];
+    // YSS TO-DO investigate whether delete this.tracked[data['dataType']] is also applicable when all data under a certain goal is erased
+  }
+
   /**
    * Add goals/tracking routines if the user doesn't have so yet
    */
