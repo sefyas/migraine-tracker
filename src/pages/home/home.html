@@ -3,10 +3,11 @@
     <button ion-button menuToggle show icon-only>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <span id="title" class="header-title-right">Home</span>
+    <!-- <span id="title" class="header-title-right">Home</span> -->
+    <ion-title id="title" class="header-title-right" style="background-color: yellow;">Home</ion-title>
     <ion-buttons *ngIf="saving" slot="end">
       <!-- <div class="header-button align-right">Saving ...<ion-spinner color="light"></ion-spinner></div> -->
-      <ion-spinner class="align-right" color="light"></ion-spinner>
+      <ion-spinner class="align-right" color="light" style="background-color: red;"></ion-spinner>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
