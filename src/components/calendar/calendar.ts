@@ -153,11 +153,12 @@ export class Calendar {
         for (let i = 0; i < this.dateArray.length / 7; i++) {
             for (let j = 0; j < 7; j++) {
                 var day = this.dateArray[i * 7 + j];
-                day['change'] = -1;
-                day['symptom'] = -1;
-                day['treatment'] = -1;
-                day['contributor'] = -1;
-                day['other'] = -1;
+                day['changeReported'] = -1;
+                day['symptomReported'] = -1;
+                day['treatmentReported'] = -1;
+                day['contributorReported'] = -1;
+                day['otherReported'] = -1;
+                day['symptomExists'] = false;
                 weekDays.push(day);
             }
             this.weekArray.push(weekDays);
@@ -171,11 +172,12 @@ export class Calendar {
         for (let i = 0; i < this.weekArray.length; i++) {
             for (let j = 0; j < this.weekArray[i].length; j++) {
                 this.getTrackingData(this.weekArray[i][j]).then((trackingData) => {
-                    this.weekArray[i][j]['change'] = 'Change' in trackingData ? Object.keys(trackingData['Change']).length : 0;
-                    this.weekArray[i][j]['symptom'] = 'Symptom' in trackingData ? Object.keys(trackingData['Symptom']).length : 0;
-                    this.weekArray[i][j]['treatment'] = 'Treatment' in trackingData ? Object.keys(trackingData['Treatment']).length : 0;
-                    this.weekArray[i][j]['contributor'] = 'Contributor' in trackingData ? Object.keys(trackingData['Contributor']).length : 0;
-                    this.weekArray[i][j]['other'] = 'Other' in trackingData ? Object.keys(trackingData['Other']).length : 0;
+                    this.weekArray[i][j]['changeReported'] = 'Change' in trackingData ? Object.keys(trackingData['Change']).length : 0;
+                    this.weekArray[i][j]['symptomReported'] = 'Symptom' in trackingData ? Object.keys(trackingData['Symptom']).length : 0;
+                    this.weekArray[i][j]['treatmentReported'] = 'Treatment' in trackingData ? Object.keys(trackingData['Treatment']).length : 0;
+                    this.weekArray[i][j]['contributorReported'] = 'Contributor' in trackingData ? Object.keys(trackingData['Contributor']).length : 0;
+                    this.weekArray[i][j]['otherReported'] = 'Other' in trackingData ? Object.keys(trackingData['Other']).length : 0;
+                    this.weekArray[i][j]['symptomExists'] = 'Symptom' in trackingData ? this.symptomsExist(trackingData['Symptom'], 'PLACE-HOLDER'): false;
                 });             
             }
         }
@@ -217,24 +219,29 @@ export class Calendar {
         }
     }
 
-    trackingDataExist(day, type) {
+    symptomsExist(data, info) {
+        console.log("YSS in symptomsExist data is", data, "with info", info);
+        return false;
+    }
+
+    trackingDataReported(day, type) {
         var exist: boolean;
 
         switch(type){
             case 'change':
-                exist = day['change'] > 0;
+                exist = day['changeReported'] > 0;
                 break;
             case 'symptom':
-                exist = day['symptom'] > 0;
+                exist = day['symptomReported'] > 0;
                 break;
             case 'treatment':
-                exist = day['treatment'] > 0;
+                exist = day['treatmentReported'] > 0;
                 break;
             case 'contributor':
-                exist = day['contributor'] > 0;
+                exist = day['contributorReported'] > 0;
                 break;
             case 'other':
-                exist = day['other'] > 0;
+                exist = day['otherReported'] > 0;
                 break;
             default:
                 exist = false;
@@ -271,24 +278,24 @@ export class Calendar {
         return exist;
     }
 
-    noDataExists(day){
-        if (day['change'] > 0){
+    noDataReported(day){
+        if (day['changeReported'] > 0){
             return false;
         }
 
-        if (day['symptom'] > 0){
+        if (day['symptomReported'] > 0){
             return false;
         }
 
-        if (day['treatment'] > 0){
+        if (day['treatmentReported'] > 0){
             return false;
         }
 
-        if (day['contributor'] > 0){
+        if (day['contributorReported'] > 0){
             return false;
         }
 
-        if (day['other'] > 0){
+        if (day['otherReported'] > 0){
             return false;
         }
 

@@ -44,12 +44,12 @@
               five different div elements, each associated with a goal type: selected goals may change
               over time but the visualization should represent what exists in the data 
              -->
-            <div class="tracking-data" *ngIf="noDataExists(day)"></div>
-            <div class="tracking-data change" *ngIf="trackingDataExist(day, 'change')"></div>
-            <div class="tracking-data symptom" *ngIf="trackingDataExist(day, 'symptom')"></div>
-            <div class="tracking-data treatment" *ngIf="trackingDataExist(day, 'treatment')"></div>
-            <div class="tracking-data contributor" *ngIf="trackingDataExist(day, 'contributor')"></div>
-            <div class="tracking-data other" *ngIf="trackingDataExist(day, 'other')"></div>
+            <div class="tracking-data" *ngIf="noDataReported(day)"></div>
+            <div class="tracking-data change" *ngIf="trackingDataReported(day, 'change')"></div>
+            <div class="tracking-data symptom" *ngIf="trackingDataReported(day, 'symptom')"></div>
+            <div class="tracking-data treatment" *ngIf="trackingDataReported(day, 'treatment')"></div>
+            <div class="tracking-data contributor" *ngIf="trackingDataReported(day, 'contributor')"></div>
+            <div class="tracking-data other" *ngIf="trackingDataReported(day, 'other')"></div>
           </div>
         </ion-col>
       </ion-row>
