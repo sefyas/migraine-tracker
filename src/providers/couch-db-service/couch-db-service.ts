@@ -219,12 +219,25 @@ export class CouchDbServiceProvider {
         tracked_data: trackedData,
         tracked_data_field: trackedDataField,
       });
-      console.log("Tracked data saved!");
+
+      /* comment for simulating delay in sving */
+      //console.log("Tracked data saved!");
+      //return true;
+      /* uncomment for simulating delay in sving */
+      return new Promise((resolve, reject)=>{
+        setTimeout(()=>{
+          console.log("Tracked data saved!");
+          resolve(true);
+        }, 3000);
+      });
+
     } catch (err) {
+      console.log("YSS Error occured while saving tracked data.");
       this.db.put({_id: doc_id, tracked_data: trackedData,
         tracked_data_field: trackedDataField}, function(err, response) {
         if (err) {
-          return console.log(err);
+          console.log(err);
+          return false;
         }
       });
     }
