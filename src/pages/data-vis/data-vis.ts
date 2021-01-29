@@ -104,7 +104,7 @@ export class DataVisPage {
   }
 
   ionViewDidLoad() {
-    // this.allTrackedData = this.sortByDate(this.couchDBService.fetchTrackedData());
+    // this.allTrackedData = this.sortByDate(this.couchDBService.fetchTrackedData()); //YSS fetchTrackedData return has changed; uncommenting won't work
     this.currentGoals = this.couchDBService.fetchConfiguredRoutine();
     this.setVisTypes();
   }

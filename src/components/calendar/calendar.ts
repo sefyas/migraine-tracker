@@ -171,13 +171,15 @@ export class Calendar {
         //      Therefore the code below is not within the loop above but after it.
         for (let i = 0; i < this.weekArray.length; i++) {
             for (let j = 0; j < this.weekArray[i].length; j++) {
-                this.getTrackingData(this.weekArray[i][j]).then((trackingData) => {
-                    this.weekArray[i][j]['changeReported'] = 'Change' in trackingData ? Object.keys(trackingData['Change']).length : 0;
-                    this.weekArray[i][j]['symptomReported'] = 'Symptom' in trackingData ? Object.keys(trackingData['Symptom']).length : 0;
-                    this.weekArray[i][j]['treatmentReported'] = 'Treatment' in trackingData ? Object.keys(trackingData['Treatment']).length : 0;
-                    this.weekArray[i][j]['contributorReported'] = 'Contributor' in trackingData ? Object.keys(trackingData['Contributor']).length : 0;
-                    this.weekArray[i][j]['otherReported'] = 'Other' in trackingData ? Object.keys(trackingData['Other']).length : 0;
-                    this.weekArray[i][j]['symptomExists'] = 'Symptom' in trackingData ? this.symptomsExist(trackingData['Symptom'], 'PLACE-HOLDER'): false;
+                this.getTrackingData(this.weekArray[i][j]).then((trackingDataDoc) => {
+                    var info = trackingDataDoc['tracked_data_field'];
+                    var data = trackingDataDoc['tracked_data'];
+                    this.weekArray[i][j]['changeReported'] = 'Change' in data ? Object.keys(data['Change']).length : 0;
+                    this.weekArray[i][j]['symptomReported'] = 'Symptom' in data ? Object.keys(data['Symptom']).length : 0;
+                    this.weekArray[i][j]['treatmentReported'] = 'Treatment' in data ? Object.keys(data['Treatment']).length : 0;
+                    this.weekArray[i][j]['contributorReported'] = 'Contributor' in data ? Object.keys(data['Contributor']).length : 0;
+                    this.weekArray[i][j]['otherReported'] = 'Other' in data ? Object.keys(data['Other']).length : 0;
+                    this.weekArray[i][j]['symptomExists'] = 'Symptom' in data ? this.symptomsExist(data['Symptom'], info['Symptom']): false;
                 });             
             }
         }
@@ -304,8 +306,8 @@ export class Calendar {
 
     async getTrackingData(day) {
         var date = [day['date'], day['month'], day['year']];
-        var trackingData = await this.couchDBService.fetchTrackedData(date);
-        return trackingData
+        var trackingDataDoc = await this.couchDBService.fetchTrackedData(date);
+        return trackingDataDoc
     }
 
     expandCalendar() {

@@ -253,11 +253,11 @@ export class CouchDbServiceProvider {
     //console.log(trackedDataDocID)
     try {
       var trackedDataDoc = await this.db.get(trackedDataDocID);
-      //console.log("YSS in fetchTrackedData", trackedDataDoc['tracked_data'], "then", 'Symptom' in trackedDataDoc['tracked_data'] ? Object.keys(trackedDataDoc['tracked_data']['Symptom']).length : -1);
-      return trackedDataDoc['tracked_data'];
+      //console.log("YSS in fetchTrackedData", trackedDataDoc, "where data is", trackedDataDoc['tracked_data'], "then check if Symptoms are reported:", 'Symptom' in trackedDataDoc['tracked_data'] ? Object.keys(trackedDataDoc['tracked_data']['Symptom']).length : -1);
+      return trackedDataDoc;
     } catch (err) {
-      console.log(err);
-      return {};
+      //console.log("YSS error in fetchTrackedData", err);
+      return {'tracked_data': {}, 'tracked_data_field': {}};
     }
   }
 

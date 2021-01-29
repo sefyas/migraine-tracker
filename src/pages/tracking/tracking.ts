@@ -87,8 +87,11 @@ export class TrackingPage {
     // YSS TO-DO investigate whether delete this.tracked[goal] is also applicable when all data under a certain goal is erased
   }
   // ================= BUTTONS Ends =================
-  async loadTrackedData() {
-    this.tracked = await this.couchDbService.fetchTrackedData(this.dateSelected);
+  loadTrackedData() {
+    //this.tracked = await this.couchDbService.fetchTrackedData(this.dateSelected);
+    this.couchDbService.fetchTrackedData(this.dateSelected).then((trackingData)=>{
+      this.tracked = trackingData['tracked_data'];
+    });
   }
 
   saveTrackedData() {
@@ -98,7 +101,7 @@ export class TrackingPage {
         //console.log("YSS tracking/saveTrackedData returns")
         this.saving = false
         if (result) {
-          console.log("YSS TO-DO trackingsaveTrackedData retured with true; show nothing")
+          console.log("YSS TO-DO tracking/saveTrackedData retured with true; show nothing")
         } else {
           console.log("YSS TO-DO tracking/saveTrackedData retured with false; show an error icon so user knows the data is not saved")
         }

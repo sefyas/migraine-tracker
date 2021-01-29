@@ -88,8 +88,12 @@ export class HomePage {
   /**
    * Load tracked data from the database into local memory
    */
-  async loadTrackedData() {
-    this.tracked = await this.couchDbService.fetchTrackedData(this.dateSelected);
+  loadTrackedData() {
+    //this.tracked = await this.couchDbService.fetchTrackedData(this.dateSelected);
+    this.couchDbService.fetchTrackedData(this.dateSelected).then((trackingData)=>{
+      this.tracked = trackingData['tracked_data'];
+    });
+    //console.log("YSS home/loadTrackedData/tracked", this.tracked);
   }
 
   /**
@@ -174,6 +178,7 @@ export class HomePage {
    * @param data
    */
   getDataVal(data) {
+    //console.log("YSS home/getDataVal/tracked", this.tracked);
     if (this.tracked[data.dataType] && this.tracked[data.dataType][data.id] && (typeof this.tracked[data.dataType][data.id] !== typeof {})) {
       return this.tracked[data.dataType][data.id];
     } else {
