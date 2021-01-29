@@ -23,6 +23,7 @@ export class TrackingPage {
   private trackedFields : any = {};
   private goalProgresses : {[dataType : string] : any} = {};
   private previouslyTracked : any;
+  private saving: boolean = false;
   dataToTrack : {[dataType : string] : DataElement[]} = {};
   dateSelected : any;
   goal : any;
@@ -91,7 +92,17 @@ export class TrackingPage {
   }
 
   saveTrackedData() {
-    this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected);
+    this.saving = true;
+    this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
+      .then((result)=>{
+        //console.log("YSS tracking/saveTrackedData returns")
+        this.saving = false
+        if (result) {
+          console.log("YSS TO-DO trackingsaveTrackedData retured with true; show nothing")
+        } else {
+          console.log("YSS TO-DO tracking/saveTrackedData retured with false; show an error icon so user knows the data is not saved")
+        }
+      }); 
   }
 
   getTrackedMeds(){
@@ -128,7 +139,7 @@ export class TrackingPage {
 
   changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
               dataType: string) {
-    console.log("YSS tracking page with event ", componentEvent, " and data ", data);
+    //console.log("YSS tracking page with event ", componentEvent, " and data ", data);
     if (dataType === 'quickTracker') {
       dataType = data.dataType;
     }

@@ -1,14 +1,24 @@
 
 <ion-header>
   <ion-toolbar color="ionBackground">
-    <button class="align-left header-button" (click)="onHomeClick(); saveTrackedData()" icon-only>
+    <ion-buttons slot="start">
+      <button class="align-left header-button" (click)="onHomeClick(); saveTrackedData()" icon-only>
+        <ion-icon name="custom-home"></ion-icon>
+      </button>
+    </ion-buttons>
+    <!-- <button class="align-left header-button" (click)="onHomeClick(); saveTrackedData()" icon-only>
       <ion-icon name="custom-home"></ion-icon>
-    </button>
-    <ion-title class="title">{{monthNames[dateSelected[1]] + " " + dateSelected[0] + ", " + dateSelected[2]}}</ion-title>
+    </button> -->
+    
+    <ion-title>{{monthNames[dateSelected[1]] + " " + dateSelected[0] + ", " + dateSelected[2]}}</ion-title>
+    
     <!-- <button class="align-right header-button" (click)="onClearClick()" icon-only>
       <ion-icon class="custom-reset-form-btn" name="custom-reset-form"></ion-icon>
     </button> -->
-    <!-- YSS consider showing the saving spinner here -->
+    <ion-buttons *ngIf="saving" slot="end">
+      <!-- <div class="header-button align-right">Saving ...<ion-spinner color="light"></ion-spinner></div> -->
+      <ion-spinner class="align-right" color="light"></ion-spinner>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
