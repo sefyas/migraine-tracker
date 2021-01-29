@@ -22,6 +22,7 @@ export class HomePage {
   private quickTrackers : DataElement[] = [];
   private tracked : {[dataType : string] : any} = {};
   private trackedFields : any = {};
+  private saving: boolean = false;
   dataToTrack : {[dataType : string] : DataElement[]} = {};
   dataList : {[dataType : string] : string} = {};
   dataTypes : string[];
@@ -95,7 +96,17 @@ export class HomePage {
    * Save tracked data to the database
    */
   saveTrackedData() {
-    this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected);
+    this.saving = true;
+    this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
+      .then((result)=>{
+        //console.log("home/saveTrackedData retured");
+        this.saving = false
+        if (result) {
+          console.log("YSS TO-DO home/saveTrackedData retured with true; show nothing")
+        } else {
+          console.log("YSS TO-DO home/saveTrackedData retured with false; show an error icon so user knows the data is not saved")
+        }
+      });
   }
 
   /**
