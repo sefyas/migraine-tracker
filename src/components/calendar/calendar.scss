@@ -1,47 +1,4 @@
 ion-calendar {
-  .calendar-day {
-
-    .day-text {
-      line-height: 70%;
-      padding-top: 5px;
-      display: block;
-    }
-
-    .tracking-data {
-      width: 4px;
-      height: 4px;
-      border-radius: 4px;
-      margin-left: -1px;
-      margin-right: -1px;
-      display: inline-block;
-    }
-
-    .change {
-      //background: purple;
-      background: var(--change-theme);
-    }
-
-    .symptom {
-      background: red;
-      //background: var(--symptom-theme);
-    }
-
-    .treatment {
-      background: green;
-      //background: var(--treatment-theme);
-    }
-
-    .contributor {
-      background: orange;
-      //background: var(--contributor-them);
-    }
-
-    .other {
-      //background: pink;
-      background: var(--other-theme);
-    }
-    
-  }
 
   .center {
     text-align: center;
@@ -82,6 +39,63 @@ ion-calendar {
       font-weight: bold;
       border-radius: 6pt;
       //border: white;
+    }
+
+    .calendar-day {
+
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+
+      .day-text {
+        margin: 2px;
+      }
+  
+      .with-symptom {
+        border-radius: 5px;
+        background-color: rgba(216, 171, 49, 0.486);
+      }
+
+      .tracking-data {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+
+        .dot-mark {
+          width: 4px;
+          height: 4px;
+          border-radius: 4px;
+          margin-top: 2px;
+        }
+  
+        .change {
+          //background: purple;
+          background: var(--change-theme);
+        }
+    
+        .symptom {
+          background: red;
+          //background: var(--symptom-theme);
+        }
+    
+        .treatment {
+          background: green;
+          //background: var(--treatment-theme);
+        }
+    
+        .contributor {
+          background: orange;
+          //background: var(--contributor-them);
+        }
+    
+        .other {
+          //background: pink;
+          background: var(--other-theme);
+        }
+      }  
+      
     }
   }
 

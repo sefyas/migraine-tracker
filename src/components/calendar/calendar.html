@@ -38,18 +38,22 @@
                                && day['date'] > currentDate['date'] ? 'not-this-month' : 'this-month'
                             ]"> 
           <div class="calendar-day">
-            <div class="day-text">{{day['date'] | number:'2.0'}}</div>
+            <div [ngClass]="day['symptomExists'] ? 'with-symptom': ''">
+              <p class="day-text">{{day['date'] | number:'2.0'}}</p>
+            </div>
             <!-- 
               it is intentional that I do not use *ngFor over the selected goals and instead have
               five different div elements, each associated with a goal type: selected goals may change
               over time but the visualization should represent what exists in the data 
              -->
-            <div class="tracking-data" *ngIf="noDataReported(day)"></div>
-            <div class="tracking-data change" *ngIf="trackingDataReported(day, 'change')"></div>
-            <div class="tracking-data symptom" *ngIf="trackingDataReported(day, 'symptom')"></div>
-            <div class="tracking-data treatment" *ngIf="trackingDataReported(day, 'treatment')"></div>
-            <div class="tracking-data contributor" *ngIf="trackingDataReported(day, 'contributor')"></div>
-            <div class="tracking-data other" *ngIf="trackingDataReported(day, 'other')"></div>
+            <div class="tracking-data">
+              <div class="dot-mark" *ngIf="noDataReported(day)"></div>
+              <div class="dot-mark change" *ngIf="trackingDataReported(day, 'change')"></div>
+              <div class="dot-mark symptom" *ngIf="trackingDataReported(day, 'symptom')"></div>
+              <div class="dot-mark treatment" *ngIf="trackingDataReported(day, 'treatment')"></div>
+              <div class="dot-mark contributor" *ngIf="trackingDataReported(day, 'contributor')"></div>
+              <div class="dot-mark other" *ngIf="trackingDataReported(day, 'other')"></div>
+            </div>
           </div>
         </ion-col>
       </ion-row>
