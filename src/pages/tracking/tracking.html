@@ -1,28 +1,14 @@
 <ion-header>
-  <ion-toolbar color="ionBackground">
-    <ion-buttons slot="start">
-      <ion-button class="align-left header-button" (click)="onHomeClick(); saveTrackedData()" icon-only>
-        <ion-icon name="custom-home"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <!-- YSS original code
-    <button class="align-left header-button" (click)="onHomeClick(); saveTrackedData()" icon-only>
+  <ion-toolbar color="ionBackground" align-title="center" id="toolbar">
+    <button ion-button class="header-button" (click)="onHomeClick(); saveTrackedData()" icon-only>
       <ion-icon name="custom-home"></ion-icon>
     </button> 
-    -->
-    
-    <ion-title text-center style="background-color: yellow;">{{monthNames[dateSelected[1]] + " " + dateSelected[0] + ", " + dateSelected[2]}}</ion-title>
-    
-    <!-- YSS page reset
-    <button class="align-right header-button" (click)="onClearClick()" icon-only>
-      <ion-icon class="custom-reset-form-btn" name="custom-reset-form"></ion-icon>
-    </button> 
-    -->
-    <ion-buttons slot="end">
-      <ion-button *ngIf="saving" class="align-right" style="background-color: red;" icon-only>
-        <ion-spinner color="light"></ion-spinner>
-      </ion-button>
-    </ion-buttons>
+ 
+    <ion-title text-center>{{monthNames[dateSelected[1]] + " " + dateSelected[0] + ", " + dateSelected[2]}}</ion-title>
+
+    <button class="header-spinner" ion-button icon-only>
+      <ion-spinner [ngClass]="saving? 'spinner-shown': 'spinner-hidden'" color="light"></ion-spinner>
+    </button>
   </ion-toolbar>
 </ion-header>
 

@@ -1,4 +1,36 @@
 page-tracking {
+  #toolbar {
+    .toolbar-content{
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      margin-left: 3%;
+      margin-right: 3%;
+    }
+
+    .header-button {
+      background: none;
+      //margin-top: 4pt;
+      //margin-left: 7%;
+      //margin-right: 7%;
+      font-size: 10pt;
+      color: white;
+    }
+
+    .header-spinner {
+      background: none;
+    }
+
+    .spinner-shown{
+      visibility: visible;
+    }
+  
+    .spinner-hidden{
+      visibility: hidden;
+    }
+  }
+
   .custom-reset-form-btn {
     font-size: 20pt;
   }
@@ -11,15 +43,6 @@ page-tracking {
   .align-right {
     float: right;
     margin-right: 4%;
-  }
-
-  .header-button {
-    background: none;
-    margin-top: 4pt;
-    margin-left: 7%;
-    margin-right: 7%;
-    font-size: 10pt;
-    color: white;
   }
 
   .date-title {

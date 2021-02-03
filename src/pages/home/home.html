@@ -1,13 +1,17 @@
 <ion-header>
-  <ion-navbar text-center hideBackButton>
-    <button ion-button menuToggle show icon-only>
-      <ion-icon name="menu"></ion-icon>
-    </button>
-    <!-- <span id="title" class="header-title-right">Home</span> -->
-    <ion-title id="title" class="header-title-right" style="background-color: yellow;">Home</ion-title>
-    <ion-buttons *ngIf="saving" slot="end">
-      <!-- <div class="header-button align-right">Saving ...<ion-spinner color="light"></ion-spinner></div> -->
-      <ion-spinner class="align-right" color="light" style="background-color: red;"></ion-spinner>
+  <ion-navbar>
+      <button ion-button icon-only menuToggle>
+        <ion-icon name="menu"></ion-icon>
+      </button>
+
+    <ion-title text-center>
+      Home
+    </ion-title>
+
+    <ion-buttons end>
+      <button ion-button class="navbar-spinner" icon-only>
+        <ion-spinner [ngClass]="saving? 'spinner-shown': 'spinner-hidden'" color="light"></ion-spinner>
+      </button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

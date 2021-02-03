@@ -14,6 +14,22 @@ page-home {
     justify-content: center;
   }
 
+  .navbar-spinner{
+    margin-top: 0;
+    margin-right: 6px;
+    margin-bottom: 0;
+    margin-left: 6px !important;
+    min-width: 44px;
+  }
+
+  .spinner-shown{
+    visibility: visible;
+  }
+
+  .spinner-hidden{
+    visibility: hidden;
+  }
+
   .align-right {
     float: right;
     margin-right: 4%;
