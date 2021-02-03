@@ -54,7 +54,11 @@ ion-calendar {
   
       .with-symptom {
         border-radius: 5px;
-        background-color: rgba(216, 171, 49, 0.486);
+        background-color: #ff165cb7; // light pink
+        //background-color: #ff165c86; // dark pink
+        //background-color: #f6f7d7; // from https://colorhunt.co/palette/14114
+        //background-color: #f6f7d78c;
+        //background-color: rgba(216, 171, 49, 0.486); // dark green
       }
 
       .tracking-data {
@@ -76,18 +80,18 @@ ion-calendar {
         }
     
         .symptom {
-          background: red;
-          //background: var(--symptom-theme);
+          //background: red;
+          background: var(--symptom-theme);
         }
     
         .treatment {
-          background: green;
-          //background: var(--treatment-theme);
+          //background: green;
+          background: var(--treatment-theme);
         }
     
         .contributor {
-          background: orange;
-          //background: var(--contributor-them);
+          //background: orange;
+          background: var(--contributor-theme);
         }
     
         .other {

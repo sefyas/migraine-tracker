@@ -5,7 +5,7 @@
     </pattern>
   </defs>
   <g id="Group_133" data-name="Group 133" transform="translate(-24 -78)">
-    <circle id="Ellipse_55" data-name="Ellipse 55" cx="47.5" cy="47.5" r="47.5" transform="translate(24 78)" fill="#2590c9"/>
+    <circle id="Ellipse_55" data-name="Ellipse 55" cx="47.5" cy="47.5" r="47.5" transform="translate(24 78)" fill="#ff165d"/>
     <rect id="symptom" width="69" height="67" transform="translate(37 92)" fill="url(#pattern)"/>
   </g>
 </svg>

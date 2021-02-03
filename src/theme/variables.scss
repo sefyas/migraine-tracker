@@ -64,15 +64,13 @@ $app-direction: ltr;
   --goal-card-background: #151D50;
 
   --change-theme: #542074;
-  --symptom-theme: #2A8CAA;
-  --treatment-theme: #E09845;
-  --contributor-theme: #30916C;
+  --symptom-theme: #ff165d; //#2A8CAA; //YSS pink from https://colorhunt.co/palette/14114
+  --treatment-theme: #3ec1d3; //#E09845; //YSS cyan from https://colorhunt.co/palette/14114
+  --contributor-theme: #ff9a00; //#30916C; //YSS orange from https://colorhunt.co/palette/14114
   --other-theme: #D09595;
   --goal-theme: #288686;
   --info-theme: #FFD13B;
   --progress-bar-theme: rgba(112, 65, 177, 1);
-
-
 
 }
 
@@ -126,10 +124,11 @@ $colors: (
         goalThemeDark: #105D5D,
         darkRed: #88212D,
         changeTheme: #542074,
-        symptomTheme: #2A8CAA,
-        treatmentTheme: #E09845,
-        contributorTheme: #30916C,
+        symptomTheme: #ff165d, //#2A8CAA, pink from https://colorhunt.co/palette/14114
+        treatmentTheme: #3ec1d3, //#E09845, cyan from https://colorhunt.co/palette/14114
+        contributorTheme: #ff9a00, //#30916C, orange from https://colorhunt.co/palette/14114
         otherTheme: #D09595,
+        rangeIconFill: #151D50
 );
 
 
