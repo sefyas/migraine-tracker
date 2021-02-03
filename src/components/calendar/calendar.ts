@@ -180,6 +180,7 @@ export class Calendar {
                     this.weekArray[i][j]['contributorReported'] = 'Contributor' in data ? Object.keys(data['Contributor']).length : 0;
                     this.weekArray[i][j]['otherReported'] = 'Other' in data ? Object.keys(data['Other']).length : 0;
                     this.weekArray[i][j]['symptomExists'] = 'Symptom' in data ? this.symptomsExist(data['Symptom'], info['Symptom']): false;
+                    //this.weekArray[i][j]['symptomExists'] = this.weekArray[i][j]['date'] % 6 === 0 ;
                 });             
             }
         }
@@ -222,62 +223,120 @@ export class Calendar {
     }
 
     symptomsExist(data, info) {
-        console.log("YSS in symptomsExist data is", data, "with info", info);
-        return false;
+        var exist: boolean = false;
+        //console.log("YSS in symptomsExist data is", data, "with info", info);
+        for(const item in data){
+            // YSS TO-DO this is to handle cases where entries are created without any 
+            //           values associted with them. As soon the entries are only created
+            //           if they have values, this check can be removed.
+            if(data[item] === null) {
+                console.log("YSS item", item, "value is undefined.");
+                continue;
+            }
+
+            if(info[item] === 'binary' && data[item] === 'Yes'){
+                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
+                exist = true;
+                break;
+            }
+
+            if(info[item] === 'number' && parseInt(data[item]) > 0){
+                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
+                exist = true;
+                break;
+            }
+
+            if(info[item] === 'numeric scale' && data[item] > 0){
+                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
+                exist = true;
+                break;
+            }
+
+            if(info[item] === 'category scale' && data[item] !== 'None'){
+                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
+                exist = true;
+                break;
+            }
+
+            // YSS TO-DO the second condition is meant to handle the current issue that 
+            //           does not allow clearing text boxes. It can be removed as soon as
+            //           that issue is resolved.
+            // YSS TO-DO we can consider more sophisticated content analysis to decide if
+            //           text indicates presence of symptoms.
+            if(info[item] === 'note' && data[item].length > 1){
+                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
+                exist = true;
+                break;
+            }
+
+            if(info[item] === 'time'){
+                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
+                exist = true;
+                break;
+            }
+
+            if(info[item] === 'time range'){
+                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
+                exist = true;
+                break;
+            }
+        }
+        return exist;
     }
 
     trackingDataReported(day, type) {
-        var exist: boolean;
+        var reported: boolean;
 
+        /**/
         switch(type){
             case 'change':
-                exist = day['changeReported'] > 0;
+                reported = day['changeReported'] > 0;
                 break;
             case 'symptom':
-                exist = day['symptomReported'] > 0;
+                reported = day['symptomReported'] > 0;
                 break;
             case 'treatment':
-                exist = day['treatmentReported'] > 0;
+                reported = day['treatmentReported'] > 0;
                 break;
             case 'contributor':
-                exist = day['contributorReported'] > 0;
+                reported = day['contributorReported'] > 0;
                 break;
             case 'other':
-                exist = day['otherReported'] > 0;
+                reported = day['otherReported'] > 0;
                 break;
             default:
-                exist = false;
+                reported = false;
         }
 
-        /*
+        /* 
         switch(type){
             case 'change':
-                exist = day['date'] % 6 === 0;
+                reported = day['date'] % 6 === 0;
                 break;
             case 'symptom':
-                exist = day['date'] % 2 === 0;
+                reported = day['date'] % 2 === 0;
                 break;
             case 'treatment':
-                exist = day['date'] % 3 === 0;
+                reported = day['date'] % 3 === 0;
                 break;
             case 'contributor':
-                exist = day['date'] % 4 === 0;
+                reported = day['date'] % 4 === 0;
                 break;
             case 'other':
-                exist = day['date'] % 5 === 0;
+                reported = day['date'] % 5 === 0;
                 break;
             default:
-                exist = false;
+                reported = false;
         }
 
         if (day['date'] === 13){
             //var trackedData = this.getData([day['date'], day['month'], day['year']]);
             //console.log(trackedData);
-            exist = true;
+            reported = true;
         }
-        */
+        */ 
 
-        return exist;
+        return reported;
     }
 
     noDataReported(day){
@@ -300,6 +359,24 @@ export class Calendar {
         if (day['otherReported'] > 0){
             return false;
         }
+
+        /*
+        if (day['date'] % 2 === 0) {
+            return false
+        }
+
+        if (day['date'] % 3 === 0) {
+            return false
+        }
+
+        if (day['date'] % 5 === 0) {
+            return false
+        }
+
+        if (day['date'] === 13){
+            return false;
+        }
+        */
 
         return true;
     }
