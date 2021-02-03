@@ -96,6 +96,20 @@ export class HomePage {
     //console.log("YSS home/loadTrackedData/tracked", this.tracked);
   }
 
+  remoteClearedData(goal, data) {
+    this.saving = true;
+    this.couchDbService.deleteData(goal, data, this.dateSelected)
+        .then((result)=>{
+          console.log("YSS tracking/remoteClearedData resolved");
+          this.saving = false
+          if (result) {
+            console.log("YSS TO-DO tracking/remoteClearedData retured with true; show nothing")
+          } else {
+            console.log("YSS TO-DO tracking/remoteClearedData retured with false; show an error icon so user knows the data is not removed")
+          }
+        });
+  }
+
   /**
    * Save tracked data to the database
    */
@@ -153,10 +167,11 @@ export class HomePage {
   }
 
   onEraseClick(data) {
-    //console.log("eraser icon clicked for goal", data['dataType'], " and data", data['name']);
+    //console.log("eraser icon clicked for goal", data['dataType'], " and data", data['name'], "data is", data);
     //console.log("among tracked data", this.tracked, "with value", this.tracked[data['dataType']][data['id']]);
     delete this.tracked[data['dataType']][data['id']];
-    // YSS TO-DO investigate whether delete this.tracked[data['dataType']] is also applicable when all data under a certain goal is erased
+    // YSS TO-DO if this.tracked[goal] is empty after deletion, remove it
+    this.remoteClearedData(data['dataType'], data);
   }
 
   /**

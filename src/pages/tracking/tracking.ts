@@ -84,7 +84,8 @@ export class TrackingPage {
     //console.log("eraser icon clicked for goal", goal, " and data", data);
     //console.log("value for this goal-data is", this.tracked[goal][data['id']], "among tracked data", this.tracked);
     delete this.tracked[goal][data['id']];
-    // YSS TO-DO investigate whether delete this.tracked[goal] is also applicable when all data under a certain goal is erased
+    // YSS TO-DO if this.tracked[goal] is empty after deletion, remove it
+    this.remoteClearedData(goal, data);
   }
   // ================= BUTTONS Ends =================
   loadTrackedData() {
@@ -94,11 +95,26 @@ export class TrackingPage {
     });
   }
 
+  remoteClearedData(goal, data) {
+    this.saving = true;
+    this.couchDbService.deleteData(goal, data, this.dateSelected)
+        .then((result)=>{
+          console.log("YSS tracking/remoteClearedData resolved");
+          this.saving = false
+          if (result) {
+            console.log("YSS TO-DO tracking/remoteClearedData retured with true; show nothing")
+          } else {
+            console.log("YSS TO-DO tracking/remoteClearedData retured with false; show an error icon so user knows the data is not removed")
+          }
+        });
+  }
+
   saveTrackedData() {
     this.saving = true;
+    console.log('saving data saveTrackedData; tracked:', this.tracked, 'trackedFields:', this.trackedFields, 'on date:', this.dateSelected)
     this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
       .then((result)=>{
-        //console.log("YSS tracking/saveTrackedData returns")
+        //console.log("YSS tracking/saveTrackedData resolved")
         this.saving = false
         if (result) {
           console.log("YSS TO-DO tracking/saveTrackedData retured with true; show nothing")

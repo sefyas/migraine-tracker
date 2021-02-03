@@ -220,10 +220,10 @@ export class CouchDbServiceProvider {
         tracked_data_field: trackedDataField,
       });
 
-      /* comment for simulating delay in sving */
+      /* comment for simulating delay in saving */
       //console.log("Tracked data saved!");
       //return true;
-      /* uncomment for simulating delay in sving */
+      /* uncomment for simulating delay in saving */
       return new Promise((resolve, reject)=>{
         setTimeout(()=>{
           console.log("Tracked data saved!");
@@ -233,6 +233,63 @@ export class CouchDbServiceProvider {
 
     } catch (err) {
       console.log("YSS Error occured while saving tracked data.");
+      this.db.put({_id: doc_id, tracked_data: trackedData,
+        tracked_data_field: trackedDataField}, function(err, response) {
+        if (err) {
+          console.log(err);
+          return false;
+        }
+      });
+    }
+  }
+
+  async deleteData(goal, data, date) {
+    var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
+    try {
+      var doc = await this.db.get(doc_id);
+      var trackedData = doc['tracked_data'];
+      var trackedDataField = doc['tracked_data_field'];
+      //console.log("YSS deleteData; doc:", doc, "doc['tracked_data']:", doc['tracked_data'], "doc['tracked_data_field']:", doc['tracked_data_field'], "trackedData:", trackedData, "trackedDataField:", trackedDataField)
+      if (trackedData.hasOwnProperty(goal)) {
+        if (trackedData[goal].hasOwnProperty(data['id'])) {
+          delete trackedData[goal][data['id']];
+          // YSS TO-DO if trackedData[goal] is empty after deletion, remove it
+        } else {
+          console.log("YSS deleteData/tracked_data update: doc has no data with id", data['id'], "for goal", trackedData[goal]);
+        }
+      } else {
+        console.log("YSS deleteData/tracked_data update: doc does not have goal", goal);
+      }
+
+      if (trackedDataField.hasOwnProperty(goal)) {
+        if (trackedDataField[goal].hasOwnProperty(data['id'])) {
+          delete trackedDataField[goal][data['id']]
+        } else {
+          console.log("YSS deleteData/tracked_data_field update: doc has no data with id", data['id'], "for goal", trackedDataField[goal]);
+        }
+      } else {
+        console.log("YSS deleteData/tracked_data_field update: doc does not have goal", goal);
+      }
+      var response = await this.db.put({
+        _id: doc_id,
+        _rev: doc._rev,
+        tracked_data: trackedData,
+        tracked_data_field: trackedDataField,
+      });
+
+      /* comment for imulating delay in saving */
+      //console.log("Tracked data saved!");
+      //return true;
+      /* uncomment for simulating delay in saving */
+      return new Promise((resolve, reject)=>{
+        setTimeout(()=>{
+          console.log("Tracked data removed!");
+          resolve(true);
+        }, 3000);
+      });
+
+    } catch (err) {
+      console.log("YSS Error occured while removing tracked data.");
       this.db.put({_id: doc_id, tracked_data: trackedData,
         tracked_data_field: trackedDataField}, function(err, response) {
         if (err) {
