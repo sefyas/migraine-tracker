@@ -92,20 +92,20 @@ export class HomePage {
     //this.tracked = await this.couchDbService.fetchTrackedData(this.dateSelected);
     this.couchDbService.fetchTrackedData(this.dateSelected).then((trackingData)=>{
       this.tracked = trackingData['tracked_data'];
+      //console.log("YSS HomePage - loadTrackedData tracked", this.tracked, "on ", this.dateSelected);
     });
-    //console.log("YSS home/loadTrackedData/tracked", this.tracked);
   }
 
   remoteClearedData(goal, data) {
     this.saving = true;
     this.couchDbService.deleteData(goal, data, this.dateSelected)
         .then((result)=>{
-          console.log("YSS tracking/remoteClearedData resolved");
+          console.log("YSS HomePage - remoteClearedData resolved");
           this.saving = false
           if (result) {
-            console.log("YSS TO-DO tracking/remoteClearedData retured with true; show nothing")
+            console.log("YSS TO-DO HomePage - remoteClearedData retured with true; show nothing")
           } else {
-            console.log("YSS TO-DO tracking/remoteClearedData retured with false; show an error icon so user knows the data is not removed")
+            console.log("YSS TO-DO HomePage - remoteClearedData retured with false; show an error icon so user knows the data is not removed")
           }
         });
   }
@@ -117,12 +117,12 @@ export class HomePage {
     this.saving = true;
     this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
       .then((result)=>{
-        //console.log("home/saveTrackedData retured");
+        //console.log("HomePage - saveTrackedData retured");
         this.saving = false
         if (result) {
-          console.log("YSS TO-DO home/saveTrackedData retured with true; show nothing")
+          console.log("YSS TO-DO HomePage - saveTrackedData retured with true; show nothing")
         } else {
-          console.log("YSS TO-DO home/saveTrackedData retured with false; show an error icon so user knows the data is not saved")
+          console.log("YSS TO-DO HomePage - saveTrackedData retured with false; show an error icon so user knows the data is not saved")
         }
       });
   }
@@ -167,11 +167,11 @@ export class HomePage {
   }
 
   onEraseClick(data) {
-    //console.log("eraser icon clicked for goal", data['dataType'], " and data", data['name'], "data is", data);
-    //console.log("among tracked data", this.tracked, "with value", this.tracked[data['dataType']][data['id']]);
-    delete this.tracked[data['dataType']][data['id']];
+    let dataType = this.inferTrackingCategory(data);
+    //console.log("YSS HomePage - onEraseClick eraser icon clicked for goal", data['dataType'], " and data", data['name'], "data is", data, "among tracked data", this.tracked, "with value", this.tracked[dataType][data['id']]");
+    delete this.tracked[dataType][data['id']];
     // YSS TO-DO if this.tracked[goal] is empty after deletion, remove it
-    this.remoteClearedData(data['dataType'], data);
+    this.remoteClearedData(dataType, data);
   }
 
   /**
@@ -193,10 +193,13 @@ export class HomePage {
    * @param data
    */
   getDataVal(data) {
-    //console.log("YSS home/getDataVal/tracked", this.tracked);
-    if (this.tracked[data.dataType] && this.tracked[data.dataType][data.id] && (typeof this.tracked[data.dataType][data.id] !== typeof {})) {
-      return this.tracked[data.dataType][data.id];
+    let dataType = this.inferTrackingCategory(data);
+    //console.log("YSS HomePage - getDataVal for data", data, "with inferred dataType", dataType, "when tracked is", this.tracked, "for dataToTrack", this.dataToTrack);
+    if (this.tracked[dataType] && this.tracked[dataType][data.id] && (typeof this.tracked[dataType][data.id] !== typeof {})) {
+      //console.log("YSS HomePage - getDataVal returning", this.tracked[dataType][data.id],"for data:", data, "and tracked:", this.tracked, "dataToTrack is", this.dataToTrack, "date selected is:", this.dateSelected);
+      return this.tracked[dataType][data.id];
     } else {
+      //console.log("YSS HomePage - getDataVal returning null for data:", data, "and tracked:", this.tracked, "dataToTrack is", this.dataToTrack, "date selected is:", this.dateSelected);
       return null;
     }
   }
@@ -226,15 +229,53 @@ export class HomePage {
   }
 
   /**
+   * infers category of data (i.e. one of Symptom, Treatment, Contributor, Change, Other)
+   * this is a temporary fix for the fact that 'dataType' is not available for all quickTrack items
+  */
+  inferTrackingCategory(data){
+    let category = null;
+    let found = false;
+    for (const trackingCategory in this.dataToTrack) { 
+      if(trackingCategory === 'quickTracker'){
+        continue;
+      }
+
+      for(const trackingData of this.dataToTrack[trackingCategory]){
+        if(!trackingData.hasOwnProperty('id')){
+          console.log("YSS HomePage - inferTrackingCategory no id for", trackingData);
+          continue;
+        }
+
+        if(data['id'] === trackingData['id']){
+          //console.log("\tYSS HomePage - inferTrackingCategory inferred category is", trackingCategory);
+          category = trackingCategory
+          found = true
+          break;
+        }
+      }
+
+      if(found){
+        break;
+      }
+    }
+
+    return category;
+  }
+
+  /**
    * Change data values
    * @param componentEvent
    * @param data
    * @param dataType
    */
-  changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
+  changeVals (componentEvent : {[eventPossibilities: string] : any}, 
+              data : {[dataProps: string] : any},
               dataType: string) {
+    //console.log("YSS HomePage - changeVals data:", data, "with inferred catgory", this.inferTrackingCategory(data), "for dataType:", dataType, "when tracked is", this.tracked, "under dataToTrack", this.dataToTrack);
     if (dataType === 'quickTracker') {
-      dataType = data['dataType'];
+      // YSS finding the dataType as it turns data['dataType'] is only available for Migraine among all the quickTracker items
+      dataType = this.inferTrackingCategory(data);
+      // YSS TO-DO consider returning null if dataType is null 
     }
     if (!this.tracked.hasOwnProperty(dataType)) {
       this.tracked[dataType] = {};
