@@ -207,9 +207,11 @@ export class DataDetailsServiceProvider {
 
 
 
-  getDataLists(alreadyTracking: {[dataType:string]:DataElement[]}, dataType: string,
-               goalIDs: string[]) : {[listInfo: string] : any}{
-    let dataOfType  : DataElement[] = this.listedData[dataType];
+  getDataLists(alreadyTracking: {[dataType:string]:DataElement[]}, 
+               dataType: string, // one of Symptom, Treatment, Contributor, Change, Other
+               goalIDs: string[]
+              ) : {[listInfo: string] : any}{
+    let dataOfType : DataElement[] = this.listedData[dataType]; // list of behaviors that can be tracked under Symptom, Treatment, Contributor, Change, Other (e.g. Migraine, Peak Migraine Severity, ... in case of Symptom)
     let otherData : DataElement[] = [];
     let recData : DataElement[] = [];
     let alwaysQuickTrack : DataElement[] = [];
@@ -217,7 +219,7 @@ export class DataDetailsServiceProvider {
     let expandOther: boolean = false;
 
     for(let i=0; i<dataOfType.length; i++){
-      let dataObject = dataOfType[i];
+      let dataObject = dataOfType[i]; // each behavior that can be tracked (e.g. Migraine or Peak Migraine Severity under Symptom)
       if (dataObject['alwaysQuickTrack']){
         dataObject['dataType'] = dataType;
         alwaysQuickTrack.push(dataObject);
@@ -230,6 +232,12 @@ export class DataDetailsServiceProvider {
             skip = true;
           }
         }
+        // YSS TO-DO this should be changed to skip only if related behaviors for the goals 
+        //           specified under 'skipIfGoals' are selected. This probably requires change
+        //           to 'skipIfGoals' data to list both the goal and the behavior. Also, goalIDs
+        //           along with selected behaviors for each goal should be provided.
+        // altenatively, the filtering step can be moved to data-config where we exactly know 
+        // the goals and the behaviors selected for each. 
         else if(dataObject['skipIfGoals']){
           for(let j=0; j<dataObject['skipIfGoals'].length; j++){
             if(goalIDs.indexOf(dataObject['skipIfGoals'][j])>-1){
