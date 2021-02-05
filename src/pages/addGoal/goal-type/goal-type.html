@@ -46,24 +46,37 @@
            text-wrap>{{goal['chooseReason']}}</p>
 
         <p class="goal-reason-text"
-           *ngIf="((goal['name'] === 'Monitoring' && expandMonitor) || (goal['name'] === 'Monitoring' && !expandMonitor
-           && (selectedGoals.indexOf('1a') > -1 ||
-           selectedGoals.indexOf('1b') > -1 || selectedGoals.indexOf('1c') > -1))) ||
-           ((goal['name'] === 'Learning' && expandLearn) || (goal['name'] === 'Learning' && !expandLearn
-           && (selectedGoals.indexOf('2a') > -1 ||
-           selectedGoals.indexOf('2b') > -1 || selectedGoals.indexOf('2c') > -1)))"
+           *ngIf="(
+                    (goal['name'] === 'Monitoring' && expandMonitor) || 
+                    (goal['name'] === 'Monitoring' && !expandMonitor && 
+                      (selectedGoals.indexOf('1a') > -1 || 
+                       selectedGoals.indexOf('1b') > -1 || 
+                       selectedGoals.indexOf('1c') > -1)
+                    )
+                  ) ||
+                  (
+                    (goal['name'] === 'Learning' && expandLearn) || 
+                    (goal['name'] === 'Learning' && !expandLearn && 
+                      (selectedGoals.indexOf('2a') > -1 || 
+                       selectedGoals.indexOf('2b') > -1 || 
+                       selectedGoals.indexOf('2c') > -1)
+                    )
+                  )"
            text-wrap>{{goal['chooseReasonDetail']}}</p>
 
 
-        <div class="sub-goal-chosen-wrapper" *ngIf="(!expandMonitor && goal.goalID == 1) || (!expandLearn && goal.goalID == 2)">
+        <div class="sub-goal-chosen-wrapper" 
+             *ngIf="(!expandMonitor && goal.goalID == 1) || 
+                    (!expandLearn && goal.goalID == 2)">
           <ion-list no-lines class="sub-goal-chosen-list" *ngFor="let subgoal of goal['subgoals']">
             <p class="sub-goal-chosen-text" *ngIf="selectedGoals.indexOf(subgoal.goalID) > -1">{{subgoal['goalPurpose']}}</p>
           </ion-list>
         </div>
 
         <div class="sub-goal-list-wrapper">
-          <ion-list no-lines class="sub-goal-list" *ngIf="goal['subgoals'] &&
-          ((goal['name'] === 'Monitoring' && expandMonitor) || (goal['name'] === 'Learning' && expandLearn))">
+          <ion-list no-lines class="sub-goal-list" 
+              *ngIf="goal['subgoals'] &&
+                    ((goal['name'] === 'Monitoring' && expandMonitor) || (goal['name'] === 'Learning' && expandLearn))">
             <ion-item class="sub-goal-list-item" *ngFor="let subgoal of goal['subgoals']" text-wrap>
 
               <button class="align-left subgoal-btn" (click)="addGoal(subgoal)"
