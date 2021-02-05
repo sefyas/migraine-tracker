@@ -43,6 +43,11 @@ export class DataConfigPage {
     this.modifyGoal = this.params['modifyGoal'];
     this.modifyData = this.params['modifyData'];
     this.getDataInfo(this.configuredRoutine['dataToTrack']);
+    console.log("YSS DataConfigPage - configuredRoutines:", this.configuredRoutine);
+    console.log("YSS DataConfigPage - params:", this.params);
+    console.log("YSS DataConfigPage - behaviors to track / recommended:", this.recommendedData);
+    console.log("YSS DataConfigPage - behaviors to track / common:", this.otherData);
+    console.log("YSS DataConfigPage - behaviors to track / custom:", this.customData);
 
     if (this.modifyGoal) {
       this.workoutProgress = Math.min( ( (this.selectedConfigData.indexOf(this.params['dataPage']) + 1)
