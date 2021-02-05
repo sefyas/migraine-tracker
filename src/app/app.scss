@@ -238,6 +238,9 @@ ion-icon {
   &[class*="custom-eraser"] {
     mask-image: url(../assets/pages/eraser_icon.svg);
   }
+  &[class*="custom-clear"] {
+    mask-image: url(../assets/pages/clear_icon.svg);
+  }
   &[class*="custom-info"] {
     mask-image: url(../assets/pages/info_icon.svg);
   }
