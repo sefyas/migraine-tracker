@@ -117,6 +117,11 @@ export class EditDataPage {
   }
 
   backToConfig(choice : string){
+    //console.log("YSS EditDataPage - backToConfig data:", this.data);
+    if(!this.data.hasOwnProperty('id')){
+      //console.log("YSS EditDataPage - backToConfig suggestedID:", this.data['name'].replace(/\s+/g,"")+(new Date().toISOString().replace(/[^0-9]/g,"").slice(0,14)));
+      this.data['id'] = this.data['name'].replace(/\s+/g,"")+(new Date().toISOString().replace(/[^0-9]/g,"").slice(0,14))
+    }
     if (choice === 'add') {
       this.viewCtrl.dismiss(this.data);
     } else if (choice === 'remove') {
