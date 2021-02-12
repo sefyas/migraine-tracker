@@ -4,7 +4,11 @@
         <ion-card-header text-left class="data-header-wrapper">
             <div *ngIf="data.custom">
                 <p class="data-header-title-text">Custom {{dataType}} Data</p>
+                <!-- YSS TO-DO modify this text for Other "Custom Other Data" is meaningless -->
                 <h2 class="data-header-explanation-text">Custom data you configured</h2>
+                <!-- YSS TO-DO it might be possible to improve this text as it is not much informatic 
+                     ideally users should be able to provide the explanation.
+                -->
             </div>
 
             <div *ngIf="!data.custom">
