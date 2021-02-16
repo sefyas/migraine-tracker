@@ -1,16 +1,19 @@
 import { Component } from '@angular/core';
 import { Events } from 'ionic-angular';
 import { ModalController, NavController, NavParams } from 'ionic-angular';
-import { CouchDbServiceProvider } from "../../providers/couch-db-service/couch-db-service";
+import { Storage } from "@ionic/storage";
+import * as moment from 'moment';
+
 import { GoalTypePage } from "../addGoal/goal-type/goal-type";
 import { LoginPage } from "../login/login";
 import { TrackingPage } from '../tracking/tracking';
+
+import { ConfiguredRoutine, DataElement } from "../../interfaces/customTypes";
+
+import { CouchDbServiceProvider } from "../../providers/couch-db-service/couch-db-service";
 import { DataDetailsServiceProvider } from "../../providers/data-details-service/data-details-service";
 import { DateFunctionServiceProvider } from "../../providers/date-function-service/date-function-service";
 import { GlobalFunctionsServiceProvider } from "../../providers/global-functions-service/global-functions-service";
-import { ConfiguredRoutine, DataElement } from "../../interfaces/customTypes";
-import { Storage } from "@ionic/storage";
-import * as moment from 'moment';
 
 @Component({
   selector: 'page-home',
@@ -98,6 +101,7 @@ export class HomePage {
 
   remoteClearedData(goal, data) {
     this.saving = true;
+    console.log("YSS HomePage - remoteClearedData");
     this.couchDbService.deleteData(goal, data, this.dateSelected)
         .then((result)=>{
           console.log("YSS HomePage - remoteClearedData resolved");
@@ -168,7 +172,7 @@ export class HomePage {
 
   onEraseClick(data) {
     let dataType = this.inferTrackingCategory(data);
-    //console.log("YSS HomePage - onEraseClick eraser icon clicked for goal", data['dataType'], " and data", data['name'], "data is", data, "among tracked data", this.tracked, "with value", this.tracked[dataType][data['id']]");
+    //console.log("YSS HomePage - onEraseClick eraser icon clicked for goal", data['dataType'], " and data", data['name'], "data is", data, "among tracked data", this.tracked, "with value", this.tracked[dataType][data['id']]);
     delete this.tracked[dataType][data['id']];
     // YSS TO-DO if this.tracked[goal] is empty after deletion, remove it
     this.remoteClearedData(dataType, data);

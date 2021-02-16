@@ -17,10 +17,7 @@ import { GoalTypePage } from "../pages/addGoal/goal-type/goal-type";
 import { LoginPage } from "../pages/login/login";
 import { SignUpPage } from "../pages/signup/signup";
 import { TrackingPage } from '../pages/tracking/tracking';
-import { GoalDetailsServiceProvider } from '../providers/goal-details-service/goal-details-service';
-import { GlobalFunctionsServiceProvider } from '../providers/global-functions-service/global-functions-service';
 import { DataConfigPage } from "../pages/addGoal/data-config/data-config";
-import { DataDetailsServiceProvider } from '../providers/data-details-service/data-details-service';
 import { SelectTrackingFrequencyPage } from "../pages/addGoal/select-tracking-frequency/select-tracking-frequency";
 import { EditDataPage } from "../pages/addGoal/edit-data/edit-data";
 import { GoalModificationPage } from "../pages/goal-modification/goal-modification";
@@ -34,6 +31,9 @@ import { ViewDatapointPage } from "../pages/view-datapoint/view-datapoint";
 import { DataVisPage } from "../pages/data-vis/data-vis";
 /* ******* Services ******* */
 import { CouchDbServiceProvider } from '../providers/couch-db-service/couch-db-service';
+import { GoalDetailsServiceProvider } from '../providers/goal-details-service/goal-details-service';
+import { GlobalFunctionsServiceProvider } from '../providers/global-functions-service/global-functions-service';
+import { DataDetailsServiceProvider } from '../providers/data-details-service/data-details-service';
 import { GeneralInfoServiceProvider } from '../providers/general-info-service/general-info-service';
 import { DateFunctionServiceProvider } from '../providers/date-function-service/date-function-service';
 /* ******* Components ******* */
