@@ -34,8 +34,6 @@
     "ajv": "^6.5.5",
     "chart.js": "^2.8.0",
     "classlist.js": "^1.1.20150312",
-    "cordova-android": "7.1.4",
-    "cordova-ios": "^5.1.1",
     "cordova-plugin-android-permissions": "^1.0.2",
     "cordova-plugin-calendar": "^5.1.5",
     "cordova-plugin-device": "^2.0.3",
@@ -67,7 +65,9 @@
     "zone.js": "0.8.26"
   },
   "devDependencies": {
-    "@ionic/app-scripts": "^3.2.3",
+    "@ionic/app-scripts": "3.2.4",
+    "cordova-android": "^8.0.0",
+    "cordova-ios": "^6.0.0",
     "typescript": "^2.7.2"
   },
   "description": "An Ionic project",
@@ -88,8 +88,8 @@
       "cordova-plugin-ionic-webview": {}
     },
     "platforms": [
-      "ios",
-      "android"
+      "android",
+      "ios"
     ]
   }
 }
