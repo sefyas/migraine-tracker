@@ -27,7 +27,7 @@
             <ion-card-header>
                 <div class="tracking-name-wrapper">
                     <p class="tracking-name-recommended" *ngIf="recommended === 'retroactive'">Recommended</p>
-                    <p class="tracking-name">Post-Symptom Tracking</p>
+                    <p class="tracking-name">After Symptoms</p>
                 </div>
                 <button class="align-right info-btn" (click)="onDisplayInfoClick('postSymptom')" icon-only>
                     <img [src]="'../../assets/pages/info_icon.svg'" alt="">
@@ -87,7 +87,7 @@
             <ion-card-header>
                 <div class="tracking-name-wrapper">
                     <p class="tracking-name-recommended" *ngIf="recommended === 'regular'">Recommended</p>
-                    <p class="tracking-name">Regular Tracking</p>
+                    <p class="tracking-name">Everyday</p>
                 </div>
                 <button class="align-right info-btn" (click)="onDisplayInfoClick('regular')" icon-only>
                     <img [src]="'../../assets/pages/info_icon.svg'" alt="">
@@ -95,23 +95,34 @@
             </ion-card-header>
 
             <ion-card-content class="tracking-card-content">
-                <p class="tracking-explanation-text" text-wrap>Track regularly get more consistent data</p>
+                <p class="tracking-explanation-text" text-wrap>Track daily to get more consistent data</p>
 
                 <div class="tracking-selected-wrapper" *ngIf="notificationData['regular']">
                     <div class="tracking-options" text-left>
                         <div class="tracking-btn-wrapper">
-                            <button *ngIf="!(notificationData['regular'].timescale === 'Daily')"
-                                    class="tracking-btn" (click)="setRegularTimeScale('Daily')" icon-only>
+                            <button *ngIf="!isDaily()"
+                                    class="tracking-btn" (click)="setRegularTimeScale('Daily1')" icon-only>
                                 <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
                             </button>
-                            <button *ngIf="(notificationData['regular'].timescale === 'Daily')"
-                                    class="tracking-btn" (click)="setRegularTimeScale('Daily')" icon-only>
+                            <button *ngIf="isDaily()"
+                                    class="tracking-btn" (click)="setRegularTimeScale('Daily1')" icon-only>
                                 <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
                             </button>
-                            <p class="tracking-btn-label" (click)="setRegularTimeScale('Daily')">Daily</p>
+                            <p class="tracking-btn-label" (click)="setRegularTimeScale('Daily1')">At</p>
+                        </div>
+                        <div class="tracking-btn-wrapper" *ngIf="isDaily()">
+                            <button *ngIf="!(notificationData['regular'].timescale === 'TwiceDaily')"
+                                    class="tracking-btn" (click)="setRegularTimeScale('Daily2')" icon-only>
+                                <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
+                            </button>
+                            <button *ngIf="(notificationData['regular'].timescale === 'TwiceDaily')"
+                                    class="tracking-btn" (click)="setRegularTimeScale('Daily2')" icon-only>
+                                <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
+                            </button>
+                            <p class="tracking-btn-label" (click)="setRegularTimeScale('Daily2')">At</p>
                         </div>
 
-                        <div class="tracking-btn-wrapper">
+                        <!-- <div class="tracking-btn-wrapper">
                             <button *ngIf="!(notificationData['regular'].timescale === 'Weekly')"
                                     class="tracking-btn" (click)="setRegularTimeScale('Weekly')" icon-only>
                                 <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
@@ -121,9 +132,9 @@
                                 <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
                             </button>
                             <p class="tracking-btn-label" (click)="setRegularTimeScale('Weekly')">Weekly</p>
-                        </div>
+                        </div> -->
 
-                        <div class="tracking-btn-wrapper">
+                        <!-- <div class="tracking-btn-wrapper">
                             <button *ngIf="!(notificationData['regular'].timescale === 'Monthly')"
                                     class="tracking-btn" (click)="setRegularTimeScale('Monthly')" icon-only>
                                 <img [src]="'../../assets/pages/uncheck_circle_icon.svg' " alt="">
@@ -133,30 +144,46 @@
                                 <img [src]="'../../assets/pages/check_radio_icon.svg' " alt="">
                             </button>
                             <p class="tracking-btn-label" (click)="setRegularTimeScale('Monthly')">Monthly</p>
-                        </div>
+                        </div> -->
                     </div>
-                    <p class="tracking-label regular-label">at</p>
+                    <!-- <p class="tracking-label regular-label">at</p> -->
 
                     <div class="regular-options-wrapper">
                         <ion-item class="regular-time-picker-wrapper"
-                                  *ngIf="!(notificationData['regular'].timescale === 'Daily') &&
-                              !(notificationData['regular'].timescale === 'Weekly') &&
-                              !(notificationData['regular'].timescale === 'Monthly')" text-wrap text-center>
+                                  *ngIf="   !isDaily()
+                                         && !(notificationData['regular'].timescale === 'Weekly')
+                                         && !(notificationData['regular'].timescale === 'Monthly')" 
+                                         text-wrap text-center>
                             <ion-datetime class="regular-time-picker" disabled>
                             </ion-datetime>
                         </ion-item>
-
                         <ion-item class="regular-time-picker-wrapper"
-                                  *ngIf="(notificationData['regular'].timescale === 'Daily') ||
-                                  (notificationData['regular'].timescale === 'Weekly') ||
-                                  (notificationData['regular'].timescale === 'Monthly')" text-wrap text-center>
-                            <ion-datetime class="regular-time-picker" displayFormat="H:mm" placeholder="Select Time"
-                                          pickerFormat="HH:mm" minuteValues="0,10,20,30,40,50"
+                                  *ngIf="    isDaily() 
+                                         || (notificationData['regular'].timescale === 'Weekly') 
+                                         || (notificationData['regular'].timescale === 'Monthly')" text-wrap text-center>
+                            <ion-datetime class="regular-time-picker" displayFormat="hh:mm a" placeholder="Select Time"
+                                          pickerFormat="hh:mm a" minuteValues="0,10,20,30,40,50"
                                           [(ngModel)]="notificationData['regular']['timeOfDay']">
                             </ion-datetime>
                         </ion-item>
 
-                        <ion-item class="regular-time-picker-popover-wrapper" *ngIf="(notificationData['regular'].timescale === 'Weekly')" text-wrap text-center>
+                        <ion-item class="regular-time-picker-wrapper"
+                                  *ngIf="(notificationData['regular'].timescale === 'Daily')" 
+                                  text-wrap text-center>
+                                  <ion-datetime class="regular-time-picker" disabled>
+                                  </ion-datetime>
+                        </ion-item>
+                        <ion-item class="regular-time-picker-wrapper"
+                                  *ngIf="(notificationData['regular'].timescale === 'TwiceDaily')" 
+                                  text-wrap text-center>
+                            <ion-datetime class="regular-time-picker" displayFormat="hh:mm a" placeholder="Select Time"
+                                          pickerFormat="hh:mm a" minuteValues="0,10,20,30,40,50"
+                                          [(ngModel)]="notificationData['regular']['timeOfDay2']">
+                            </ion-datetime>
+                        </ion-item>
+                        
+
+                        <!-- <ion-item class="regular-time-picker-popover-wrapper" *ngIf="(notificationData['regular'].timescale === 'Weekly')" text-wrap text-center>
                             <ion-select class="regular-time-picker-popover" placeholder="Select Day" interface="popover"
                                         [(ngModel)]="notificationData['regular']['dayOfWeek']">
                                 <ion-option>Monday</ion-option>
@@ -167,16 +194,16 @@
                                 <ion-option>Saturday</ion-option>
                                 <ion-option>Sunday</ion-option>
                             </ion-select>
-                        </ion-item>
+                        </ion-item> -->
 
-                        <ion-item class="regular-time-picker-popover-wrapper" *ngIf="(notificationData['regular'].timescale === 'Monthly')" text-wrap text-center>
+                        <!-- <ion-item class="regular-time-picker-popover-wrapper" *ngIf="(notificationData['regular'].timescale === 'Monthly')" text-wrap text-center>
                             <ion-select class="regular-time-picker-popover" placeholder="Select Day" interface="popover"
                                         [(ngModel)]="notificationData['regular']['dayOfMonth']">
                                 <div *ngFor="let day of days">
                                     <ion-option>{{day}}</ion-option>
                                 </div>
                             </ion-select>
-                        </ion-item>
+                        </ion-item> -->
                     </div>
                 </div>
 

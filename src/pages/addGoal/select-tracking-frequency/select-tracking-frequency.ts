@@ -43,6 +43,9 @@ export class SelectTrackingFrequencyPage {
 
     this.modifyNotification = this.params['modifyNotification'];
 
+    //YSS
+    //console.log('YSS SelectTrackingFrequencyPage - ionViewDidLoad:\n\tconfig', this.configuredRoutine, '\n\tmodify', this.modifyNotification);
+
     if (this.modifyNotification) { // if there are configured notifications, display those
       this.notificationData = this.configuredRoutine['notifications'];
     } else {
@@ -60,6 +63,7 @@ export class SelectTrackingFrequencyPage {
 
   onClickNext() {
     this.navCtrl.setRoot(HomePage, this.configuredRoutine);
+    this.configuredRoutine['notifications'] = this.notificationData;
     this.couchDbService.logConfiguredRoutine(this.configuredRoutine);
   }
 
@@ -119,7 +123,81 @@ export class SelectTrackingFrequencyPage {
     }
   }
 
+  isDaily() {
+    if(this.notificationData['regular']['timescale'] === 'Daily'){
+      return true;
+    }
+    if(this.notificationData['regular']['timescale'] === 'TwiceDaily'){
+      return true;
+    }
+    return false;
+  }
+
   setRegularTimeScale(type : string) {
+    switch (this.notificationData['regular'].timescale){
+      case 'TwiceDaily':
+        if(type === 'Daily1'){
+          this.notificationData['regular'].timescale = 'Daily';
+          this.notificationData['regular']['timeOfDay'] = this.notificationData['regular']['timeOfDay2']
+          delete this.notificationData['regular']['timeOfDay2'];
+        } else if (type === 'Daily2') {
+          this.notificationData['regular'].timescale = 'Daily';
+          delete this.notificationData['regular']['timeOfDay2'];
+        } else {
+          // YSS TO-DO double check that type is either Monthly or Weekly; it cannot be anything else
+          this.notificationData['regular'].timescale = type;
+          delete this.notificationData['regular']['timeOfDay1'];
+          delete this.notificationData['regular']['timeOfDay2'];
+        }
+        break;
+      case 'Daily':
+        if(type === 'Daily1'){
+          this.notificationData['regular'].timescale = null;
+          delete this.notificationData['regular']['timeOfDay1'];
+        } else if (type === 'Daily2') {
+          this.notificationData['regular'].timescale = 'TwiceDaily';
+        } else {
+          // YSS TO-DO double check that type is either Monthly or Weekly; it cannot be anything else
+          this.notificationData['regular'].timescale = type;
+          delete this.notificationData['regular']['timeOfDay1'];
+        }
+        break;
+      case 'Weekly':
+        if(type === 'Weekly') {
+          this.notificationData['regular'].timescale = null;
+        } else if (type === 'Daily1') {
+          this.notificationData['regular'].timescale = 'Daily';
+        } else {
+          // YSS TO-DO double check that type is Monthly; it cannot be Daily2 or any other thing
+          this.notificationData['regular'].timescale = type;
+        }
+        // YSS TO-DO delete whatever values are stored that are associated with 'Weekly'
+        break;
+      case 'Monthly':
+        if(type === 'Monthly') {
+          this.notificationData['regular'].timescale = null;
+        } else if (type === 'Daily1') {
+          this.notificationData['regular'].timescale = 'Daily';
+        } else {
+          // YSS TO-DO double check that type is Weekly; it cannot be Daily2 or any other thing
+          this.notificationData['regular'].timescale = type;
+        }
+        // YSS TO-DO delete whatever values are stored that are associated with 'Monthly'
+        break;
+      case null:
+        if(type === 'Monthly') {
+          this.notificationData['regular'].timescale = 'Monthly';
+        } else if (type === 'Weekly') {
+          this.notificationData['regular'].timescale = 'Weekly';
+        } else {
+          // YSS TO-DO double check that type is Daily1; it cannot be Daily2 or any other thing
+          this.notificationData['regular'].timescale = 'Daily';
+        } 
+        break;
+      default:
+        this.notificationData['regular'].timescale = null;
+    }
+    /*
     if (type === 'Daily') {
       if (this.notificationData['regular'].timescale !== 'Daily') {
         this.notificationData['regular'].timescale = 'Daily';
@@ -139,6 +217,7 @@ export class SelectTrackingFrequencyPage {
         this.notificationData['regular'].timescale = null;
       }
     }
+    */
   }
 
   canContinue() {
