@@ -202,6 +202,40 @@ export class CouchDbServiceProvider {
     return oldData;
   }
 
+  logUsage(logType) {
+    let entry = {
+      "timestamp": new Date().toISOString(), // e.g. 2021-03-11T06:47:20.467Z
+      "type": logType // one of 'opened', 'foreground', 'background'
+    };
+    let doc_id = 'usage-'+entry['timestamp'].slice(0, 10); // e.g. 2021-03-11
+    //console.log('YSS CouchDbServiceProvider - logUsage: doc_id', doc_id, 'entry', entry);
+
+    this.db.get(doc_id)
+      .then( doc => {
+        //console.log('YSS CouchDbServiceProvider - logUsage: doc', doc);
+        doc['entries'].push(entry)
+        this.db.put({
+          _id: doc_id,
+          _rev: doc._rev,
+          entries: doc['entries']
+        })
+        .then(() => console.log('YSS CouchDbServiceProvider - logUsage: update resolved'))
+      })
+      .catch(err => {
+        if(err['status'] === 404) {
+          this.db.put({
+            _id: doc_id,
+            entries: [entry]
+            //entries: [1]
+          })
+          .then(() => console.log('YSS CouchDbServiceProvider - logUsage: init resolved'))
+          .catch((err) => console.log('YSS CouchDbServiceProvider - logUsage: init rejected', err))
+        } else {
+          console.log('YSS CouchDbServiceProvider - logUsage: update rejected', err)
+        }  
+      });
+  }
+
   /**
    * Log tracked data to the database
    * @param trackedData
@@ -232,7 +266,7 @@ export class CouchDbServiceProvider {
       });
 
     } catch (err) {
-      console.log("YSS Error occured while saving tracked data.");
+      console.log("YSS CouchDbServiceProvider - logTrackedData: Error occured while saving tracked data.");
       this.db.put({_id: doc_id, tracked_data: trackedData,
         tracked_data_field: trackedDataField}, function(err, response) {
         if (err) {
@@ -249,26 +283,26 @@ export class CouchDbServiceProvider {
       var doc = await this.db.get(doc_id);
       var trackedData = doc['tracked_data'];
       var trackedDataField = doc['tracked_data_field'];
-      //console.log("YSS deleteData; doc:", doc, "doc['tracked_data']:", doc['tracked_data'], "doc['tracked_data_field']:", doc['tracked_data_field'], "trackedData:", trackedData, "trackedDataField:", trackedDataField)
+      //console.log("YSS CouchDbServiceProvider - deleteData: doc:", doc, "doc['tracked_data']:", doc['tracked_data'], "doc['tracked_data_field']:", doc['tracked_data_field'], "trackedData:", trackedData, "trackedDataField:", trackedDataField)
       if (trackedData.hasOwnProperty(goal)) {
         if (trackedData[goal].hasOwnProperty(data['id'])) {
           delete trackedData[goal][data['id']];
           // YSS TO-DO if trackedData[goal] is empty after deletion, remove it
         } else {
-          console.log("YSS deleteData/tracked_data update: doc has no data with id", data['id'], "for goal", trackedData[goal]);
+          console.log("YSS CouchDbServiceProvider - deleteData: tracked_data update: doc has no data with id", data['id'], "for goal", trackedData[goal]);
         }
       } else {
-        console.log("YSS deleteData/tracked_data update: doc does not have goal", goal);
+        console.log("YSS CouchDbServiceProvider - deleteData: tracked_data update: doc does not have goal", goal);
       }
 
       if (trackedDataField.hasOwnProperty(goal)) {
         if (trackedDataField[goal].hasOwnProperty(data['id'])) {
           delete trackedDataField[goal][data['id']]
         } else {
-          console.log("YSS deleteData/tracked_data_field update: doc has no data with id", data['id'], "for goal", trackedDataField[goal]);
+          console.log("YSS CouchDbServiceProvider - deleteData: tracked_data_field update: doc has no data with id", data['id'], "for goal", trackedDataField[goal]);
         }
       } else {
-        console.log("YSS deleteData/tracked_data_field update: doc does not have goal", goal);
+        console.log("YSS CouchDbServiceProvider - deleteData: tracked_data_field update: doc does not have goal", goal);
       }
       var response = await this.db.put({
         _id: doc_id,
@@ -277,19 +311,19 @@ export class CouchDbServiceProvider {
         tracked_data_field: trackedDataField,
       });
 
-      /* comment for imulating delay in saving */
+      /* comment for simulating delay in saving */
       //console.log("Tracked data saved!");
       //return true;
       /* uncomment for simulating delay in saving */
       return new Promise((resolve, reject)=>{
         setTimeout(()=>{
-          console.log("Tracked data removed!");
+          console.log("YSS CouchDbServiceProvider - deleteData: Tracked data removed!");
           resolve(true);
         }, 3000);
       });
 
     } catch (err) {
-      console.log("YSS Error occured while removing tracked data.");
+      console.log("YSS CouchDbServiceProvider - deleteData: Error occured while removing tracked data.");
       this.db.put({_id: doc_id, tracked_data: trackedData,
         tracked_data_field: trackedDataField}, function(err, response) {
         if (err) {
@@ -310,10 +344,10 @@ export class CouchDbServiceProvider {
     //console.log(trackedDataDocID)
     try {
       var trackedDataDoc = await this.db.get(trackedDataDocID);
-      //console.log("YSS in fetchTrackedData", trackedDataDoc, "where data is", trackedDataDoc['tracked_data'], "then check if Symptoms are reported:", 'Symptom' in trackedDataDoc['tracked_data'] ? Object.keys(trackedDataDoc['tracked_data']['Symptom']).length : -1);
+      //console.log("YSS CouchDbServiceProvider - fetchTrackedData: trackedDataDoc", trackedDataDoc, "where data is", trackedDataDoc['tracked_data'], "then check if Symptoms are reported:", 'Symptom' in trackedDataDoc['tracked_data'] ? Object.keys(trackedDataDoc['tracked_data']['Symptom']).length : -1);
       return trackedDataDoc;
     } catch (err) {
-      //console.log("YSS error in fetchTrackedData", err);
+      //console.log("YSS CouchDbServiceProvider - fetchTrackedData: error in fetchTrackedData", err);
       return {'tracked_data': {}, 'tracked_data_field': {}};
     }
   }

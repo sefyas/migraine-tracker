@@ -31,8 +31,14 @@ export class MyApp {
   //             private couchDBService: CouchDbServiceProvider, public keyboard: Keyboard,
   //             public events: Events) {
 
-  constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen,
-              private couchDBService: CouchDbServiceProvider, public events: Events) {
+  constructor(public platform: Platform, 
+              public statusBar: StatusBar, 
+              public splashScreen: SplashScreen,
+              private couchDBService: CouchDbServiceProvider, 
+              public events: Events) {
+    // console.log('YSS MyApp - constructor'); // YSS NOTE not fired on iOS simulation
+    // YSS NOTE ngOnInit(), ionViewWillEnter(), ionViewDidEnter(), ionViewWillLeave(), 
+    //          ionViewDidLeave(), or ngOnDestroy() is not fired on iOS simulation
 
     events.subscribe('configSeen', () => {
       this.pages = [
@@ -50,9 +56,6 @@ export class MyApp {
 
     this.initializeApp();
 
-    // console.log("$$$$$$$$$$$$");
-    // console.log(this.couchDBService.fetchConfiguredRoutine());
-
     // used for an example of ngFor and navigation
     if (this.couchDBService.fetchConfiguredRoutine() === null) {
       this.pages = [
@@ -63,7 +66,7 @@ export class MyApp {
       this.pages = [
         { title: 'Home', component: HomePage},
         { title: 'About Migraine', component: FaqPage},
-        { title: 'Data Summary', component: DataSummaryPage},
+        { title: 'Data Summary', component: DataSummaryPage}, // YSS TO-DO comment
         // { title: 'Data Calendar', component: DataCalendarPage},
         // { title: 'Data Visualizations', component: DataVisPage},
         { title: 'Modify Goals', component: GoalModificationPage},
@@ -82,6 +85,15 @@ export class MyApp {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
       // this.keyboard.disableScroll(true);
+
+      this.logUsage('opened'); // log when the app is opened
+
+      this.platform.pause.subscribe(() => {
+        this.logUsage('background'); // log when the app goes to background
+      });
+      this.platform.resume.subscribe(() => {
+        this.logUsage('foreground'); // log when the app comes back to foreground
+      });
     });
   }
 
@@ -94,5 +106,10 @@ export class MyApp {
     // we wouldn't want the back button to show in this scenario
     this.nav.setRoot(page.component);
     this.activePage = page;
+  }
+
+  logUsage(logtype: String) {
+    //console.log('YSS MyApp -', logtype);
+    this.couchDBService.logUsage(logtype);
   }
 }
