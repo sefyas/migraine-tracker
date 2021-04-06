@@ -202,10 +202,36 @@ export class CouchDbServiceProvider {
     return oldData;
   }
 
+  static timestampData(oldData, newData, lastEditData, timestamp){
+    //console.log('YSS CouchDbServiceProvider - timestampData: lastEditData at start', lastEditData);
+    for (let goal in newData) {
+      if (!lastEditData.hasOwnProperty(goal)) {
+        lastEditData[goal] = {};
+      }
+      //console.log('\tYSS CouchDbServiceProvider - timestampData: goal', goal);
+      for (let data in newData[goal]) {
+        //console.log('\t\tYSS CouchDbServiceProvider - timestampData: data', data);
+        if (lastEditData[goal].hasOwnProperty(data)) {
+          //console.log('YSS CouchDbServiceProvider - timestampData: existing data', 'old:', oldData[goal][data], 'new:', newData[goal][data]);
+          if (oldData[goal][data] !== newData[goal][data]) {
+            //console.log('YSS CouchDbServiceProvider - timestampData: changed', data);
+            lastEditData[goal][data] = timestamp
+          }
+        } else {
+          //console.log('YSS CouchDbServiceProvider - timestampData: new data');
+          lastEditData[goal][data] = timestamp
+        }
+        //console.log('YSS CouchDbServiceProvider - timestampData: timestamp for', data, 'is now', lastEditData[goal][data]);
+      }
+    }
+    //console.log('YSS CouchDbServiceProvider - timestampData: lastEditData at end', lastEditData);
+    return lastEditData;
+  }
+
   logUsage(logType) {
     let entry = {
       "timestamp": new Date().toISOString(), // e.g. 2021-03-11T06:47:20.467Z
-      "type": logType // one of 'opened', 'foreground', 'background'
+      "type": logType // one of 'opened', 'foreground', 'background', 'data'
     };
     let doc_id = 'usage-'+entry['timestamp'].slice(0, 10); // e.g. 2021-03-11
     //console.log('YSS CouchDbServiceProvider - logUsage: doc_id', doc_id, 'entry', entry);
@@ -243,8 +269,17 @@ export class CouchDbServiceProvider {
    */
   async logTrackedData(trackedData, trackedDataField, date) {
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
+    let timestamp = new Date().toISOString()
     try {
       var doc = await this.db.get(doc_id);
+      //console.log("YSS CouchDbServiceProvider - logTrackedData: DB doc is", doc);
+      let trackedDataLastEdit;
+      if (doc.hasOwnProperty('tracked_data_last_edit')){
+        trackedDataLastEdit = doc.tracked_data_last_edit;
+      } else {
+        trackedDataLastEdit = {}
+      }
+      trackedDataLastEdit = CouchDbServiceProvider.timestampData(doc.tracked_data, trackedData, trackedDataLastEdit, timestamp);
       trackedData = CouchDbServiceProvider.combineTrackedData(doc.tracked_data, trackedData);
       trackedDataField = CouchDbServiceProvider.combineTrackedData(doc.tracked_data_field, trackedDataField);
       var response = await this.db.put({
@@ -252,6 +287,7 @@ export class CouchDbServiceProvider {
         _rev: doc._rev,
         tracked_data: trackedData,
         tracked_data_field: trackedDataField,
+        tracked_data_last_edit: trackedDataLastEdit,
       });
 
       /* comment for simulating delay in saving */
@@ -260,7 +296,7 @@ export class CouchDbServiceProvider {
       /* uncomment for simulating delay in saving */
       return new Promise((resolve, reject)=>{
         setTimeout(()=>{
-          console.log("Tracked data saved!");
+          console.log("YSS CouchDbServiceProvider - logTrackedData: Tracked data saved!");
           resolve(true);
         }, 3000);
       });
@@ -279,13 +315,33 @@ export class CouchDbServiceProvider {
 
   async deleteData(goal, data, date) {
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
+    let timestamp = new Date().toISOString()
     try {
       var doc = await this.db.get(doc_id);
+      let trackedDataLastEdit;
+      if (doc.hasOwnProperty('tracked_data_last_edit')){
+        trackedDataLastEdit = doc.tracked_data_last_edit;
+      } else {
+        // YSS NOTE this is primarily for backward compatibility in working with
+        //          documents stored without timestamp information. Otherwise last
+        //          edit timing should exist.
+        trackedDataLastEdit = {};
+      }
       var trackedData = doc['tracked_data'];
       var trackedDataField = doc['tracked_data_field'];
       //console.log("YSS CouchDbServiceProvider - deleteData: doc:", doc, "doc['tracked_data']:", doc['tracked_data'], "doc['tracked_data_field']:", doc['tracked_data_field'], "trackedData:", trackedData, "trackedDataField:", trackedDataField)
       if (trackedData.hasOwnProperty(goal)) {
+        if(!trackedDataLastEdit.hasOwnProperty(goal)) {
+          // YSS NOTE this is primarily for backward compatibility in working with
+          //          documents stored without timestamp information. Otherwise last
+          //          edit timing should exist.
+          trackedDataLastEdit[goal] = {};
+        }
         if (trackedData[goal].hasOwnProperty(data['id'])) {
+          trackedDataLastEdit[goal][data['id']] = timestamp
+          // YSS NOTE this will update the timestamp only if a meaningful deletion happens
+          //          as we reach here if trackedData[goal][data['id']] exists
+
           delete trackedData[goal][data['id']];
           // YSS TO-DO if trackedData[goal] is empty after deletion, remove it
         } else {
@@ -309,6 +365,7 @@ export class CouchDbServiceProvider {
         _rev: doc._rev,
         tracked_data: trackedData,
         tracked_data_field: trackedDataField,
+        tracked_data_last_edit: trackedDataLastEdit,
       });
 
       /* comment for simulating delay in saving */
