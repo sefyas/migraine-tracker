@@ -8,6 +8,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 // import { Keyboard } from '@ionic-native/keyboard';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { ChartsModule } from 'ng2-charts-x';
+import { Push} from '@ionic-native/push';
 
 import { MyApp } from './app.component';
 
@@ -97,6 +98,7 @@ import { DataElementTrackingComponent } from "../components/data-element-trackin
     StatusBar,
     // Keyboard,
     SplashScreen,
+    Push,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     CouchDbServiceProvider,
     GoalDetailsServiceProvider,

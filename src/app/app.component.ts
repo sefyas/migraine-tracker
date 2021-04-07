@@ -3,6 +3,7 @@ import {Events, Nav, Platform} from 'ionic-angular';
 import {StatusBar} from '@ionic-native/status-bar';
 // import {Keyboard} from '@ionic-native/keyboard/ngx';
 import {SplashScreen} from '@ionic-native/splash-screen';
+import { Push, PushObject, PushOptions} from '@ionic-native/push';
 
 import {HomePage} from '../pages/home/home';
 import {GoalModificationPage} from "../pages/goal-modification/goal-modification";
@@ -34,6 +35,7 @@ export class MyApp {
   constructor(public platform: Platform, 
               public statusBar: StatusBar, 
               public splashScreen: SplashScreen,
+              private push: Push,
               private couchDBService: CouchDbServiceProvider, 
               public events: Events) {
     // console.log('YSS MyApp - constructor'); // YSS NOTE not fired on iOS simulation
@@ -76,6 +78,8 @@ export class MyApp {
       ];
     }
     this.activePage = this.pages[0];
+
+    this.pushSetup();
   }
 
   initializeApp() {
@@ -112,4 +116,18 @@ export class MyApp {
     //console.log('YSS MyApp -', logtype);
     this.couchDBService.logUsage(logtype);
   }
+
+  pushSetup(){
+    const options: PushOptions = {
+      android: {senderID: '43998989268'}, 
+      ios: {alert: 'true', badge: true, sound: 'false'}
+    };
+    const pushObject: PushObject = this.push.init(options);
+
+    console.log('YSS MyApp - pushSetup: in setup');
+
+    pushObject.on('notification').subscribe((notification: any) => console.log('YSS MyApp - pushSetup: Received a notification', notification));
+    pushObject.on('registration').subscribe((registration: any) => console.log('YSS MyApp - pushSetup: Device registered', JSON.stringify(registration)));
+    pushObject.on('error').subscribe(error => console.error('YSS MyApp - pushSetup: Error with Push plugin', error));
+ }
 }
