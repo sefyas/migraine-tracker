@@ -78,8 +78,6 @@ export class MyApp {
       ];
     }
     this.activePage = this.pages[0];
-
-    this.pushSetup();
   }
 
   initializeApp() {
@@ -90,8 +88,9 @@ export class MyApp {
       this.splashScreen.hide();
       // this.keyboard.disableScroll(true);
 
-      this.logUsage('opened'); // log when the app is opened
+      this.pushSetup();
 
+      this.logUsage('opened'); // log when the app is opened
       this.platform.pause.subscribe(() => {
         this.logUsage('background'); // log when the app goes to background
       });
@@ -113,8 +112,8 @@ export class MyApp {
   }
 
   logUsage(logtype: String) {
-    //console.log('YSS MyApp -', logtype);
-    this.couchDBService.logUsage(logtype);
+    console.log('YSS MyApp -', logtype);
+    //this.couchDBService.logUsage(logtype);//YSS TO-DO removed to see if this is the memory pressure culprit
   }
 
   pushSetup(){
@@ -124,10 +123,13 @@ export class MyApp {
     };
     const pushObject: PushObject = this.push.init(options);
 
-    console.log('YSS MyApp - pushSetup: in setup');
+    //console.log('YSS MyApp - pushSetup: in setup');
 
-    pushObject.on('notification').subscribe((notification: any) => console.log('YSS MyApp - pushSetup: Received a notification', notification));
-    pushObject.on('registration').subscribe((registration: any) => console.log('YSS MyApp - pushSetup: Device registered', JSON.stringify(registration)));
+    pushObject.on('registration').subscribe((registration: any) => {
+      console.log('YSS MyApp - pushSetup: Device registered', JSON.stringify(registration));
+      this.couchDBService.storeFCMregID(registration.registrationId);
+    });
     pushObject.on('error').subscribe(error => console.error('YSS MyApp - pushSetup: Error with Push plugin', error));
+    pushObject.on('notification').subscribe((notification: any) => console.log('YSS MyApp - pushSetup: Received a notification', JSON.stringify(notification)));
  }
 }

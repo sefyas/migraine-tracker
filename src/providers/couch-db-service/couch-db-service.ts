@@ -228,6 +228,26 @@ export class CouchDbServiceProvider {
     return lastEditData;
   }
 
+  storeFCMregID(token){
+    this.db.get('user-info')
+      .then(usrinfodoc => {
+        console.log('YSS CouchDbServiceProvider - storeFCMregID: user-info is', JSON.stringify(usrinfodoc));
+        this.db.put({
+          _id: 'user-info',
+          register_time: usrinfodoc.register_time,
+          username: usrinfodoc.username,
+          current_configured_routine_id: usrinfodoc.current_configured_routine_id,
+          _rev: usrinfodoc._rev, 
+          FCMregID: token
+        })
+        .then(() => console.log('YSS CouchDbServiceProvider - storeFCMregID: user-info updated with FCM reg ID'))
+        .catch(err => console.log('YSS CouchDbServiceProvider - storeFCMregID: error in updating user-info', err))
+      })
+      .catch(err => {
+        console.log('YSS CouchDbServiceProvider - storeFCMregID: error in loading user-info', err);
+      });
+  }
+
   logUsage(logType) {
     let entry = {
       "timestamp": new Date().toISOString(), // e.g. 2021-03-11T06:47:20.467Z
@@ -279,7 +299,7 @@ export class CouchDbServiceProvider {
       } else {
         trackedDataLastEdit = {}
       }
-      trackedDataLastEdit = CouchDbServiceProvider.timestampData(doc.tracked_data, trackedData, trackedDataLastEdit, timestamp);
+      //trackedDataLastEdit = CouchDbServiceProvider.timestampData(doc.tracked_data, trackedData, trackedDataLastEdit, timestamp); //YSS TO-DO removed to see if this is the memory pressure culprit
       trackedData = CouchDbServiceProvider.combineTrackedData(doc.tracked_data, trackedData);
       trackedDataField = CouchDbServiceProvider.combineTrackedData(doc.tracked_data_field, trackedDataField);
       var response = await this.db.put({
@@ -365,7 +385,7 @@ export class CouchDbServiceProvider {
         _rev: doc._rev,
         tracked_data: trackedData,
         tracked_data_field: trackedDataField,
-        tracked_data_last_edit: trackedDataLastEdit,
+        //tracked_data_last_edit: trackedDataLastEdit, //YSS TO-DO removed to see if this is the memory pressure culprit
       });
 
       /* comment for simulating delay in saving */
