@@ -113,7 +113,7 @@ export class MyApp {
 
   logUsage(logtype: String) {
     console.log('YSS MyApp -', logtype);
-    //this.couchDBService.logUsage(logtype);//YSS TO-DO removed to see if this is the memory pressure culprit
+    this.couchDBService.logUsage(logtype);//YSS TO-DO removed to see if this is the memory pressure culprit
   }
 
   pushSetup(){
