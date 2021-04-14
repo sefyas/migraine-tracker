@@ -7,6 +7,7 @@ import { DataReport } from "../../interfaces/customTypes";
 import { Break } from "../../interfaces/customTypes";
 import { HttpClient } from '@angular/common/http';
 
+
 let options = {
   live: true,
   retry: true,
@@ -94,14 +95,8 @@ export class CouchDbServiceProvider {
   async logCurrentConfiguredRoutineID(current_configured_routine_id) {
     try {
       var doc = await this.db.get('user-info');
-      var response = await this.db.put({
-        _id: 'user-info',
-        _rev: doc._rev,
-        register_time: doc.register_time,
-        username: doc.username,
-        current_configured_routine_id: current_configured_routine_id,
-        break: doc.break,
-      });
+      doc['current_configured_routine_id'] = current_configured_routine_id
+      var response = await this.db.put(doc);
     } catch (err) {
       console.log(err);
     }
@@ -232,14 +227,8 @@ export class CouchDbServiceProvider {
     this.db.get('user-info')
       .then(usrinfodoc => {
         console.log('YSS CouchDbServiceProvider - storeFCMregID: user-info is', JSON.stringify(usrinfodoc));
-        this.db.put({
-          _id: 'user-info',
-          register_time: usrinfodoc.register_time,
-          username: usrinfodoc.username,
-          current_configured_routine_id: usrinfodoc.current_configured_routine_id,
-          _rev: usrinfodoc._rev, 
-          FCMregID: token
-        })
+        usrinfodoc['FCMregID'] = token;
+        this.db.put(usrinfodoc)
         .then(() => console.log('YSS CouchDbServiceProvider - storeFCMregID: user-info updated with FCM reg ID'))
         .catch(err => console.log('YSS CouchDbServiceProvider - storeFCMregID: error in updating user-info', err))
       })
@@ -487,14 +476,8 @@ export class CouchDbServiceProvider {
   async logCurrentBreakID(current_break_id) {
     try {
       var doc = await this.db.get('user-info');
-      var response = await this.db.put({
-        _id: 'user-info',
-        _rev: doc._rev,
-        register_time: doc.register_time,
-        username: doc.username,
-        current_break_id: current_break_id,
-        break: doc.break,
-      });
+      doc['current_break_id'] = current_break_id;
+      var response = await this.db.put(doc);
     } catch (err) {
       console.log(err);
     }
