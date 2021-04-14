@@ -299,7 +299,7 @@ export class CouchDbServiceProvider {
       } else {
         trackedDataLastEdit = {}
       }
-      //trackedDataLastEdit = CouchDbServiceProvider.timestampData(doc.tracked_data, trackedData, trackedDataLastEdit, timestamp); //YSS TO-DO removed to see if this is the memory pressure culprit
+      trackedDataLastEdit = CouchDbServiceProvider.timestampData(doc.tracked_data, trackedData, trackedDataLastEdit, timestamp);
       trackedData = CouchDbServiceProvider.combineTrackedData(doc.tracked_data, trackedData);
       trackedDataField = CouchDbServiceProvider.combineTrackedData(doc.tracked_data_field, trackedDataField);
       var response = await this.db.put({
@@ -385,7 +385,7 @@ export class CouchDbServiceProvider {
         _rev: doc._rev,
         tracked_data: trackedData,
         tracked_data_field: trackedDataField,
-        //tracked_data_last_edit: trackedDataLastEdit, //YSS TO-DO removed to see if this is the memory pressure culprit
+        tracked_data_last_edit: trackedDataLastEdit,
       });
 
       /* comment for simulating delay in saving */
