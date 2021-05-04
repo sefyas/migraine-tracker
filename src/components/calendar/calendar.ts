@@ -33,20 +33,33 @@ export class Calendar {
 
     ngOnInit() {
         this.initCalendar(this.dateSelected);
-        this.displayDateText = (this.displayDate['month'] + 1) + "/" + this.displayDate['date'] + "/" + this.displayDate['year'];
-        this.displayDate['isToday'] = this.isToday();
     }
 
     initCalendar(dateSelected) {
+        console.log('YSS Calendar - initCalendar: called');
         this.displayDate = {'date': dateSelected[0], 'month': dateSelected[1], 'year': dateSelected[2]};
         this.createMonth(this.displayDate['year'], this.displayDate['month']);
-        let selectedIndex = _.findIndex(this.dateArray, {
+        this.setSelection();
+        this.displayDate['isToday'] = this.isToday();
+        //YSS NOTE 'isThisMonth' is not set for displayDate. It is alright mainly
+        //          because displayDate.isThisMonth is never used elsewhere. 
+        //          Otherwise it should have been taken care of.
+    }
+
+    setSelection(){
+        this.displayDateText = (this.displayDate['month'] + 1) + "/" + this.displayDate['date'] + "/" + this.displayDate['year'];
+        let ind = _.findIndex(this.dateArray, {
             year: this.displayDate['year'],
             month: this.displayDate['month'],
             date: this.displayDate['date'],
         });
-        this.lastSelect = selectedIndex;
-        this.dateArray[selectedIndex].isSelect = true;
+        console.log('YSS Calendar - setSelectedDate: index for selected date', this.displayDate, 'is', ind);
+        if (ind !== -1) {
+            this.dateArray[this.lastSelect].isSelect = false;
+            this.lastSelect = ind;
+            this.dateArray[ind].isSelect = true;
+        }
+        return ind;
     }
 
     isToday() {
@@ -79,7 +92,7 @@ export class Calendar {
             for (let i = 0; i < firstDay; i++) {
                 if (month === 0) {
                     this.dateArray.push({
-                        year: year,
+                        year: year, //YSS why not year: year-1?
                         month: 11,
                         date: lastMonthStart + i,
                         isThisMonth: false,
@@ -127,7 +140,7 @@ export class Calendar {
             for (let i = 0; i < nextMonthAdd; i++) {
                 if (month === 11) {
                     this.dateArray.push({
-                        year: year,
+                        year: year, //YSS why not year: year+1
                         month: 0,
                         date: i + 1,
                         isThisMonth: false,
@@ -185,6 +198,8 @@ export class Calendar {
             }
         }
 
+        console.log('YSS Calendar - createMonths: dateArray', this.dateArray, 'weekArray', this.weekArray, 'dateSelected', this.dateSelected);
+
     }
 
     back() {
@@ -195,7 +210,12 @@ export class Calendar {
         } else {
             this.displayDate['month']--;
         }
+        this.displayDate['date'] = moment({year: this.displayDate['year'], 
+                                           month: this.displayDate['month']}).daysInMonth();
         this.createMonth(this.displayDate['year'], this.displayDate['month']);
+        this.setSelection();
+        this.onDaySelect.emit([this.displayDate['date'], this.displayDate['month'], this.displayDate['year']]);
+        console.log('YSS Calendar - back: displayDate', this.displayDate)
     }
 
     forward() {
@@ -206,19 +226,23 @@ export class Calendar {
         } else {
             this.displayDate['month']++;
         }
+        this.displayDate['date'] = 1
         this.createMonth(this.displayDate['year'], this.displayDate['month']);
+        this.setSelection();
+        this.onDaySelect.emit([this.displayDate['date'], this.displayDate['month'], this.displayDate['year']]);
+        console.log('YSS Calendar - forward: displayDate', this.displayDate)
     }
 
     // select a day
     daySelect(day, i, j) {
-        if (!((day['year'] === this.currentDate['year'] && day['month'] === this.currentDate['month'] &&
-            day['date'] > this.currentDate['date']) || !day['isThisMonth'])) {
-            this.dateArray[this.lastSelect].isSelect = false;
-            this.lastSelect = i * 7 + j;
-            this.dateArray[i * 7 + j].isSelect = true;
-            this.displayDateText = (day['month'] + 1) + "/" + day['date'] + "/" + day['year'];
+        if (!(    (   day['year'] === this.currentDate['year'] 
+                   && day['month'] === this.currentDate['month'] 
+                   && day['date'] > this.currentDate['date'])
+               || !day['isThisMonth'])) { //YSS if not today but within this month
             this.displayDate = day;
-            this.onDaySelect.emit([day['date'], day['month'], day['year']]);
+            this.setSelection();
+            this.onDaySelect.emit([this.displayDate['date'], this.displayDate['month'], this.displayDate['year']]);
+            //console.log('YSS Calendar - daySelect: dateSelect is', this.dateSelected); //YSS this.dateSelected is not day!
         }
     }
 

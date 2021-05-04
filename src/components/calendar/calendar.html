@@ -59,3 +59,25 @@
       </ion-row>
   </ion-grid>
 </div>
+
+<!-- <ion-card class="calendar-card">
+  <ion-card-content>
+    <button class="calendar-btn" (click)="expandCalendar()">
+      <ion-icon name="custom-calendar" class="calendar-icon"></ion-icon>
+      <label *ngIf="displayDate.isToday">Today</label>
+      <label *ngIf="!displayDate.isToday">{{displayDateText}}</label>
+      <label *ngIf="!isExpandCalendar" class="calendar-label">Change Date</label>
+      <label *ngIf="isExpandCalendar" class="calendar-label">Hide Calendar</label>
+    </button>
+  </ion-card-content>
+</ion-card> -->
+<!-- YSS I did not like how it looked like. 
+         It was odd to see the calendar open upward when expanding 
+         I think coupling of displayDateText and dateSelected is sufficient
+         if the goal is to signal what date is active (i.e. selected)
+         to ensure people record data against that date. Before the coupling,
+         there was a chance that after navigating back and forth, people did 
+         not know what date their data is being recorded against (they must
+         have paid attention to what was displayed in the bar which could have
+         been very different from what the calendar box displayed).
+-->
