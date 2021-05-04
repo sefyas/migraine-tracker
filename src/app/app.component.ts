@@ -96,7 +96,10 @@ export class MyApp {
       });
       this.platform.resume.subscribe(() => {
         this.logUsage('foreground'); // log when the app comes back to foreground
+        this.couchDBService.logTimezone();
       });
+
+      this.couchDBService.logTimezone();
     });
   }
 

@@ -1,5 +1,6 @@
 import PouchDB from 'pouchdb';
 import moment from 'moment';
+import tz from 'moment';
 import PouchDBAuthentication from 'pouchdb-authentication';
 import { Injectable } from '@angular/core';
 import { ConfiguredRoutine, DataElement, Notification } from "../../interfaces/customTypes";
@@ -268,6 +269,25 @@ export class CouchDbServiceProvider {
         } else {
           console.log('YSS CouchDbServiceProvider - logUsage: update rejected', err)
         }  
+      });
+  }
+
+  logTimezone(){
+    this.db.get('user-info')
+      .then(usrinfodoc => {
+        usrinfodoc['timezone_offset_minutes'] = (new Date()).getTimezoneOffset();
+        /* alternative syntax
+        usrinfodoc = {
+          ...usrinfodoc,
+          'timezone_offset_minutes': (new Date()).getTimezoneOffset()
+        };*/
+        //console.log('YSS CouchDbServiceProvider - logTimezone: usrinfodoc is updated to', JSON.stringify(usrinfodoc));
+        this.db.put(usrinfodoc)
+        .then(() => console.log('YSS CouchDbServiceProvider - logTimezone: user-info updated with timezone offset info'))
+        .catch(err => console.log('YSS CouchDbServiceProvider - logTimezone: error in updating user-info', err))
+      })
+      .catch(err => {
+        console.log('YSS CouchDbServiceProvider - logTimezone: error in loading user-info', err);
       });
   }
 
