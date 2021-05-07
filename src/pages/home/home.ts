@@ -119,16 +119,19 @@ export class HomePage {
    */
   saveTrackedData() {
     this.saving = true;
+    console.log('YSS HomePage - saveTrackedData: tracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected)
     this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
-      .then((result)=>{
-        //console.log("HomePage - saveTrackedData retured");
+      .then((changes)=>{
         this.saving = false
-        if (result) {
-          console.log("YSS TO-DO HomePage - saveTrackedData retured with true; show nothing")
-        } else {
-          console.log("YSS TO-DO HomePage - saveTrackedData retured with false; show an error icon so user knows the data is not saved")
-        }
-      });
+        console.log("YSS HomePage - saveTrackedData: retured with changes:", changes);
+        //return changes; //YSS TO-DO further work on the logging call;         
+        //YSS TO-DO show check-mark sign
+      })
+      .catch(err => {
+        console.log("YSS HomePage - saveTrackedData: retured with error:", err);
+        //YSS TO-DO show error sign
+      })
+      //.then(changes => this.couchDbService.logUsage(changes)); //YSS TO-DO further work on the logging call
   }
 
   /**

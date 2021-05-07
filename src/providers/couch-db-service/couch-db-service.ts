@@ -210,6 +210,73 @@ export class CouchDbServiceProvider {
     return combinedData;
   }
 
+  static getChanges(oldData, newData){
+    // make a copy of the old data
+    let changes = {};
+    for(let goal in oldData) {
+      changes[goal] = {};
+      for (let data in oldData[goal]) {
+        changes[goal][data] = oldData[goal][data]
+      }
+    }
+
+    // go through new data and mark new and modified values
+    for(let goal in newData) {
+      if(goal in oldData){
+        for (let data in newData[goal]) {
+          if (data in oldData[goal]){
+            // goal-data in both old and new
+            if (oldData[goal][data] !== newData[goal][data]) { // value changed
+              //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->', newData[goal][data]);
+              changes[goal][data] = 'Updated';
+            } else { // value fixed => not a change
+              //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '=', newData[goal][data], 'remove from changes');
+              delete changes[goal][data];
+              if (Object.keys(changes[goal]).length === 0){
+                delete changes[goal];
+              }
+            }
+          } else {
+            // goal but not data in both old and new; data only in new
+            //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', '\t->', newData[goal][data]);
+            changes[goal][data] = 'Added'
+          }
+        }
+      } else {
+        changes[goal] = {};
+        for (let data in newData[goal]) {
+          // goal-data only in new
+          //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', '\t->', newData[goal][data]);
+          changes[goal][data] = 'Added'
+        }
+      }
+    }
+
+    // go through the old data and mark all the deleted values
+    for (let goal in oldData){
+      if(goal in newData){
+        for (let data in oldData[goal]){
+          if(data in newData[goal]){
+            // goal-data in both old and new; already considered above
+            continue;
+          } else {
+            // goal but not data in both old and new; data only in old
+            //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->.');
+            changes[goal][data] = 'Removed'
+          }
+        }
+      } else {
+        for (let data in oldData[goal]) {
+          // goal-data only in old
+          //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->.');
+          changes[goal][data] = 'Removed'
+        }
+      }
+    }
+
+    return changes;
+  }
+
   static timestampData(oldData, newData, lastEdit, timestamp){
     //console.log('YSS CouchDbServiceProvider - timestampData: lastEditData at start', lastEditData);
     for (let goal in newData) {
@@ -316,50 +383,81 @@ export class CouchDbServiceProvider {
    * @param trackedData
    * @param date
    */
-  async logTrackedData(trackedData, trackedDataField, date) {
-    console.log('YSS CouchDbServiceProvider - logTrackedData: data', trackedData, 'fields', trackedDataField, 'for', date);
+  logTrackedData(trackedData, trackedDataField, date) {
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
     let timestamp = new Date().toISOString()  
-    let trackedDataLastEdit = {};
-    try {
-      var doc = await this.db.get(doc_id);
-      //console.log("YSS CouchDbServiceProvider - logTrackedData: DB doc is", doc);
-      if (doc.hasOwnProperty('tracked_data_last_edit')){
-        trackedDataLastEdit = doc.tracked_data_last_edit;
-      }
-      trackedData = CouchDbServiceProvider.combineTrackedData(doc.tracked_data, trackedData);
-      trackedDataField = CouchDbServiceProvider.combineTrackedData(doc.tracked_data_field, trackedDataField);
-      trackedDataLastEdit = CouchDbServiceProvider.timestampData(doc.tracked_data, trackedData, trackedDataLastEdit, timestamp);
-      var response = await this.db.put({
-        _id: doc_id,
-        _rev: doc._rev,
-        tracked_data: trackedData,
-        tracked_data_field: trackedDataField,
-        tracked_data_last_edit: trackedDataLastEdit,
-      });
+    return new Promise((resolve, reject) => {
+      this.db.get(doc_id) // retrieve the existing document for the date if it exists
+        .then(doc => { // update the document with new tracked data   
+          //console.log('YSS CouchDbServiceProvider - logTrackedData: retried doc is', doc);
+          // combine old and new information
+          let updatedData = CouchDbServiceProvider.combineTrackedData(doc.tracked_data, trackedData);
+          let updatedDataField = CouchDbServiceProvider.combineTrackedData(doc.tracked_data_field, trackedDataField);
+          let changes = CouchDbServiceProvider.getChanges(doc.tracked_data, updatedData);
 
-      /* comment for simulating delay in saving */
-      //console.log("Tracked data saved!");
-      //return true;
-      /* uncomment for simulating delay in saving */
-      return new Promise((resolve, reject)=>{
-        setTimeout(()=>{
-          console.log("YSS CouchDbServiceProvider - logTrackedData: Tracked data saved!");
-          resolve(true);
-        }, 3000);
-      });
+          let updatedTime = {};
+          // make a copy of the last edit information if it exists
+          if (doc.hasOwnProperty('tracked_data_last_edit')){
+            for(let goal in doc.tracked_data_last_edit){
+              updatedTime[goal] = {};
+              for(let data in doc.tracked_data_last_edit[goal]){
+                updatedTime[goal][data] = doc.tracked_data_last_edit[goal][data];
+              }
+            }
+          }
+          // update timing where there are changes
+          updatedTime = CouchDbServiceProvider.timestampData(doc.tracked_data, trackedData, updatedTime, timestamp);
 
-    } catch (err) {
-      console.log("YSS CouchDbServiceProvider - logTrackedData: Error occured while saving tracked data.", err);
-      trackedDataLastEdit = CouchDbServiceProvider.timestampData({}, trackedData, trackedDataLastEdit, timestamp);
-      this.db.put({_id: doc_id, tracked_data: trackedData,
-        tracked_data_field: trackedDataField, tracked_data_last_edit: trackedDataLastEdit}, function(err, response) {
-        if (err) {
-          console.log(err);
-          return false;
-        }
+          let doc_updated = {
+            'content': {
+              '_id': doc_id,
+              '_rev': doc._rev,
+              'tracked_data': updatedData,
+              'tracked_data_field': updatedDataField,
+              'tracked_data_last_edit': updatedTime,
+            },
+            'changes': changes
+          }
+          //console.log('YSS CouchDbServiceProvider - logTrackedData: updated doc is', doc_updated);
+          return doc_updated;
+        })
+        .catch(err => { // create the document for the date if it does not exist; otherwise promise is rejected  
+          //console.log('YSS CouchDbServiceProvider - logTrackedData: retrieving doc failed');
+          if(err['status'] === 404) { // create the document if it does not exist
+            let trackTime = CouchDbServiceProvider.timestampData({}, trackedData, {}, timestamp);
+            let doc_created = {
+              'content': {
+                '_id': doc_id,
+                'tracked_data': trackedData,
+                'tracked_data_field': trackedDataField,
+                'tracked_data_last_edit': trackTime,
+              },
+              'changes': trackedData
+            }
+            //console.log('YSS CouchDbServiceProvider - logTrackedData: created doc is', doc_created);
+            return doc_created;
+          }
+          else {
+            console.log('YSS CouchDbServiceProvider - logTrackedData: failed to prepare document for saving', err);
+            reject(err); //YSS TO-DO double-check the return value
+          } 
+        })
+        .then(doc => { // store the updated or newly created document
+          
+          //console.log('YSS CouchDbServiceProvider - logTrackedData: storing doc', doc);
+          //this.db.put(doc['content']); //comment for simulating delay
+          setTimeout(() => {this.db.put(doc['content'])}, 3000); //uncomment for simulating delay
+          return doc['changes'];
+        })
+        .then(changes => { // promise is resolved
+          //console.log('YSS CouchDbServiceProvider - logTrackedData: changes saved', changes);
+          resolve(changes)
+        })
+        .catch(err => { // promise id rejected
+          console.log('YSS CouchDbServiceProvider - logTrackedData: failed to save the document', err);
+          reject(false);
+        })
       });
-    }
   }
 
   async deleteData(goal, data, date) {
