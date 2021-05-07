@@ -187,41 +187,59 @@ export class CouchDbServiceProvider {
    * @param newData
    */
   static combineTrackedData(oldData, newData) {
-    for (let goal in newData) {
-      if (!oldData.hasOwnProperty(goal)) {
-        oldData[goal] = {};
-      }
-      for (let data in newData[goal]) {
-        oldData[goal][data] = newData[goal][data];
+    // make a copy of the old data
+    let combinedData = {};
+    for(let goal in oldData) {
+      combinedData[goal] = {};
+      for (let data in oldData[goal]) {
+        combinedData[goal][data] = oldData[goal][data];
       }
     }
-    return oldData;
+
+    // go through new data and add new goals along with their data 
+    // or update the existing goals with new data values
+    for (let goal in newData) {
+      if (!combinedData.hasOwnProperty(goal)) {
+        combinedData[goal] = {};
+      }
+      for (let data in newData[goal]) {
+        combinedData[goal][data] = newData[goal][data];
+      }
+    }
+
+    return combinedData;
   }
 
-  static timestampData(oldData, newData, lastEditData, timestamp){
+  static timestampData(oldData, newData, lastEdit, timestamp){
     //console.log('YSS CouchDbServiceProvider - timestampData: lastEditData at start', lastEditData);
     for (let goal in newData) {
-      if (!lastEditData.hasOwnProperty(goal)) {
-        lastEditData[goal] = {};
+      if (!lastEdit.hasOwnProperty(goal)) {
+        lastEdit[goal] = {};
       }
       //console.log('\tYSS CouchDbServiceProvider - timestampData: goal', goal);
       for (let data in newData[goal]) {
         //console.log('\t\tYSS CouchDbServiceProvider - timestampData: data', data);
-        if (lastEditData[goal].hasOwnProperty(data)) {
-          //console.log('YSS CouchDbServiceProvider - timestampData: existing data', 'old:', oldData[goal][data], 'new:', newData[goal][data]);
-          if (oldData[goal][data] !== newData[goal][data]) {
-            //console.log('YSS CouchDbServiceProvider - timestampData: changed', data);
-            lastEditData[goal][data] = timestamp
-          }
-        } else {
+        if (!oldData.hasOwnProperty(goal)){
           //console.log('YSS CouchDbServiceProvider - timestampData: new data');
-          lastEditData[goal][data] = timestamp
+          lastEdit[goal][data] = timestamp
+        } else {
+          if (lastEdit[goal].hasOwnProperty(data)) { 
+            //YSS NOTE this ensures backward compatibility with data stored without last edit
+            //console.log('YSS CouchDbServiceProvider - timestampData: existing data', 'old:', oldData[goal][data], 'new:', newData[goal][data]);
+            if (oldData[goal][data] !== newData[goal][data]) {
+              //console.log('YSS CouchDbServiceProvider - timestampData: changed', data);
+              lastEdit[goal][data] = timestamp
+            }
+          } else {
+            //console.log('YSS CouchDbServiceProvider - timestampData: new data');
+            lastEdit[goal][data] = timestamp
+          }
         }
         //console.log('YSS CouchDbServiceProvider - timestampData: timestamp for', data, 'is now', lastEditData[goal][data]);
       }
     }
     //console.log('YSS CouchDbServiceProvider - timestampData: lastEditData at end', lastEditData);
-    return lastEditData;
+    return lastEdit;
   }
 
   storeFCMregID(token){
@@ -238,7 +256,9 @@ export class CouchDbServiceProvider {
       });
   }
 
-  logUsage(logType) {
+  //YSS TO-DO modify this function to take in log info and and store it in a new doc under 
+  //          usage-timestamp name this way, I can call this function for all logging purposes.
+  logUsage(logType) { 
     let entry = {
       "timestamp": new Date().toISOString(), // e.g. 2021-03-11T06:47:20.467Z
       "type": logType // one of 'opened', 'foreground', 'background', 'data'
@@ -297,20 +317,19 @@ export class CouchDbServiceProvider {
    * @param date
    */
   async logTrackedData(trackedData, trackedDataField, date) {
+    console.log('YSS CouchDbServiceProvider - logTrackedData: data', trackedData, 'fields', trackedDataField, 'for', date);
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
-    let timestamp = new Date().toISOString()
+    let timestamp = new Date().toISOString()  
+    let trackedDataLastEdit = {};
     try {
       var doc = await this.db.get(doc_id);
       //console.log("YSS CouchDbServiceProvider - logTrackedData: DB doc is", doc);
-      let trackedDataLastEdit;
       if (doc.hasOwnProperty('tracked_data_last_edit')){
         trackedDataLastEdit = doc.tracked_data_last_edit;
-      } else {
-        trackedDataLastEdit = {}
       }
-      trackedDataLastEdit = CouchDbServiceProvider.timestampData(doc.tracked_data, trackedData, trackedDataLastEdit, timestamp);
       trackedData = CouchDbServiceProvider.combineTrackedData(doc.tracked_data, trackedData);
       trackedDataField = CouchDbServiceProvider.combineTrackedData(doc.tracked_data_field, trackedDataField);
+      trackedDataLastEdit = CouchDbServiceProvider.timestampData(doc.tracked_data, trackedData, trackedDataLastEdit, timestamp);
       var response = await this.db.put({
         _id: doc_id,
         _rev: doc._rev,
@@ -331,9 +350,10 @@ export class CouchDbServiceProvider {
       });
 
     } catch (err) {
-      console.log("YSS CouchDbServiceProvider - logTrackedData: Error occured while saving tracked data.");
+      console.log("YSS CouchDbServiceProvider - logTrackedData: Error occured while saving tracked data.", err);
+      trackedDataLastEdit = CouchDbServiceProvider.timestampData({}, trackedData, trackedDataLastEdit, timestamp);
       this.db.put({_id: doc_id, tracked_data: trackedData,
-        tracked_data_field: trackedDataField}, function(err, response) {
+        tracked_data_field: trackedDataField, tracked_data_last_edit: trackedDataLastEdit}, function(err, response) {
         if (err) {
           console.log(err);
           return false;
