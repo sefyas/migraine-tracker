@@ -53,7 +53,7 @@ export class Calendar {
             month: this.displayDate['month'],
             date: this.displayDate['date'],
         });
-        console.log('YSS Calendar - setSelectedDate: index for selected date', this.displayDate, 'is', ind);
+        //console.log('YSS Calendar - setSelectedDate: index for selected date', this.displayDate, 'is', ind);
         if (ind !== -1) {
             this.dateArray[this.lastSelect].isSelect = false;
             this.lastSelect = ind;
@@ -212,10 +212,17 @@ export class Calendar {
         }
         this.displayDate['date'] = moment({year: this.displayDate['year'], 
                                            month: this.displayDate['month']}).daysInMonth();
+        if (this.currentDate['year'] === this.displayDate['year'] && 
+            this.currentDate['month'] === this.displayDate['month'] &&
+            this.currentDate['date'] === this.displayDate['date']) {
+            this.displayDate.isToday = true;
+        } else {
+            this.displayDate.isToday = false;
+        }
         this.createMonth(this.displayDate['year'], this.displayDate['month']);
         this.setSelection();
         this.onDaySelect.emit([this.displayDate['date'], this.displayDate['month'], this.displayDate['year']]);
-        console.log('YSS Calendar - back: displayDate', this.displayDate)
+        //console.log('YSS Calendar - back: displayDate', this.displayDate)
     }
 
     forward() {
@@ -226,11 +233,18 @@ export class Calendar {
         } else {
             this.displayDate['month']++;
         }
-        this.displayDate['date'] = 1
+        this.displayDate['date'] = 1;
+        if (this.currentDate['year'] === this.displayDate['year'] && 
+            this.currentDate['month'] === this.displayDate['month'] &&
+            this.currentDate['date'] === this.displayDate['date']) {
+            this.displayDate.isToday = true;
+        } else {
+            this.displayDate.isToday = false;
+        }
         this.createMonth(this.displayDate['year'], this.displayDate['month']);
         this.setSelection();
         this.onDaySelect.emit([this.displayDate['date'], this.displayDate['month'], this.displayDate['year']]);
-        console.log('YSS Calendar - forward: displayDate', this.displayDate)
+        //console.log('YSS Calendar - forward: displayDate', this.displayDate)
     }
 
     // select a day
