@@ -36,7 +36,7 @@ export class Calendar {
     }
 
     initCalendar(dateSelected) {
-        console.log('YSS Calendar - initCalendar: called');
+        //console.log('YSS Calendar - initCalendar: called');
         this.displayDate = {'date': dateSelected[0], 'month': dateSelected[1], 'year': dateSelected[2]};
         this.createMonth(this.displayDate['year'], this.displayDate['month']);
         this.setSelection();
@@ -198,7 +198,7 @@ export class Calendar {
             }
         }
 
-        console.log('YSS Calendar - createMonths: dateArray', this.dateArray, 'weekArray', this.weekArray, 'dateSelected', this.dateSelected);
+        //console.log('YSS Calendar - createMonths: dateArray', this.dateArray, 'weekArray', this.weekArray, 'dateSelected', this.dateSelected);
 
     }
 
