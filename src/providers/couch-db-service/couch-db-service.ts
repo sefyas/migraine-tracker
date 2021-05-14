@@ -250,20 +250,17 @@ export class CouchDbServiceProvider {
         for (let data in newData[goal]) {
           if (data in oldData[goal]){
             // goal-data in both old and new
-            if (oldData[goal][data] !== newData[goal][data]) { // value changed
+            if (oldData[goal][data] === newData[goal][data]) { // value fixed => not a change
+              //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '=', newData[goal][data], 'no changes ==> remove from changes');
+              delete changes[goal][data];
+            } else { // value changed
               //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->', newData[goal][data]);
               changes[goal][data] = 'Updated';
-            } else { // value fixed => not a change
-              //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '=', newData[goal][data], 'remove from changes');
-              delete changes[goal][data];
-              if (Object.keys(changes[goal]).length === 0 
-                  && changes[goal].constructor === Object){
-                delete changes[goal];
-              }
             }
           } else {
             // goal but not data in both old and new; data only in new
             //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', '\t->', newData[goal][data]);
+            //console.log('YSS CouchDbServiceProvider - getChanges: oldData', oldData, 'newData', newData, 'changes', changes)
             changes[goal][data] = 'Added'
           }
         }
@@ -296,6 +293,13 @@ export class CouchDbServiceProvider {
           //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->.');
           changes[goal][data] = 'Removed'
         }
+      }
+    }
+
+    for(let goal in changes){
+      if (Object.keys(changes[goal]).length === 0 
+          && changes[goal].constructor === Object){
+        delete changes[goal];
       }
     }
 
@@ -391,6 +395,7 @@ export class CouchDbServiceProvider {
    * @param date
    */
   logTrackedData(trackedData, trackedDataField, date) {
+    console.log('YSS CouchDbServiceProvider - logTrackedData: on', date, 'trackedData: ', trackedData, 'trackedDataField:', trackedDataField);
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
     let timestamp = new Date().toISOString()  
     return new Promise((resolve, reject) => {
@@ -431,7 +436,8 @@ export class CouchDbServiceProvider {
         .catch(err => { // create the document for the date if it does not exist; otherwise promise is rejected  
           //console.log('YSS CouchDbServiceProvider - logTrackedData: retrieving doc failed');
           if(err['status'] === 404) { // create the document if it does not exist
-            let trackTime = CouchDbServiceProvider.timestampData(trackedData, {}, timestamp);
+            let changes = CouchDbServiceProvider.getChanges({}, trackedData);
+            let trackTime = CouchDbServiceProvider.timestampData(changes, {}, timestamp);
             let doc_created = {
               'content': {
                 '_id': doc_id,
@@ -439,7 +445,7 @@ export class CouchDbServiceProvider {
                 'tracked_data_field': trackedDataField,
                 'tracked_data_last_edit': trackTime,
               },
-              'changes': trackedData
+              'changes': changes
             }
             //console.log('YSS CouchDbServiceProvider - logTrackedData: created doc is', doc_created);
             return doc_created;
