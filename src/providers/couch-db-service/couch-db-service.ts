@@ -395,7 +395,7 @@ export class CouchDbServiceProvider {
    * @param date
    */
   logTrackedData(trackedData, trackedDataField, date) {
-    console.log('YSS CouchDbServiceProvider - logTrackedData: on', date, 'trackedData: ', trackedData, 'trackedDataField:', trackedDataField);
+    //console.log('YSS CouchDbServiceProvider - logTrackedData: on', date, 'trackedData: ', trackedData, 'trackedDataField:', trackedDataField);
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
     let timestamp = new Date().toISOString()  
     return new Promise((resolve, reject) => {

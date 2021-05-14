@@ -27,8 +27,8 @@ export class DataDetailsServiceProvider {
   _openSupportedFields() {
     this.http.get<DataField[]>('assets/supportedFields.json', {},).subscribe(fieldList => {
         this.supportedFields = fieldList;
-        console.log("supportedFields");
-        console.log(this.supportedFields);
+        //console.log("supportedFields");
+        //console.log(this.supportedFields);
       }, error => {
         console.log(error);
       });
@@ -37,8 +37,8 @@ export class DataDetailsServiceProvider {
   _openListedData() {
     this.http.get<{[dataType: string] : DataElement[]}>('assets/listedData.json', {},).subscribe(listedData => {
         this.listedData = listedData;
-        console.log("listedData");
-        console.log(this.listedData);
+        //console.log("listedData");
+        //console.log(this.listedData);
       }, error => {
         console.log(error);
       });

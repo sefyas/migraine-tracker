@@ -115,7 +115,7 @@ export class MyApp {
   }
 
   logUsage(logtype: String) {
-    console.log('YSS MyApp -', logtype);
+    //console.log('YSS MyApp -', logtype);
     this.couchDBService.logUsage(logtype);
   }
 
