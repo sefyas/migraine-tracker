@@ -210,7 +210,7 @@ export class CouchDbServiceProvider {
     return combinedData;
   }
 
-  /*static reduceTrackedData(track, the_goal, the_data){
+  static reduceTrackedData(track, the_goal, the_data){
     // make a copy of the tracking record
     let newTrack = {};
     for(let goal in track) {
@@ -232,7 +232,7 @@ export class CouchDbServiceProvider {
     }
 
     return newTrack;
-  }*/
+  }
 
   static getChanges(oldData, newData){
     // make a copy of the old data
@@ -476,7 +476,7 @@ export class CouchDbServiceProvider {
   async deleteData(goal, data, date) {
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
     let timestamp = new Date().toISOString()
-    /*return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.db.get(doc_id) // retrieve the existing document for the date (it must exist)
         .then(doc => { // update the document by removing the specified data from the specified goal
           let updatedData = CouchDbServiceProvider.reduceTrackedData(doc.tracked_data, goal, data['id'])
@@ -521,80 +521,7 @@ export class CouchDbServiceProvider {
         .catch(err => { // promise is rejected
           reject(false);
         })
-    });*/
-    try {
-      var doc = await this.db.get(doc_id);
-      let trackedDataLastEdit;
-      if (doc.hasOwnProperty('tracked_data_last_edit')){
-        trackedDataLastEdit = doc.tracked_data_last_edit;
-      } else {
-        // YSS NOTE this is primarily for backward compatibility in working with
-        //          documents stored without timestamp information. Otherwise last
-        //          edit timing should exist.
-        trackedDataLastEdit = {};
-      }
-      var trackedData = doc['tracked_data'];
-      var trackedDataField = doc['tracked_data_field'];
-      //console.log("YSS CouchDbServiceProvider - deleteData: doc:", doc, "doc['tracked_data']:", doc['tracked_data'], "doc['tracked_data_field']:", doc['tracked_data_field'], "trackedData:", trackedData, "trackedDataField:", trackedDataField)
-      if (trackedData.hasOwnProperty(goal)) {
-        if(!trackedDataLastEdit.hasOwnProperty(goal)) {
-          // YSS NOTE this is primarily for backward compatibility in working with
-          //          documents stored without timestamp information. Otherwise last
-          //          edit timing should exist.
-          trackedDataLastEdit[goal] = {};
-        }
-        if (trackedData[goal].hasOwnProperty(data['id'])) {
-          trackedDataLastEdit[goal][data['id']] = timestamp
-          // YSS NOTE this will update the timestamp only if a meaningful deletion happens
-          //          as we reach here if trackedData[goal][data['id']] exists
-
-          delete trackedData[goal][data['id']];
-          // YSS TO-DO if trackedData[goal] is empty after deletion, remove it
-        } else {
-          console.log("YSS CouchDbServiceProvider - deleteData: tracked_data update: doc has no data with id", data['id'], "for goal", trackedData[goal]);
-        }
-      } else {
-        console.log("YSS CouchDbServiceProvider - deleteData: tracked_data update: doc does not have goal", goal);
-      }
-
-      if (trackedDataField.hasOwnProperty(goal)) {
-        if (trackedDataField[goal].hasOwnProperty(data['id'])) {
-          delete trackedDataField[goal][data['id']]
-        } else {
-          console.log("YSS CouchDbServiceProvider - deleteData: tracked_data_field update: doc has no data with id", data['id'], "for goal", trackedDataField[goal]);
-        }
-      } else {
-        console.log("YSS CouchDbServiceProvider - deleteData: tracked_data_field update: doc does not have goal", goal);
-      }
-      var response = await this.db.put({
-        _id: doc_id,
-        _rev: doc._rev,
-        tracked_data: trackedData,
-        tracked_data_field: trackedDataField,
-        tracked_data_last_edit: trackedDataLastEdit,
-      });
-
-      /* comment for simulating delay in saving */
-      //console.log("Tracked data saved!");
-      //return true;
-      /* uncomment for simulating delay in saving */
-      return new Promise((resolve, reject)=>{
-        setTimeout(()=>{
-          console.log("YSS CouchDbServiceProvider - deleteData: Tracked data removed!");
-          resolve(true);
-        }, 3000);
-      });
-
-    } catch (err) {
-      console.log("YSS CouchDbServiceProvider - deleteData: Error occured while removing tracked data.");
-      this.db.put({_id: doc_id, tracked_data: trackedData,
-        tracked_data_field: trackedDataField}, function(err, response) {
-        if (err) {
-          console.log(err);
-          return false;
-        }
-      });
-    }
+    });
   }
 
   /**

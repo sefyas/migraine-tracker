@@ -98,16 +98,7 @@ export class TrackingPage {
   remoteClearedData(goal, data) {
     this.saving = true;
     this.couchDbService.deleteData(goal, data, this.dateSelected)
-        .then((result)=>{
-          console.log("YSS tracking/remoteClearedData resolved");
-          this.saving = false
-          if (result) {
-            console.log("YSS TO-DO tracking/remoteClearedData retured with true; show nothing")
-          } else {
-            console.log("YSS TO-DO tracking/remoteClearedData retured with false; show an error icon so user knows the data is not removed")
-          }
-        });
-        /*.then((changes)=>{
+        .then((changes)=>{
           this.saving = false;
           console.log("YSS TrackingPage - remoteClearedData: retured with changes ", changes);
           //return changes; //YSS TO-DO further work on the logging call; 
@@ -117,8 +108,7 @@ export class TrackingPage {
           console.log("YSS TrackingPage - remoteClearedData: retured with error", err)
           //YSS TO-DO show error sign
         })
-        //.then(changes => this.couchDbService.logUsage(changes)); //YSS TO-DO further work on the logging call; ;
-        */
+        //.then(changes => this.couchDbService.logUsage(changes)); //YSS TO-DO further work on the logging call
   }
 
   saveTrackedData() {
