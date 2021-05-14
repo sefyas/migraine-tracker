@@ -107,6 +107,18 @@ export class TrackingPage {
             console.log("YSS TO-DO tracking/remoteClearedData retured with false; show an error icon so user knows the data is not removed")
           }
         });
+        /*.then((changes)=>{
+          this.saving = false;
+          console.log("YSS TrackingPage - remoteClearedData: retured with changes ", changes);
+          //return changes; //YSS TO-DO further work on the logging call; 
+          //YSS TO-DO show check-mark sign
+        })
+        .catch(err => {
+          console.log("YSS TrackingPage - remoteClearedData: retured with error", err)
+          //YSS TO-DO show error sign
+        })
+        //.then(changes => this.couchDbService.logUsage(changes)); //YSS TO-DO further work on the logging call; ;
+        */
   }
 
   saveTrackedData() {

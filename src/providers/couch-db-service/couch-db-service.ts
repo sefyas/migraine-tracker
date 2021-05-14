@@ -210,6 +210,30 @@ export class CouchDbServiceProvider {
     return combinedData;
   }
 
+  /*static reduceTrackedData(track, the_goal, the_data){
+    // make a copy of the tracking record
+    let newTrack = {};
+    for(let goal in track) {
+      newTrack[goal] = {};
+      for (let data in track[goal]) {
+        newTrack[goal][data] = track[goal][data];
+      }
+    }
+
+    if(newTrack.hasOwnProperty(the_goal)){
+      if(newTrack[the_goal].hasOwnProperty(the_data)){
+        delete newTrack[the_goal][the_data];
+      }
+      // if newTrack[the_goal] is empty after deletion, remove it
+      if (Object.keys(newTrack[the_goal]).length === 0 
+                  && newTrack[the_goal].constructor === Object){
+                delete newTrack[the_goal];
+      }
+    }
+
+    return newTrack;
+  }*/
+
   static getChanges(oldData, newData){
     // make a copy of the old data
     let changes = {};
@@ -232,7 +256,8 @@ export class CouchDbServiceProvider {
             } else { // value fixed => not a change
               //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '=', newData[goal][data], 'remove from changes');
               delete changes[goal][data];
-              if (Object.keys(changes[goal]).length === 0){
+              if (Object.keys(changes[goal]).length === 0 
+                  && changes[goal].constructor === Object){
                 delete changes[goal];
               }
             }
@@ -277,32 +302,14 @@ export class CouchDbServiceProvider {
     return changes;
   }
 
-  static timestampData(oldData, newData, lastEdit, timestamp){
+  static timestampData(changes, lastEdit, timestamp){
     //console.log('YSS CouchDbServiceProvider - timestampData: lastEditData at start', lastEditData);
-    for (let goal in newData) {
-      if (!lastEdit.hasOwnProperty(goal)) {
+    for (let goal in changes){
+      if(!lastEdit.hasOwnProperty(goal)) {
         lastEdit[goal] = {};
       }
-      //console.log('\tYSS CouchDbServiceProvider - timestampData: goal', goal);
-      for (let data in newData[goal]) {
-        //console.log('\t\tYSS CouchDbServiceProvider - timestampData: data', data);
-        if (!oldData.hasOwnProperty(goal)){
-          //console.log('YSS CouchDbServiceProvider - timestampData: new data');
-          lastEdit[goal][data] = timestamp
-        } else {
-          if (lastEdit[goal].hasOwnProperty(data)) { 
-            //YSS NOTE this ensures backward compatibility with data stored without last edit
-            //console.log('YSS CouchDbServiceProvider - timestampData: existing data', 'old:', oldData[goal][data], 'new:', newData[goal][data]);
-            if (oldData[goal][data] !== newData[goal][data]) {
-              //console.log('YSS CouchDbServiceProvider - timestampData: changed', data);
-              lastEdit[goal][data] = timestamp
-            }
-          } else {
-            //console.log('YSS CouchDbServiceProvider - timestampData: new data');
-            lastEdit[goal][data] = timestamp
-          }
-        }
-        //console.log('YSS CouchDbServiceProvider - timestampData: timestamp for', data, 'is now', lastEditData[goal][data]);
+      for (let data in changes[goal]){
+        lastEdit[goal][data] = timestamp;
       }
     }
     //console.log('YSS CouchDbServiceProvider - timestampData: lastEditData at end', lastEditData);
@@ -406,7 +413,7 @@ export class CouchDbServiceProvider {
             }
           }
           // update timing where there are changes
-          updatedTime = CouchDbServiceProvider.timestampData(doc.tracked_data, trackedData, updatedTime, timestamp);
+          updatedTime = CouchDbServiceProvider.timestampData(changes, updatedTime, timestamp);
 
           let doc_updated = {
             'content': {
@@ -424,7 +431,7 @@ export class CouchDbServiceProvider {
         .catch(err => { // create the document for the date if it does not exist; otherwise promise is rejected  
           //console.log('YSS CouchDbServiceProvider - logTrackedData: retrieving doc failed');
           if(err['status'] === 404) { // create the document if it does not exist
-            let trackTime = CouchDbServiceProvider.timestampData({}, trackedData, {}, timestamp);
+            let trackTime = CouchDbServiceProvider.timestampData(trackedData, {}, timestamp);
             let doc_created = {
               'content': {
                 '_id': doc_id,
@@ -451,9 +458,9 @@ export class CouchDbServiceProvider {
         })
         .then(changes => { // promise is resolved
           //console.log('YSS CouchDbServiceProvider - logTrackedData: changes saved', changes);
-          resolve(changes)
+          resolve(changes);
         })
-        .catch(err => { // promise id rejected
+        .catch(err => { // promise is rejected
           console.log('YSS CouchDbServiceProvider - logTrackedData: failed to save the document', err);
           reject(false);
         })
@@ -463,6 +470,52 @@ export class CouchDbServiceProvider {
   async deleteData(goal, data, date) {
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
     let timestamp = new Date().toISOString()
+    /*return new Promise((resolve, reject) => {
+      this.db.get(doc_id) // retrieve the existing document for the date (it must exist)
+        .then(doc => { // update the document by removing the specified data from the specified goal
+          let updatedData = CouchDbServiceProvider.reduceTrackedData(doc.tracked_data, goal, data['id'])
+          let updatedDataField = CouchDbServiceProvider.reduceTrackedData(doc.tracked_data_field, goal, data['id']);
+          let changes = CouchDbServiceProvider.getChanges(doc.tracked_data, updatedData);
+
+          let updatedTime = {};
+          // make a copy of the last edit information if it exists
+          if (doc.hasOwnProperty('tracked_data_last_edit')){
+            for(let goal in doc.tracked_data_last_edit){
+              updatedTime[goal] = {};
+              for(let data in doc.tracked_data_last_edit[goal]){
+                updatedTime[goal][data] = doc.tracked_data_last_edit[goal][data];
+              }
+            }
+          }
+          // update timing where there are changes
+          updatedTime = CouchDbServiceProvider.timestampData(changes, updatedTime, timestamp);
+
+          let doc_updated = {
+            'content': {
+              '_id': doc_id,
+              '_rev': doc._rev,
+              'tracked_data': updatedData,
+              'tracked_data_field': updatedDataField,
+              'tracked_data_last_edit': updatedTime,
+            },
+            'changes': changes
+          }
+
+          //console.log('YSS CouchDbServiceProvider - deleteData: updated doc is', doc_updated);
+          return doc_updated;
+        })
+        .then(doc => { // store the updated document
+          //this.db.put(doc['content']); //comment for simulating delay
+          setTimeout(() => {this.db.put(doc['content'])}, 3000); //uncomment for simulating delay
+          return doc['changes'];
+        })
+        .then(changes => { // promise is resolved
+          resolve(changes);
+        })
+        .catch(err => { // promise is rejected
+          reject(false);
+        })
+    });*/
     try {
       var doc = await this.db.get(doc_id);
       let trackedDataLastEdit;
