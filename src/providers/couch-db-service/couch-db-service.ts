@@ -255,13 +255,13 @@ export class CouchDbServiceProvider {
               delete changes[goal][data];
             } else { // value changed
               //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->', newData[goal][data]);
-              changes[goal][data] = 'Updated';
+              changes[goal][data] = 'Update: ' + JSON.stringify(oldData[goal][data]) + ' -> ' + JSON.stringify(newData[goal][data]);
             }
           } else {
             // goal but not data in both old and new; data only in new
             //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', '\t->', newData[goal][data]);
             //console.log('YSS CouchDbServiceProvider - getChanges: oldData', oldData, 'newData', newData, 'changes', changes)
-            changes[goal][data] = 'Added'
+            changes[goal][data] = 'Add: ' + JSON.stringify(newData[goal][data]);
           }
         }
       } else {
@@ -269,7 +269,7 @@ export class CouchDbServiceProvider {
         for (let data in newData[goal]) {
           // goal-data only in new
           //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', '\t->', newData[goal][data]);
-          changes[goal][data] = 'Added'
+          changes[goal][data] = 'Add: ' + JSON.stringify(newData[goal][data]);
         }
       }
     }
@@ -284,14 +284,14 @@ export class CouchDbServiceProvider {
           } else {
             // goal but not data in both old and new; data only in old
             //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->.');
-            changes[goal][data] = 'Removed'
+            changes[goal][data] = 'Remove: ' + JSON.stringify(oldData[goal][data]);
           }
         }
       } else {
         for (let data in oldData[goal]) {
           // goal-data only in old
           //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->.');
-          changes[goal][data] = 'Removed'
+          changes[goal][data] = 'Remove: ' + JSON.stringify(oldData[goal][data]);
         }
       }
     }
@@ -456,16 +456,26 @@ export class CouchDbServiceProvider {
           } 
         })
         .then(doc => { // store the updated or newly created document
-          
           //console.log('YSS CouchDbServiceProvider - logTrackedData: storing doc', doc);
-          //this.db.put(doc['content']); //comment for simulating delay
-          setTimeout(() => {this.db.put(doc['content'])}, 3000); //uncomment for simulating delay
-          return doc['changes'];
-        })
-        .then(changes => { // promise is resolved
-          //console.log('YSS CouchDbServiceProvider - logTrackedData: changes saved', changes);
-          resolve(changes);
-        })
+          /*this.db.put(doc['content']) //comment for simulating delay
+            .then(() => { // promise is resovled
+              console.log('YSS CouchDbServiceProvider - logTrackedData: changes saved', doc['changes']);
+              resolve(doc['changes'])
+            }, err => { // promise is rejected
+              console.log('YSS CouchDbServiceProvider - logTrackedData: saving failed', err);
+              reject(false)
+            })*/
+          setTimeout(() => { //uncomment for simulating delay
+            this.db.put(doc['content'])
+            .then(() => { // promise is resovled
+              console.log('YSS CouchDbServiceProvider - logTrackedData: changes saved', doc['changes']);
+              resolve(doc['changes'])
+            }, err => { // promise is rejected
+              console.log('YSS CouchDbServiceProvider - logTrackedData: saving failed', err);
+              reject(false)
+            })
+          }, 3000)
+        }) 
         .catch(err => { // promise is rejected
           console.log('YSS CouchDbServiceProvider - logTrackedData: failed to save the document', err);
           reject(false);
@@ -511,14 +521,27 @@ export class CouchDbServiceProvider {
           return doc_updated;
         })
         .then(doc => { // store the updated document
-          //this.db.put(doc['content']); //comment for simulating delay
-          setTimeout(() => {this.db.put(doc['content'])}, 3000); //uncomment for simulating delay
-          return doc['changes'];
-        })
-        .then(changes => { // promise is resolved
-          resolve(changes);
+          /*this.db.put(doc['content']) //comment for simulating delay
+            .then(() => { // promise is resovled
+              console.log('YSS CouchDbServiceProvider - deleteData: changes saved', doc['changes']);
+              resolve(doc['changes'])
+            }, err => { // promise is rejected
+              console.log('YSS CouchDbServiceProvider - deleteData: saving failed', err);
+              reject(false)
+            })*/
+            setTimeout(() => { //uncomment for simulating delay
+              this.db.put(doc['content'])
+              .then(() => { // promise is resovled
+                console.log('YSS CouchDbServiceProvider - deleteData: changes saved', doc['changes']);
+                resolve(doc['changes'])
+              }, err => { // promise is rejected
+                console.log('YSS CouchDbServiceProvider - deleteData: saving failed', err);
+                reject(false)
+              })
+            }, 3000)
         })
         .catch(err => { // promise is rejected
+          console.log('YSS CouchDbServiceProvider - deleteData: failed to save the document', err);
           reject(false);
         })
     });
