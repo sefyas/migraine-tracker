@@ -399,7 +399,8 @@ export class CouchDbServiceProvider {
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
     let timestamp = new Date().toISOString()  
     return new Promise((resolve, reject) => {
-      this.db.get(doc_id) // retrieve the existing document for the date if it exists
+      setTimeout(() => { // wait to allow time for the previous write to finish
+        this.db.get(doc_id) // retrieve the existing document for the date if it exists
         .then(doc => { // update the document with new tracked data   
           //console.log('YSS CouchDbServiceProvider - logTrackedData: retried doc is', doc);
           // combine old and new information
@@ -457,7 +458,7 @@ export class CouchDbServiceProvider {
         })
         .then(doc => { // store the updated or newly created document
           //console.log('YSS CouchDbServiceProvider - logTrackedData: storing doc', doc);
-          this.db.put(doc['content']) //comment for simulating delay
+          this.db.put(doc['content'])
             .then(() => { // promise is resovled
               console.log('YSS CouchDbServiceProvider - logTrackedData: changes saved', doc['changes']);
               resolve(doc['changes'])
@@ -465,29 +466,22 @@ export class CouchDbServiceProvider {
               console.log('YSS CouchDbServiceProvider - logTrackedData: saving failed', err);
               reject(false)
             })
-          /*setTimeout(() => { //uncomment for simulating delay
-            this.db.put(doc['content'])
-            .then(() => { // promise is resovled
-              console.log('YSS CouchDbServiceProvider - logTrackedData: changes saved', doc['changes']);
-              resolve(doc['changes'])
-            }, err => { // promise is rejected
-              console.log('YSS CouchDbServiceProvider - logTrackedData: saving failed', err);
-              reject(false)
-            })
-          }, 3000)*/
         }) 
         .catch(err => { // promise is rejected
           console.log('YSS CouchDbServiceProvider - logTrackedData: failed to save the document', err);
           reject(false);
         })
-      });
+      }, 1000)
+      
+    });
   }
 
   deleteData(goal, data, date) {
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
     let timestamp = new Date().toISOString()
     return new Promise((resolve, reject) => {
-      this.db.get(doc_id) // retrieve the existing document for the date (it must exist)
+      setTimeout(() => { // wait to allow time for the previous write to finish
+        this.db.get(doc_id) // retrieve the existing document for the date (it must exist)
         .then(doc => { // update the document by removing the specified data from the specified goal
           let updatedData = CouchDbServiceProvider.reduceTrackedData(doc.tracked_data, goal, data['id'])
           let updatedDataField = CouchDbServiceProvider.reduceTrackedData(doc.tracked_data_field, goal, data['id']);
@@ -529,21 +523,12 @@ export class CouchDbServiceProvider {
               console.log('YSS CouchDbServiceProvider - deleteData: saving failed', err);
               reject(false)
             })
-            /*setTimeout(() => { //uncomment for simulating delay
-              this.db.put(doc['content'])
-              .then(() => { // promise is resovled
-                console.log('YSS CouchDbServiceProvider - deleteData: changes saved', doc['changes']);
-                resolve(doc['changes'])
-              }, err => { // promise is rejected
-                console.log('YSS CouchDbServiceProvider - deleteData: saving failed', err);
-                reject(false)
-              })
-            }, 3000)*/
         })
         .catch(err => { // promise is rejected
           console.log('YSS CouchDbServiceProvider - deleteData: failed to save the document', err);
           reject(false);
         })
+      }, 1000)
     });
   }
 
