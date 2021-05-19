@@ -457,15 +457,15 @@ export class CouchDbServiceProvider {
         })
         .then(doc => { // store the updated or newly created document
           //console.log('YSS CouchDbServiceProvider - logTrackedData: storing doc', doc);
-          /*this.db.put(doc['content']) //comment for simulating delay
+          this.db.put(doc['content']) //comment for simulating delay
             .then(() => { // promise is resovled
               console.log('YSS CouchDbServiceProvider - logTrackedData: changes saved', doc['changes']);
               resolve(doc['changes'])
             }, err => { // promise is rejected
               console.log('YSS CouchDbServiceProvider - logTrackedData: saving failed', err);
               reject(false)
-            })*/
-          setTimeout(() => { //uncomment for simulating delay
+            })
+          /*setTimeout(() => { //uncomment for simulating delay
             this.db.put(doc['content'])
             .then(() => { // promise is resovled
               console.log('YSS CouchDbServiceProvider - logTrackedData: changes saved', doc['changes']);
@@ -474,7 +474,7 @@ export class CouchDbServiceProvider {
               console.log('YSS CouchDbServiceProvider - logTrackedData: saving failed', err);
               reject(false)
             })
-          }, 3000)
+          }, 3000)*/
         }) 
         .catch(err => { // promise is rejected
           console.log('YSS CouchDbServiceProvider - logTrackedData: failed to save the document', err);
@@ -521,15 +521,15 @@ export class CouchDbServiceProvider {
           return doc_updated;
         })
         .then(doc => { // store the updated document
-          /*this.db.put(doc['content']) //comment for simulating delay
+          this.db.put(doc['content']) //comment for simulating delay
             .then(() => { // promise is resovled
               console.log('YSS CouchDbServiceProvider - deleteData: changes saved', doc['changes']);
               resolve(doc['changes'])
             }, err => { // promise is rejected
               console.log('YSS CouchDbServiceProvider - deleteData: saving failed', err);
               reject(false)
-            })*/
-            setTimeout(() => { //uncomment for simulating delay
+            })
+            /*setTimeout(() => { //uncomment for simulating delay
               this.db.put(doc['content'])
               .then(() => { // promise is resovled
                 console.log('YSS CouchDbServiceProvider - deleteData: changes saved', doc['changes']);
@@ -538,7 +538,7 @@ export class CouchDbServiceProvider {
                 console.log('YSS CouchDbServiceProvider - deleteData: saving failed', err);
                 reject(false)
               })
-            }, 3000)
+            }, 3000)*/
         })
         .catch(err => { // promise is rejected
           console.log('YSS CouchDbServiceProvider - deleteData: failed to save the document', err);
