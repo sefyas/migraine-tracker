@@ -483,7 +483,7 @@ export class CouchDbServiceProvider {
       });
   }
 
-  async deleteData(goal, data, date) {
+  deleteData(goal, data, date) {
     var doc_id = CouchDbServiceProvider.getTrackedDataDocID(date);
     let timestamp = new Date().toISOString()
     return new Promise((resolve, reject) => {
