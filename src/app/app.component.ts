@@ -114,9 +114,9 @@ export class MyApp {
     this.activePage = page;
   }
 
-  logUsage(logtype: String) {
+  logUsage(log: String) {
     //console.log('YSS MyApp -', logtype);
-    this.couchDBService.logUsage(logtype);
+    this.couchDBService.logUsage('interaction', log);
   }
 
   pushSetup(){

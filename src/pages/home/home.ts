@@ -103,17 +103,20 @@ export class HomePage {
     this.saving = true;
     console.log("YSS HomePage - remoteClearedData");
     this.couchDbService.deleteData(goal, data, this.dateSelected)
-        .then((changes)=>{
+        .then(changes => {
           this.saving = false;
           console.log("YSS HomePage - remoteClearedData: retured with changes ", changes);
-          //return changes; //YSS TO-DO further work on the logging call; 
+          return changes;
           //YSS TO-DO show check-mark sign
         })
         .catch(err => {
           console.log("YSS HomePage - remoteClearedData: retured with error", err)
           //YSS TO-DO show error sign
         })
-        //.then(changes => this.couchDbService.logUsage(changes)); //YSS TO-DO further work on the logging call
+        .then(changes => {
+          //this.couchDbService.logUsage('data', changes);
+          console.log("YSS HomePage - remoteClearedData: logged changes", changes);
+        });
   }
 
   /**
@@ -126,14 +129,17 @@ export class HomePage {
       .then((changes)=>{
         this.saving = false
         console.log("YSS HomePage - saveTrackedData: retured with changes:", changes);
-        //return changes; //YSS TO-DO further work on the logging call;         
+        return changes;         
         //YSS TO-DO show check-mark sign
       })
       .catch(err => {
         console.log("YSS HomePage - saveTrackedData: retured with error:", err);
         //YSS TO-DO show error sign
       })
-      //.then(changes => this.couchDbService.logUsage(changes)); //YSS TO-DO further work on the logging call
+      .then(changes => {
+        //this.couchDbService.logUsage('data', changes);
+        console.log("YSS HomePage - saveTrackedData: logged changes", changes);
+      })
   }
 
   /**

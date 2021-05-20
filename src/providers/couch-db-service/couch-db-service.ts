@@ -255,13 +255,13 @@ export class CouchDbServiceProvider {
               delete changes[goal][data];
             } else { // value changed
               //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->', newData[goal][data]);
-              changes[goal][data] = 'Update: ' + JSON.stringify(oldData[goal][data]) + ' -> ' + JSON.stringify(newData[goal][data]);
+              changes[goal][data] = 'updated: ' + JSON.stringify(oldData[goal][data]) + ' -> ' + JSON.stringify(newData[goal][data]);
             }
           } else {
             // goal but not data in both old and new; data only in new
             //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', '\t->', newData[goal][data]);
             //console.log('YSS CouchDbServiceProvider - getChanges: oldData', oldData, 'newData', newData, 'changes', changes)
-            changes[goal][data] = 'Add: ' + JSON.stringify(newData[goal][data]);
+            changes[goal][data] = 'added: ' + JSON.stringify(newData[goal][data]);
           }
         }
       } else {
@@ -269,7 +269,7 @@ export class CouchDbServiceProvider {
         for (let data in newData[goal]) {
           // goal-data only in new
           //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', '\t->', newData[goal][data]);
-          changes[goal][data] = 'Add: ' + JSON.stringify(newData[goal][data]);
+          changes[goal][data] = 'added: ' + JSON.stringify(newData[goal][data]);
         }
       }
     }
@@ -284,14 +284,14 @@ export class CouchDbServiceProvider {
           } else {
             // goal but not data in both old and new; data only in old
             //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->.');
-            changes[goal][data] = 'Remove: ' + JSON.stringify(oldData[goal][data]);
+            changes[goal][data] = 'removed: ' + JSON.stringify(oldData[goal][data]);
           }
         }
       } else {
         for (let data in oldData[goal]) {
           // goal-data only in old
           //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->.');
-          changes[goal][data] = 'Remove: ' + JSON.stringify(oldData[goal][data]);
+          changes[goal][data] = 'removed: ' + JSON.stringify(oldData[goal][data]);
         }
       }
     }
@@ -334,14 +334,14 @@ export class CouchDbServiceProvider {
       });
   }
 
-  //YSS TO-DO modify this function to take in log info and and store it in a new doc under 
-  //          usage-timestamp name this way, I can call this function for all logging purposes.
-  logUsage(logType) { 
+  logUsage(type, log) { 
     let entry = {
       "timestamp": new Date().toISOString(), // e.g. 2021-03-11T06:47:20.467Z
-      "type": logType // one of 'opened', 'foreground', 'background', 'data'
+      "type": type, // one of 'interaction' or 'data'
+      "log": log // in case of type: 'interaction':  one of 'opened', 'foreground', or 'background' 
+                 // in case of type: 'data': something like {'Symptom': {'migraineToday': 'added: Yes', 'peakMigraineSeverity': 'updated: 2 -> 5', ...}, ...}}
     };
-    let doc_id = 'usage-'+entry['timestamp'].slice(0, 10); // e.g. 2021-03-11
+    let doc_id = 'usage-'+entry['timestamp'].slice(0, 19).replace(/:/g, ''); // e.g. 2021-03-11T064720
     //console.log('YSS CouchDbServiceProvider - logUsage: doc_id', doc_id, 'entry', entry);
 
     this.db.get(doc_id)
@@ -453,7 +453,7 @@ export class CouchDbServiceProvider {
           }
           else {
             console.log('YSS CouchDbServiceProvider - logTrackedData: failed to prepare document for saving', err);
-            reject(err); //YSS TO-DO double-check the return value
+            reject(err);
           } 
         })
         .then(doc => { // store the updated or newly created document
