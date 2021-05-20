@@ -460,7 +460,7 @@ export class CouchDbServiceProvider {
           //console.log('YSS CouchDbServiceProvider - logTrackedData: storing doc', doc);
           this.db.put(doc['content'])
             .then(() => { // promise is resovled
-              console.log('YSS CouchDbServiceProvider - logTrackedData: changes saved', doc['changes']);
+              //console.log('YSS CouchDbServiceProvider - logTrackedData: changes saved', doc['changes']);
               resolve(doc['changes'])
             }, err => { // promise is rejected
               console.log('YSS CouchDbServiceProvider - logTrackedData: saving failed', err);
@@ -472,7 +472,6 @@ export class CouchDbServiceProvider {
           reject(false);
         })
       }, 1000)
-      
     });
   }
 

@@ -120,7 +120,7 @@ export class TrackingPage {
     this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
       .then((changes)=>{
         this.saving = false
-        console.log("YSS TrackingPage - saveTrackedData: retured with changes ", changes);
+        console.log("YSS TrackingPage - saveTrackedData: received changes ", changes);
         return changes;
         //YSS TO-DO show check-mark sign
       })
@@ -168,7 +168,7 @@ export class TrackingPage {
 
   changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
               dataType: string) {
-    //console.log("YSS tracking page with event ", componentEvent, " and data ", data);
+    console.log("YSS TrackingPage - changeVals: event ", componentEvent, "data ", data);
     if (dataType === 'quickTracker') {
       dataType = data.dataType;
     }

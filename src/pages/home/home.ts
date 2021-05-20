@@ -128,7 +128,7 @@ export class HomePage {
     this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
       .then((changes)=>{
         this.saving = false
-        console.log("YSS HomePage - saveTrackedData: retured with changes:", changes);
+        console.log("YSS HomePage - saveTrackedData: received changes:", changes);
         return changes;         
         //YSS TO-DO show check-mark sign
       })
@@ -286,7 +286,7 @@ export class HomePage {
   changeVals (componentEvent : {[eventPossibilities: string] : any}, 
               data : {[dataProps: string] : any},
               dataType: string) {
-    //console.log("YSS HomePage - changeVals data:", data, "with inferred catgory", this.inferTrackingCategory(data), "for dataType:", dataType, "when tracked is", this.tracked, "under dataToTrack", this.dataToTrack);
+    console.log("YSS HomePage - changeVals data:", data, "with inferred catgory", this.inferTrackingCategory(data), "for dataType:", dataType, "when tracked is", this.tracked, "under dataToTrack", this.dataToTrack);
     if (dataType === 'quickTracker') {
       // YSS finding the dataType as it turns data['dataType'] is only available for Migraine among all the quickTracker items
       dataType = this.inferTrackingCategory(data);
