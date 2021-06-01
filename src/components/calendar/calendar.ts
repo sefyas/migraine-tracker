@@ -20,8 +20,7 @@ export class Calendar {
     displayDateText: string;
     dateArray: Array<dateObj> = []; // data for the current month
     weekArray = []; // weekly data (data per rows)
-    lastSelect: number = 0; // last click index
-    //lastDate: any = {}; // this is no different from dateSelected; the last (manually or automatically) selected date; manual selection is by tapping on calendar days and automaticall is by navigating back and forth on months
+    lastSelect: number = 0; // last click index //YSS stopped using this because the index is out of date when navigating from one month to another
     isExpandCalendar: boolean;
     weekHead: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     monthNames: string[] = ["January", "February", "March", "April", "May", "June", "July",
@@ -59,12 +58,13 @@ export class Calendar {
             month: this.dateSelected[1],
             date: this.dateSelected[0],
         });
-        console.log('YSS Calendar - setSelectedDate: index for selected date', this.displayDate, 'is', ind, 'index of last selected date', this.dateSelected, 'is', last_ind);
+        //console.log('YSS Calendar - setSelectedDate: index for selected date', this.displayDate, 'is', ind, ', index of last selected date', this.dateSelected, 'is', last_ind, ', lastSelect is', this.lastSelect, '. dateArray is', this.dateArray);
+        //console.log('YSS Calendar - setSelectedDate: isSelect status in dateArray; ind', ind !== -1 ? this.dateArray[ind].isSelect: 'undefined', 'last_ind', last_ind !== -1 ? this.dateArray[last_ind].isSelect: 'undefined', 'lastSelect', this.dateArray[this.lastSelect].isSelect)
         if (ind !== -1) {
-            console.log('YSS Calendar - setSelectedDate: dateArray update; lastSelect:', this.lastSelect, ' -> false, ind:', ind, ' -> true in', this.dateArray);
-            this.dateArray[this.lastSelect].isSelect = false;
-            this.lastSelect = ind;
             this.dateArray[ind].isSelect = true;
+        }
+        if (last_ind !== -1) {
+            this.dateArray[last_ind].isSelect = false;
         }
         return ind;
     }
@@ -206,7 +206,6 @@ export class Calendar {
         }
 
         //console.log('YSS Calendar - createMonths: dateArray', this.dateArray, 'weekArray', this.weekArray, 'dateSelected', this.dateSelected);
-        this.lastSelect = 0; // whenever we create a month as a set of dates we default to the first item within that set as lastSelect
     }
 
     back() {
