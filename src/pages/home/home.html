@@ -59,29 +59,37 @@
 
                 <div class="limit-wrapper" *ngIf="data.goal && data.goal.freq && dataType !== 'Symptom' ">
                     <div class="limit-info-message" *ngIf="data.goal.timespan!=='Day'">
-                        Total / goal :
-                        <p class="limit-value" [class.goal-ok]="goalProgress(data, dataType) === 'at limit' ||
-                            goalProgress(data, dataType) === 'under'"
-                            [class.goal-met]="goalProgress(data, dataType) === 'met' ||
-                            goalProgress(data, dataType) === 'below limit'"
-                            [class.goal-over]="goalProgress(data, dataType) === 'over'">
-                            {{totalTrackedTimes(data, dataType)}}</p> / <p class="limit-value goal-info">{{data.goal.threshold}}</p>
-                        per {{data.goal.timespan.toLowerCase()}}
+                        Total for past {{data.goal.timespan.toLowerCase()}}: 
+                        <p class="limit-value" [class.goal-ok]="goalProgress(data, dataType, 'total/goal-at') === 'at limit' ||
+                            goalProgress(data, dataType, 'total/goal-und') === 'under'"
+                            [class.goal-met]="goalProgress(data, dataType, 'total/goal-met') === 'met' ||
+                            goalProgress(data, dataType, 'total/goal-bel') === 'below limit'"
+                            [class.goal-over]="goalProgress(data, dataType, 'total/goal-ove') === 'over'">
+                            {{totalTrackedTimes(data, dataType, 'html')}}</p>;
+                        Desired: <p class="limit-value goal-info">{{data.goal.freq}} than {{data.goal.threshold}}</p>
+                        <!-- Total / goal :
+                        <p class="limit-value" [class.goal-ok]="goalProgress(data, dataType, 'total/goal-at') === 'at limit' ||
+                            goalProgress(data, dataType, 'total/goal-und') === 'under'"
+                            [class.goal-met]="goalProgress(data, dataType, 'total/goal-met') === 'met' ||
+                            goalProgress(data, dataType, 'total/goal-bel') === 'below limit'"
+                            [class.goal-over]="goalProgress(data, dataType, 'total/goal-ove') === 'over'">
+                            {{totalTrackedTimes(data, dataType, 'html')}}</p> / <p class="limit-value goal-info">{{data.goal.threshold}}</p>
+                        per {{data.goal.timespan.toLowerCase()}} -->
                     </div>
 
-                    <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, dataType) === 'met'">
+                    <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, dataType, 'msg-met') === 'met'">
                         You met your goal!
                     </div>
-                    <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, dataType) === 'below limit'">
+                    <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, dataType, 'msg-bel') === 'below limit'">
                         You're under your limit!
                     </div>
-                    <div class="goal-ok limit-warning-message" *ngIf="goalProgress(data, dataType) === 'at limit'">
+                    <div class="goal-ok limit-warning-message" *ngIf="goalProgress(data, dataType, 'msg-at') === 'at limit'">
                         You're at your limit!
                     </div>
-                    <div class="goal-ok limit-warning-message" *ngIf="goalProgress(data, dataType) === 'under'">
+                    <div class="goal-ok limit-warning-message" *ngIf="goalProgress(data, dataType, 'msg-und') === 'under'">
                         Keep going!
                     </div>
-                    <div class="goal-over limit-warning-message" *ngIf="goalProgress(data, dataType) === 'over'">
+                    <div class="goal-over limit-warning-message" *ngIf="goalProgress(data, dataType, 'msg-ove') === 'over'">
                         Try to cut back!
                     </div>
                 </div>
