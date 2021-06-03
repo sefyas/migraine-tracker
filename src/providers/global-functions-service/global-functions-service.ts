@@ -93,7 +93,7 @@ export class GlobalFunctionsServiceProvider {
                              dataType : string,
                              previouslyTracked : {[dataType:string] : any}[],
                              timespan : string=undefined) {
-    console.log("$$$$$$$$$$@@@@@@@@@ previouslyTracked", previouslyTracked)
+    //console.log('YSS GlobalFunctionsServiceProvider - calculatePriorGoalProgress: data', data, 'dataType', dataType, 'previouslyTracked', previouslyTracked)
     let timesTracked = 0;
     if (!timespan) {
       timespan = data.goal.timespan;
@@ -107,15 +107,22 @@ export class GlobalFunctionsServiceProvider {
       } else {
         continue;
       }
+      //console.log('\tYSS GlobalFunctionsServiceProvider - calculatePriorGoalProgress: considering', previouslyTracked[i][2], 'with cutoff', cutoff)
       if (previouslyTracked[i][2] > cutoff) {
+        //console.log('\t\tYSS GlobalFunctionsServiceProvider - calculatePriorGoalProgress: passed cutoff');
         if (previouslyTracked[i][1][dataType]) {
           let field = previouslyTracked[i][1][dataType][data.id];
           let value = previouslyTracked[i][0][dataType][data.id];
+          value = (field === 'number') ? Number(value) : ((value === 'Yes') ? 1 : 0);
+          timesTracked += value;
+          //console.log('\t\t\tYSS GlobalFunctionsServiceProvider - calculatePriorGoalProgress: incrementing by', value, 'to', timesTracked);
+          /*
           if (field === 'number') {
             timesTracked += Number(previouslyTracked[i][dataType][data.id]);
           } else if (field === 'binary' && value === 'Yes') {
             timesTracked += 1;
           }
+          */
         }
       }
     }
