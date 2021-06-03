@@ -40,6 +40,8 @@ export class Calendar {
         this.displayDate = {'date': dateSelected[0], 'month': dateSelected[1], 'year': dateSelected[2]};
         this.createMonth(this.displayDate['year'], this.displayDate['month']);
         this.setSelection();
+        //let ind = this.setSelection();
+        //console.log('YSS Calendar - initCalendar: dateSelected', this.dateSelected, 'at index', ind, 'with info', ind !== -1 ? this.dateArray[ind]: 'undefined', this.displayDate);
         this.displayDate['isToday'] = this.isToday();
         //YSS NOTE 'isThisMonth' is not set for displayDate. It is alright mainly
         //          because displayDate.isThisMonth is never used elsewhere. 
@@ -47,25 +49,29 @@ export class Calendar {
     }
 
     setSelection(){
-        this.displayDateText = (this.displayDate['month'] + 1) + "/" + this.displayDate['date'] + "/" + this.displayDate['year'];
-        let ind = _.findIndex(this.dateArray, {
-            year: this.displayDate['year'],
-            month: this.displayDate['month'],
-            date: this.displayDate['date'],
-        });
         let last_ind = _.findIndex(this.dateArray, {
             year: this.dateSelected[2],
             month: this.dateSelected[1],
             date: this.dateSelected[0],
         });
-        //console.log('YSS Calendar - setSelectedDate: index for selected date', this.displayDate, 'is', ind, ', index of last selected date', this.dateSelected, 'is', last_ind, ', lastSelect is', this.lastSelect, '. dateArray is', this.dateArray);
-        //console.log('YSS Calendar - setSelectedDate: isSelect status in dateArray; ind', ind !== -1 ? this.dateArray[ind].isSelect: 'undefined', 'last_ind', last_ind !== -1 ? this.dateArray[last_ind].isSelect: 'undefined', 'lastSelect', this.dateArray[this.lastSelect].isSelect)
-        if (ind !== -1) {
-            this.dateArray[ind].isSelect = true;
-        }
         if (last_ind !== -1) {
             this.dateArray[last_ind].isSelect = false;
         }
+        
+        
+        let ind = _.findIndex(this.dateArray, {
+            year: this.displayDate['year'],
+            month: this.displayDate['month'],
+            date: this.displayDate['date'],
+        });
+        if (ind !== -1) {
+            this.dateArray[ind].isSelect = true;
+        }
+
+        //console.log('YSS Calendar - setSelectedDate: index for selected date', this.displayDate, 'is', ind, ', index of last selected date', this.dateSelected, 'is', last_ind, ', lastSelect is', this.lastSelect, '. dateArray is', this.dateArray);
+        //console.log('YSS Calendar - setSelectedDate: isSelect status in dateArray; ind', ind !== -1 ? this.dateArray[ind].isSelect: 'undefined', 'last_ind', last_ind !== -1 ? this.dateArray[last_ind].isSelect: 'undefined', 'lastSelect', this.dateArray[this.lastSelect].isSelect)
+
+        this.displayDateText = (this.displayDate['month'] + 1) + "/" + this.displayDate['date'] + "/" + this.displayDate['year'];
         return ind;
     }
 
