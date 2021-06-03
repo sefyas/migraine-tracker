@@ -80,6 +80,7 @@ export class HomePage {
    * Set up the app if there's cached user credential info
    */
   async loggedIn(){
+    //console.log('YSS HomePage - loggedIn: called');
     this.activeGoals = await this.couchDbService.fetchConfiguredRoutine().then((val) => {
       return val;
     });
@@ -147,6 +148,7 @@ export class HomePage {
    * @param componentEvent
    */
   onDaySelectClick(componentEvent : any) {
+    //console.log('YSS HomePage - onDaySelectClick: called with input', componentEvent);
     this.dateSelected = componentEvent;
     this.loadTrackedData();
   }
@@ -257,7 +259,7 @@ export class HomePage {
 
       for(const trackingData of this.dataToTrack[trackingCategory]){
         if(!trackingData.hasOwnProperty('id')){
-          console.log("YSS HomePage - inferTrackingCategory no id for", trackingData);
+          console.log("YSS HomePage - inferTrackingCategory: no id for", trackingData);
           continue;
         }
 
@@ -322,8 +324,9 @@ export class HomePage {
    * @param data
    * @param dataType
    */
-  goalProgress(data : {[dataProps : string] : any}, dataType :string) {
-    let timesTracked = this.totalTrackedTimes(data, dataType);
+  goalProgress(data : {[dataProps : string] : any}, dataType :string, context:string='undefined') {
+    let timesTracked = this.totalTrackedTimes(data, dataType, 'gp-'+context);
+    //console.log('YSS HomePage - goalProgress: under context', context,'timesTracked', timesTracked, 'for', dataType, 'with data', data['id']);
     if (timesTracked > data.goal.threshold) {
       if (data.goal.freq === 'More') {
         return 'met';
@@ -368,16 +371,21 @@ export class HomePage {
    * @param data
    * @param dataType
    */
-  totalTrackedTimes(data: {[dataProps : string] : any}, dataType : string) : Number {
-    if (dataType === 'quickTracker') dataType = data.dataType;
+  totalTrackedTimes(data: {[dataProps : string] : any}, dataType : string, context:string='undefined') : Number {
+    //console.log('YSS HomePage - totalTrackedTimes: context', context, 'data', data, 'dataType', dataType);
+    //console.log('YSS HomePage - totalTrackedTimes: context', context, 'for', data.id);
+    if (dataType === 'quickTracker') dataType = this.inferTrackingCategory(data);
     let timesSoFar = this.goalProgresses[dataType] ? this.goalProgresses[dataType][data.id] : 0;
     if (data.id === 'frequentMedUse') { // we pull from the 'treatments' dict!
+      //console.log('YSS HomePage - totalTrackedTimes: context', context, 'in frequentMedUse branch')
       timesSoFar += (this.getTrackedMeds() ? 1 : 0);
     } else if (this.tracked[dataType] && this.tracked[dataType][data.id]) {
       if (data.field === 'number') {
+        //console.log('YSS HomePage - totalTrackedTimes: context', context, 'in number branch')
         timesSoFar += Number(this.tracked[dataType][data.id]);
       } else if (data.field !== 'binary' || this.tracked[dataType][data.id] === 'Yes') {
         timesSoFar += 1;
+        //console.log('YSS HomePage - totalTrackedTimes: context', context, 'incremented by 1 to', timesSoFar, 'for', data.id);
       }
     }
     return timesSoFar;
@@ -412,6 +420,8 @@ export class HomePage {
    * @param dataType
    */
   calculatePriorDataProgresses(dataType) {
+    //console.log('YSS HomePage - calculatePriorDataProgresses: previouslyTracked', this.previouslyTracked, 'dataToTrack', this.dataToTrack);
+    // YSS TO-DO this is terrible style; dataToTrack is a dict so use for data in this.dataToTrack[dataType]
     for (let j = 0; j < this.dataToTrack[dataType].length; j++) {
       let data = this.dataToTrack[dataType][j];
       if (data.id === 'frequentMedUse') {
@@ -422,5 +432,6 @@ export class HomePage {
           this.globalFuns.calculatePriorGoalProgress(data, dataType, this.previouslyTracked);
       }
     }
+    //console.log('YSS HomePage - calculatePriorDataProgresses: goalProgresses', this.goalProgresses);
   }
 }
