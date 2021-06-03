@@ -85,7 +85,7 @@ export class TrackingPage {
     //console.log("value for this goal-data is", this.tracked[goal][data['id']], "among tracked data", this.tracked);
     delete this.tracked[goal][data['id']];
     // YSS TO-DO if this.tracked[goal] is empty after deletion, remove it
-    this.remoteClearedData(goal, data);
+    this.removeClearedData(goal, data);
   }
   // ================= BUTTONS Ends =================
   loadTrackedData() {
@@ -95,22 +95,22 @@ export class TrackingPage {
     });
   }
 
-  remoteClearedData(goal, data) {
+  removeClearedData(goal, data) {
     this.saving = true;
     this.couchDbService.deleteData(goal, data, this.dateSelected)
         .then((changes)=>{
           this.saving = false;
-          console.log("YSS TrackingPage - remoteClearedData: retured with changes ", changes);
+          console.log("YSS TrackingPage - removeClearedData: retured with changes ", changes);
           return changes;
           //YSS TO-DO show check-mark sign
         })
         .catch(err => {
-          console.log("YSS TrackingPage - remoteClearedData: retured with error", err)
+          console.log("YSS TrackingPage - removeClearedData: retured with error", err)
           //YSS TO-DO show error sign
         })
         .then(changes => {
           //this.couchDbService.logUsage('data', changes);
-          console.log("YSS TrackingPage - remoteClearedData: logged changes", changes);
+          console.log("YSS TrackingPage - removeClearedData: logged changes", changes);
         });
   }
 
