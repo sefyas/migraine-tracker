@@ -57,7 +57,7 @@
                                        [trackedMedsToday] = getTrackedMeds() (valueChanged) = 'changeVals($event, data, dataType)'>
                 </data-element-tracking>
 
-                <div class="limit-wrapper" *ngIf="data.goal && data.goal.freq && dataType !== 'Symptom' ">
+                <div class="limit-wrapper" *ngIf="isToday() && data.goal && data.goal.freq && dataType !== 'Symptom' ">
                     <div class="limit-info-message" *ngIf="data.goal.timespan!=='Day'">
                         Total for past {{data.goal.timespan.toLowerCase()}}: 
                         <p class="limit-value" [class.goal-ok]="goalProgress(data, dataType, 'total/goal-at') === 'at limit' ||

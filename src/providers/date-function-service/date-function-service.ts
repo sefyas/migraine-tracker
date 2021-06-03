@@ -9,6 +9,16 @@ export class DateFunctionServiceProvider {
   constructor (public http: HttpClient) {
   }
 
+  isToday(year, month, day) {
+    // NOTE year is YYYY, month is zero indexed, day is not zero indexed
+    //      therefore Jun 03, 2021 is represented as (2021, 5, 3)
+    let today = moment();
+    if(day !== today.date()) return false;
+    if(month !== today.month()) return false;
+    if(year !== today.year()) return false;
+    return true;
+  }
+
   compareTimes(time1, time2){
     var beginningTime = moment(time1, 'ha');
     var endTime = moment(time2, 'ha');

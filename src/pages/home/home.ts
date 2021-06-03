@@ -39,8 +39,8 @@ export class HomePage {
                private couchDbService: CouchDbServiceProvider,
                public navParams: NavParams,
                private dataDetialsProvider: DataDetailsServiceProvider,
-               public dateFunctions: DateFunctionServiceProvider,
-               private dateFunctionsProvider: DateFunctionServiceProvider,
+               public dateFunctions: DateFunctionServiceProvider, // YSS why is this public?
+               //private dateFunctionsProvider: DateFunctionServiceProvider, // YSS redundant
                private globalFuns: GlobalFunctionsServiceProvider,
                private modalCtrl: ModalController,
                public events: Events,
@@ -51,6 +51,7 @@ export class HomePage {
       this.dateSelected = [moment().date(), moment().month(), moment().year()];
     }
     this.loadTrackedData();
+    //console.log('YSS HomePage - constructor: isToday?', this.dateFunctions.isToday(this.dateSelected[2], this.dateSelected[1], this.dateSelected[0]));
   }
 
   async ionViewDidEnter() {
@@ -140,7 +141,11 @@ export class HomePage {
       .then(changes => {
         //this.couchDbService.logUsage('data', changes);
         console.log("YSS HomePage - saveTrackedData: logged changes", changes);
+        return changes;
       })
+      //.then(changes => {
+      //  console.log("YSS HomePage - saveTrackedData: changes", changes);
+      //})
   }
 
   /**
@@ -279,6 +284,10 @@ export class HomePage {
     return category;
   }
 
+  isToday(){
+    return this.dateFunctions.isToday(this.dateSelected[2],this.dateSelected[1], this.dateSelected[0]);
+  }
+
   /**
    * Change data values
    * @param componentEvent
@@ -288,7 +297,7 @@ export class HomePage {
   changeVals (componentEvent : {[eventPossibilities: string] : any}, 
               data : {[dataProps: string] : any},
               dataType: string) {
-    console.log("YSS HomePage - changeVals data:", data, "with inferred catgory", this.inferTrackingCategory(data), "for dataType:", dataType, "when tracked is", this.tracked, "under dataToTrack", this.dataToTrack);
+    //console.log("YSS HomePage - changeVals data:", data, "with inferred catgory", this.inferTrackingCategory(data), "for dataType:", dataType, "when tracked is", this.tracked, "under dataToTrack", this.dataToTrack);
     if (dataType === 'quickTracker') {
       // YSS finding the dataType as it turns data['dataType'] is only available for Migraine among all the quickTracker items
       dataType = this.inferTrackingCategory(data);
