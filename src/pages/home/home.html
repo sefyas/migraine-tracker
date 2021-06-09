@@ -60,12 +60,12 @@
                 <div class="limit-wrapper" *ngIf="isToday() && data.goal && data.goal.freq && dataType !== 'Symptom' ">
                     <div class="limit-info-message" *ngIf="data.goal.timespan!=='Day'">
                         Total for past {{data.goal.timespan.toLowerCase()}}: 
-                        <p class="limit-value" [class.goal-ok]="goalProgress(data, dataType, 'total/goal-at') === 'at limit' ||
-                            goalProgress(data, dataType, 'total/goal-und') === 'under'"
-                            [class.goal-met]="goalProgress(data, dataType, 'total/goal-met') === 'met' ||
-                            goalProgress(data, dataType, 'total/goal-bel') === 'below limit'"
-                            [class.goal-over]="goalProgress(data, dataType, 'total/goal-ove') === 'over'">
-                            {{totalTrackedTimes(data, dataType, 'html')}}</p>;
+                        <p class="limit-value" 
+                           [class.goal-ok]="getProgressMsg(data, dataType, 'total/goal-at') === 'at'"
+                           [class.goal-met]="getProgressMsg(data, dataType, 'total/goal-met') === 'met'"
+                           [class.goal-violated]="   getProgressMsg(data, dataType, 'total/goal-ove') === 'over'
+                                                  || getProgressMsg(data, dataType, 'total/goal-und') === 'under'">
+                            {{getProgress(data, dataType, 'html')}}</p>;
                         Desired: <p class="limit-value goal-info">{{data.goal.freq}} than {{data.goal.threshold}}</p>
                         <!-- Total / goal :
                         <p class="limit-value" [class.goal-ok]="goalProgress(data, dataType, 'total/goal-at') === 'at limit' ||
@@ -77,7 +77,20 @@
                         per {{data.goal.timespan.toLowerCase()}} -->
                     </div>
 
-                    <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, dataType, 'msg-met') === 'met'">
+                    <div class="goal-met limit-warning-message" *ngIf="getProgressMsg(data, dataType, 'msg-met') === 'met'">
+                      You met your goal!
+                    </div>
+                    <div class="goal-ok limit-warning-message" *ngIf="getProgressMsg(data, dataType, 'msg-at') === 'at'">
+                      You're at your limit.
+                    </div>
+                    <div class="goal-violated limit-warning-message" *ngIf="getProgressMsg(data, dataType, 'msg-und') === 'under'">
+                      Keep going!
+                    </div>
+                    <div class="goal-violated limit-warning-message" *ngIf="getProgressMsg(data, dataType, 'msg-ove') === 'over'">
+                      Try to cut back!
+                    </div>
+
+                    <!-- <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, dataType, 'msg-met') === 'met'">
                         You met your goal!
                     </div>
                     <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, dataType, 'msg-bel') === 'below limit'">
@@ -91,7 +104,7 @@
                     </div>
                     <div class="goal-over limit-warning-message" *ngIf="goalProgress(data, dataType, 'msg-ove') === 'over'">
                         Try to cut back!
-                    </div>
+                    </div> -->
                 </div>
             </ng-container>
           </ion-card-content>

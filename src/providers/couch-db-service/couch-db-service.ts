@@ -255,13 +255,15 @@ export class CouchDbServiceProvider {
               delete changes[goal][data];
             } else { // value changed
               //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->', newData[goal][data]);
-              changes[goal][data] = 'updated: ' + JSON.stringify(oldData[goal][data]) + ' -> ' + JSON.stringify(newData[goal][data]);
+              //changes[goal][data] = 'updated: ' + JSON.stringify(oldData[goal][data]) + ' -> ' + JSON.stringify(newData[goal][data]);
+              changes[goal][data] = {'type': 'update', 'from': oldData[goal][data], 'to': newData[goal][data]};
             }
           } else {
             // goal but not data in both old and new; data only in new
             //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', '\t->', newData[goal][data]);
             //console.log('YSS CouchDbServiceProvider - getChanges: oldData', oldData, 'newData', newData, 'changes', changes)
-            changes[goal][data] = 'added: ' + JSON.stringify(newData[goal][data]);
+            //changes[goal][data] = 'added: ' + JSON.stringify(newData[goal][data]);
+            changes[goal][data] = {'type': 'add', 'from': null, 'to': newData[goal][data]};
           }
         }
       } else {
@@ -269,7 +271,8 @@ export class CouchDbServiceProvider {
         for (let data in newData[goal]) {
           // goal-data only in new
           //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', '\t->', newData[goal][data]);
-          changes[goal][data] = 'added: ' + JSON.stringify(newData[goal][data]);
+          //changes[goal][data] = 'added: ' + JSON.stringify(newData[goal][data]);
+          changes[goal][data] = {'type': 'add', 'from': null, 'to': newData[goal][data]};
         }
       }
     }
@@ -284,14 +287,16 @@ export class CouchDbServiceProvider {
           } else {
             // goal but not data in both old and new; data only in old
             //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->.');
-            changes[goal][data] = 'removed: ' + JSON.stringify(oldData[goal][data]);
+            //changes[goal][data] = 'removed: ' + JSON.stringify(oldData[goal][data]);
+            changes[goal][data] = {'type': 'remove', 'from': oldData[goal][data], 'to': null};
           }
         }
       } else {
         for (let data in oldData[goal]) {
           // goal-data only in old
           //console.log('YSS CouchDbServiceProvider - getChanges:', goal, '-', data, ':', oldData[goal][data], '->.');
-          changes[goal][data] = 'removed: ' + JSON.stringify(oldData[goal][data]);
+          //changes[goal][data] = 'removed: ' + JSON.stringify(oldData[goal][data]);
+          changes[goal][data] = {'type': 'remove', 'from': oldData[goal][data], 'to': null};
         }
       }
     }
@@ -339,7 +344,7 @@ export class CouchDbServiceProvider {
       "timestamp": new Date().toISOString(), // e.g. 2021-03-11T06:47:20.467Z
       "type": type, // one of 'interaction' or 'data'
       "log": log // in case of type: 'interaction':  one of 'opened', 'foreground', or 'background' 
-                 // in case of type: 'data': something like {'Symptom': {'migraineToday': 'added: Yes', 'peakMigraineSeverity': 'updated: 2 -> 5', ...}, ...}}
+                 // in case of type: 'data': something like {'Symptom': {'migraineToday': {'type': 'add', 'from': null, 'to': 'Yes'}, 'peakMigraineSeverity': {'type': 'update', 'from': 2, 'to': 3}, ...}, ...}}
     };
     let doc_id = 'usage-'+entry['timestamp'].slice(0, 19).replace(/:/g, ''); // e.g. 2021-03-11T064720
     //console.log('YSS CouchDbServiceProvider - logUsage: doc_id', doc_id, 'entry', entry);

@@ -103,7 +103,7 @@ export class HomePage {
 
   removeClearedData(goal, data) {
     this.saving = true;
-    console.log("YSS HomePage - removeClearedData");
+    //console.log('YSS HomePage - removeClearedDatatracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected);
     this.couchDbService.deleteData(goal, data, this.dateSelected)
         .then(changes => {
           this.saving = false;
@@ -118,6 +118,11 @@ export class HomePage {
         .then(changes => {
           //this.couchDbService.logUsage('data', changes);
           console.log("YSS HomePage - removeClearedData: logged changes", changes);
+          return changes;
+        })
+        .then(changes => {        
+          //console.log("YSS HomePage - removeClearedData: changes", changes, "tracked", this.tracked, "dataToTrack", this.dataToTrack);
+          this.updateProgress(changes);
         });
   }
 
@@ -126,7 +131,7 @@ export class HomePage {
    */
   saveTrackedData() {
     this.saving = true;
-    console.log('YSS HomePage - saveTrackedData: tracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected)
+    //console.log('YSS HomePage - saveTrackedData: tracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected)
     this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
       .then((changes)=>{
         this.saving = false
@@ -143,9 +148,136 @@ export class HomePage {
         console.log("YSS HomePage - saveTrackedData: logged changes", changes);
         return changes;
       })
-      //.then(changes => {
-      //  console.log("YSS HomePage - saveTrackedData: changes", changes);
-      //})
+      .then(changes => {        
+        //console.log("YSS HomePage - saveTrackedData: changes", changes, "tracked", this.tracked, "dataToTrack", this.dataToTrack);
+        this.updateProgress(changes);
+      });
+  }
+
+  updateProgress(changes){
+    //console.log("YSS HomePage - updateProgress: considering changes", changes, "to update progress", this.goalProgresses);
+    for(const category in Object(changes)){
+      for(const behavior in changes[category]){
+        let update = this.calculateUpdate(changes, category, behavior);
+        if (update) {
+          //console.log('YSS HomePage - updateProgress: update for', behavior, '/', category, 'is:', update);
+          if(!this.goalProgresses.hasOwnProperty(category)){
+            this.goalProgresses[category] = {};
+            console.log('YSS HomePage - updateProgress: no progress recorded for behaviors in', category, '... adding it in.');
+          }
+          if(!this.goalProgresses[category].hasOwnProperty(behavior)){
+            this.goalProgresses[category][behavior] = update;
+            console.log('YSS HomePage - updateProgress: no progress recorded for behavior', behavior, '/', category, '... initializing it with', update);
+          } else {
+            let temp = this.goalProgresses[category][behavior];
+            this.goalProgresses[category][behavior] += update;
+            //console.log('YSS HomePage - updateProgress: progress for behavior', behavior, '/', category, 'updated from', temp, 'to', this.goalProgresses[category][behavior]);
+          }
+        } else {
+          console.log('YSS HomePage - updateProgress: no update for', behavior, '/', category);
+        }
+      }
+    }
+  }
+
+  calculateUpdate(changes, category, behavior){
+    let update = null;
+    
+    // check if there is a limit for the behavior
+    let info = this.dataToTrack[category].find(element => element['id'] === behavior);
+    let hasLimit;
+    if(   info.hasOwnProperty('goal') 
+       && info['goal'].hasOwnProperty('freq') 
+       && info['goal'].hasOwnProperty('threshold') 
+       && info['goal'].hasOwnProperty('timespan')){
+      hasLimit =    info['goal']['freq'] !== null 
+                 && info['goal']['threshold'] !== null 
+                 && info['goal']['timespan'] !== null;
+    } else {
+      hasLimit = false;
+    }
+    //console.log('YSS HomePage - calculateUpdate: is there limit for', behavior, '/', category,'?', hasLimit ? 'Yes': 'No', 'full info', info);
+
+    // if there is a limit, we want to know the change that can potentially 
+    // influence progress to-date
+    let change;
+    if(hasLimit){ 
+      let type = info['field'];
+      let value1 = changes[category][behavior]['from'];
+      let value2 = changes[category][behavior]['to'];
+      if (type === 'binary'){
+        value1 = (value1 === 'Yes')? 1: 0;
+        value2 = (value2 === 'Yes')? 1: 0;
+      } else if(type === 'number') {
+        value1 = Number(value1);
+        value2 = Number(value2);
+      } else {
+        // NOTE the following line assumes only behaviors of type number or
+        //      binary Yes/No can have limits
+        console.log('YSS HomePage - calculateUpdate: limit incorrectly set for a non-binary, not a number behavior');
+        value1 = null;
+        value2 = null;
+      }
+      
+      if(value1 !== null && value2 !== null) change = value2 - value1;
+      //console.log('YSS HomePage - calculateUpdate: change for', behavior, '/', category,'from', value1, 'to', value2, 'is', change);
+    }
+
+    // if there is a change of a behavior for which we have limit, 
+    // we want to consider if the update is happening within the 
+    // timespan of interest.
+    let withinSpan = false;
+    if(hasLimit){
+      let span = info['goal']['timespan'][0].toLowerCase();
+      if (span === 'd') span = 'day';
+      else if (span === 'w') span = 'week';
+      else if (span === 'm') span = 'month';
+      else {
+        console.log('YSS HomePage - calculateUpdate: invalid timespan');
+        return null;
+      }
+      let cutoff = this.dateFunctions.dateArithmatic(new Date(), 'subtract', 1, span);
+      let dateSelected = {'year': this.dateSelected[2],'month': this.dateSelected[1],'day': this.dateSelected[0]};
+      withinSpan = this.dateFunctions.dateGreaterOrEqual(dateSelected, cutoff);
+      //console.log('YSS HomePage - calculateUpdate: is change for', behavior, '/', category,'within timespan?', withinSpan ? 'Yes;': 'No', 'cutoff for span', span, 'is', cutoff, 'date selected is', dateSelected);
+    }
+
+    // If there is a limit for a behavior and there is a non-zero change within the timespan 
+    // of interest, we want to consider an update
+    if(hasLimit && withinSpan && change) update = change;
+    return update;
+  }
+
+  getProgress(data, dataType, context){
+    let category = this.inferTrackingCategory(data);
+    let behavior = data['id'];
+    //console.log('YSS HomePage - getProgress: progress in context', context, 'for', behavior, 'is', this.goalProgresses[category][behavior]);
+    return this.goalProgresses[category][behavior];
+  }
+
+  getProgressMsg(data, dataType, context) {
+    let category = this.inferTrackingCategory(data);
+    let behavior = data['id'];
+    let msg;
+    if(   this.goalProgresses.hasOwnProperty(category) 
+       && this.goalProgresses[category].hasOwnProperty(behavior)){
+      if(   data.hasOwnProperty('goal') 
+         && data['goal'].hasOwnProperty('freq')
+         && data['goal'].hasOwnProperty('threshold')){
+        let freq = data['goal']['freq'].toLowerCase();
+        if( freq === 'more'){
+          if(this.goalProgresses[category][behavior] > data['goal']['threshold']) msg = 'met';
+          else if(this.goalProgresses[category][behavior] < data['goal']['threshold']) msg = 'under';
+          else msg = 'at';
+        } else if(freq === 'less') {
+          if(this.goalProgresses[category][behavior] > data['goal']['threshold']) msg = 'over';
+          else if(this.goalProgresses[category][behavior] < data['goal']['threshold']) msg = 'met';
+          else msg = 'at';
+        }
+      }
+    }
+    //console.log('YSS HomePage - getProgressMsg: under context', context, 'for', category, 'with data', behavior, 'msg is', msg, 'for progress', this.goalProgresses[category][behavior]);
+    return msg;
   }
 
   /**
@@ -358,10 +490,12 @@ export class HomePage {
    * Set up the trackers
    */
   async setupTrackers() {
+    //console.log('YSS HomePage - setupTrackers: called');
     if (this.activeGoals['dataToTrack']) {
-      this.previouslyTracked = await this.couchDbService.fetchTrackedDataRange(
-        this.dateFunctions.getMonthAgo(new Date()).toISOString(),
-        this.dateFunctions.getDayAgo(new Date()).toISOString());
+      let month = this.dateFunctions.getMonthAgo(new Date()).toISOString();
+      //let day = this.dateFunctions.getDayAgo(new Date()).toISOString();
+      let day = this.dateFunctions.getDate(new Date()).toISOString();
+      this.previouslyTracked = await this.couchDbService.fetchTrackedDataRange(month, day);
       this.quickTrackers = this.activeGoals['quickTrackers'];
       if (this.quickTrackers && this.quickTrackers.length > 0) {
         this.dataTypes = ['quickTracker'];
@@ -405,6 +539,7 @@ export class HomePage {
    * For data with configured goal, calculate its prior progresses
    */
   setupPriorDataRecord() {
+    //console.log('YSS HomePage - setupPriorDataRecord: called to calculated progress for today.');
     for (let i = 0; i < this.dataTypes.length; i++) {
       let dataType = this.dataTypes[i];
       if (dataType === 'quickTracker') continue;
@@ -412,6 +547,7 @@ export class HomePage {
       this.setupDataList(dataType);
       this.calculatePriorDataProgresses(dataType);
     }
+    //console.log('YSS HomePage - setupPriorDataRecord: progress based on prior data is', this.goalProgresses);
   }
 
   /**
