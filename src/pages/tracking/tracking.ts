@@ -44,6 +44,9 @@ export class TrackingPage {
     this.goal = navParams.get('goal');
     this.neighborData = navParams.get('neighborData');
     this.loadTrackedData();
+    if(!this.goalProgresses.hasOwnProperty(this.goal)){
+      this.goalProgresses[this.goal] = {};
+    }
     this.calculatePriorDataProgresses();
   }
 
@@ -80,7 +83,7 @@ export class TrackingPage {
     this.tracked = {};
   }
 
-  onEraseClick(goal, data) {
+  onEraseClick(goal, data) { //YSS TO-DO goal is this.goal; refactor to use this.goal instead of passing in goal
     //console.log("eraser icon clicked for goal", goal, " and data", data);
     //console.log("value for this goal-data is", this.tracked[goal][data['id']], "among tracked data", this.tracked);
     delete this.tracked[goal][data['id']];
@@ -95,7 +98,7 @@ export class TrackingPage {
     });
   }
 
-  removeClearedData(goal, data) {
+  removeClearedData(goal, data) { //YSS TO-DO goal is this.goal; refactor to use this.goal instead of passing in goal
     this.saving = true;
     this.couchDbService.deleteData(goal, data, this.dateSelected)
         .then((changes)=>{
@@ -111,6 +114,11 @@ export class TrackingPage {
         .then(changes => {
           //this.couchDbService.logUsage('data', changes);
           console.log("YSS TrackingPage - removeClearedData: logged changes", changes);
+          return changes;
+        })
+        .then(changes => {        
+          //console.log("YSS TrackingPage - removeClearedData: changes", changes, "tracked", this.tracked, "dataToTrack", this.dataToTrack);
+          this.updateProgress(changes);
         });
   }
 
@@ -131,7 +139,137 @@ export class TrackingPage {
       .then(changes => {
         //this.couchDbService.logUsage('data',changes);
         console.log("YSS TrackingPage - saveTrackedData: logged changes", changes);
+        return changes;
+      })
+      .then(changes => {        
+        //console.log("YSS TrackingPage - saveTrackedData: changes", changes, "tracked", this.tracked, "dataToTrack", this.dataToTrack);
+        this.updateProgress(changes);
       });
+  }
+
+  updateProgress(changes){
+    //console.log("YSS TrackingPage - updateProgress: considering changes", changes, "to update progress", this.goalProgresses);
+    for(const category in Object(changes)){
+      for(const behavior in changes[category]){
+        let update = this.calculateUpdate(changes, category, behavior);
+        if (update) {
+          //console.log('YSS TrackingPage - updateProgress: update for', behavior, '/', category, 'is:', update);
+          if(!this.goalProgresses.hasOwnProperty(category)){
+            this.goalProgresses[category] = {};
+            console.log('YSS TrackingPage - updateProgress: no progress recorded for behaviors in', category, '... adding it in.');
+          }
+          if(!this.goalProgresses[category].hasOwnProperty(behavior)){
+            this.goalProgresses[category][behavior] = update;
+            console.log('YSS TrackingPage - updateProgress: no progress recorded for behavior', behavior, '/', category, '... initializing it with', update);
+          } else {
+            let temp = this.goalProgresses[category][behavior];
+            this.goalProgresses[category][behavior] += update;
+            //console.log('YSS TrackingPage - updateProgress: progress for behavior', behavior, '/', category, 'updated from', temp, 'to', this.goalProgresses[category][behavior]);
+          }
+        } else {
+          console.log('YSS TrackingPage - updateProgress: no update for', behavior, '/', category);
+        }
+      }
+    }
+  }
+
+  calculateUpdate(changes, category, behavior){
+    let update = null;
+    
+    // check if there is a limit for the behavior
+    let info = this.dataToTrack[category].find(element => element['id'] === behavior);
+    let hasLimit;
+    if(   info.hasOwnProperty('goal') 
+       && info['goal'].hasOwnProperty('freq') 
+       && info['goal'].hasOwnProperty('threshold') 
+       && info['goal'].hasOwnProperty('timespan')){
+      hasLimit =    info['goal']['freq'] !== null 
+                 && info['goal']['threshold'] !== null 
+                 && info['goal']['timespan'] !== null;
+    } else {
+      hasLimit = false;
+    }
+    //console.log('YSS TrackingPage - calculateUpdate: is there limit for', behavior, '/', category,'?', hasLimit ? 'Yes': 'No', 'full info', info);
+
+    // if there is a limit, we want to know the change that can potentially 
+    // influence progress to-date
+    let change;
+    if(hasLimit){ 
+      let type = info['field'];
+      let value1 = changes[category][behavior]['from'];
+      let value2 = changes[category][behavior]['to'];
+      if (type === 'binary'){
+        value1 = (value1 === 'Yes')? 1: 0;
+        value2 = (value2 === 'Yes')? 1: 0;
+      } else if(type === 'number') {
+        value1 = Number(value1);
+        value2 = Number(value2);
+      } else {
+        // NOTE the following line assumes only behaviors of type number or
+        //      binary Yes/No can have limits
+        console.log('YSS TrackingPage - calculateUpdate: limit incorrectly set for a non-binary, not a number behavior');
+        value1 = null;
+        value2 = null;
+      }
+      
+      if(value1 !== null && value2 !== null) change = value2 - value1;
+      //console.log('YSS TrackingPage - calculateUpdate: change for', behavior, '/', category,'from', value1, 'to', value2, 'is', change);
+    }
+
+    // if there is a change of a behavior for which we have limit, 
+    // we want to consider if the update is happening within the 
+    // timespan of interest.
+    let withinSpan = false;
+    if(hasLimit){
+      let span = info['goal']['timespan'][0].toLowerCase();
+      if (span === 'd') span = 'day';
+      else if (span === 'w') span = 'week';
+      else if (span === 'm') span = 'month';
+      else {
+        console.log('YSS TrackingPage - calculateUpdate: invalid timespan');
+        return null;
+      }
+      let cutoff = this.dateFunctions.dateArithmatic(new Date(), 'subtract', 1, span);
+      let dateSelected = {'year': this.dateSelected[2],'month': this.dateSelected[1],'day': this.dateSelected[0]};
+      withinSpan = this.dateFunctions.dateGreaterOrEqual(dateSelected, cutoff);
+      //console.log('YSS TrackingPage - calculateUpdate: is change for', behavior, '/', category,'within timespan?', withinSpan ? 'Yes;': 'No', 'cutoff for span', span, 'is', cutoff, 'date selected is', dateSelected);
+    }
+
+    // If there is a limit for a behavior and there is a non-zero change within the timespan 
+    // of interest, we want to consider an update
+    if(hasLimit && withinSpan && change) update = change;
+    return update;
+  }
+
+  getProgress(data, category, context){
+    let behavior = data['id'];
+    //console.log('YSS HomePage - getProgress: progress in context', context, 'for', behavior, 'is', this.goalProgresses[category][behavior]);
+    //console.log('YSS HomePage - getProgress: in context', context, 'for', behavior, 'of', category, 'with calculated progress', this.goalProgresses);
+    return this.goalProgresses[category][behavior];
+  }
+
+  getProgressMsg(data, category, context) {
+    let behavior = data['id'];
+    let msg;
+    if(   this.goalProgresses.hasOwnProperty(category) 
+       && this.goalProgresses[category].hasOwnProperty(behavior)){
+      if(   data.hasOwnProperty('goal') 
+         && data['goal'].hasOwnProperty('freq')
+         && data['goal'].hasOwnProperty('threshold')){
+        let freq = data['goal']['freq'].toLowerCase();
+        if( freq === 'more'){
+          if(this.goalProgresses[category][behavior] > data['goal']['threshold']) msg = 'met';
+          else if(this.goalProgresses[category][behavior] < data['goal']['threshold']) msg = 'under';
+          else msg = 'at';
+        } else if(freq === 'less') {
+          if(this.goalProgresses[category][behavior] > data['goal']['threshold']) msg = 'over';
+          else if(this.goalProgresses[category][behavior] < data['goal']['threshold']) msg = 'met';
+          else msg = 'at';
+        }
+      }
+    }
+    //console.log('YSS HomePage - getProgressMsg: under context', context, 'for', category, 'with data', behavior, 'msg is', msg, 'for progress', this.goalProgresses[category][behavior]);
+    return msg;
   }
 
   getTrackedMeds(){
@@ -242,7 +380,10 @@ export class TrackingPage {
 
   totalTrackedTimes(data: {[dataProps : string] : any}, dataType : string) : Number{
     if (dataType === 'quickTracker') dataType = data.dataType;
-    let timesSoFar = this.goalProgresses ? this.goalProgresses[data.id] : 0;
+    let timesSoFar = 0;
+    if(this.goalProgresses.hasOwnProperty(this.goal) && this.goalProgresses[this.goal].hasOwnProperty(data['id'])){
+      timesSoFar = this.goalProgresses[this.goal][data.id]
+    }
     if (data.id === 'frequentMedUse') { // we pull from the 'treatments' dict!
       timesSoFar += (this.getTrackedMeds() ? 1 : 0);
     } else if (this.tracked[dataType] && this.tracked[dataType][data.id]) {
@@ -260,18 +401,22 @@ export class TrackingPage {
    * @param dataType
    */
   async calculatePriorDataProgresses() {
-    this.previouslyTracked = await this.couchDbService.fetchTrackedDataRange(
-        this.dateFunctions.getMonthAgo(new Date()).toISOString(),
-        this.dateFunctions.getDayAgo(new Date()).toISOString());
+    let month = this.dateFunctions.getMonthAgo(new Date()).toISOString();
+    let day = this.dateFunctions.getDate(new Date()).toISOString();
+    this.previouslyTracked = await this.couchDbService.fetchTrackedDataRange(month, day);
+    //this.previouslyTracked = await this.couchDbService.fetchTrackedDataRange(
+    //    this.dateFunctions.getMonthAgo(new Date()).toISOString(),
+    //    this.dateFunctions.getDayAgo(new Date()).toISOString());
     for (let j = 0; j < this.dataToTrack[this.goal].length; j++) {
       let data = this.dataToTrack[this.goal][j];
       if (data.id === 'frequentMedUse') {
-        this.goalProgresses[data.id] =
+        this.goalProgresses[this.goal][data.id] =
           this.globalFuns.calculatePriorGoalProgress(data, '', this.previouslyTracked);
       } else if (data.goal && data.goal.freq) {
-        this.goalProgresses[data.id] =
+        this.goalProgresses[this.goal][data.id] =
           this.globalFuns.calculatePriorGoalProgress(data, this.goal, this.previouslyTracked);
       }
     }
+    //console.log('YSS TrackingPage - calculatePriorDataProgresses: goalProgresses', this.goalProgresses);
   }
 }
