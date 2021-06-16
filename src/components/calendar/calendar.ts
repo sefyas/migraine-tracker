@@ -3,6 +3,7 @@
 
 import {Component, Output, EventEmitter, Input} from '@angular/core';
 import { CouchDbServiceProvider } from "../../providers/couch-db-service/couch-db-service";
+import { DateFunctionServiceProvider } from '../../providers/date-function-service/date-function-service';
 import * as moment from 'moment';
 import * as _ from "lodash";
 
@@ -26,13 +27,15 @@ export class Calendar {
     monthNames: string[] = ["January", "February", "March", "April", "May", "June", "July",
       "August", "September", "October", "November", "December"];
 
-    constructor(private couchDBService: CouchDbServiceProvider) {
+    constructor(private couchDBService: CouchDbServiceProvider,
+                private dateFuns: DateFunctionServiceProvider) {
         this.currentDate = {'date': moment().date(), 'month': moment().month(), 'year': moment().year()};
         this.isExpandCalendar = true;
     }
 
     ngOnInit() {
         this.initCalendar(this.dateSelected);
+        //console.log('YSS Calendar - ngOnInit: currentDate', this.currentDate, 'dateSelected', this.dateSelected);
     }
 
     initCalendar(dateSelected) {
@@ -76,9 +79,10 @@ export class Calendar {
     }
 
     isToday() {
-        return this.displayDate['date'] === this.currentDate['date'] &&
+        return this.dateFuns.isToday(this.displayDate['year'], this.displayDate['month'], this.displayDate['date'])
+        /*return this.displayDate['date'] === this.currentDate['date'] &&
             this.displayDate['month'] === this.currentDate['month'] &&
-            this.displayDate['year'] === this.currentDate['year'];
+            this.displayDate['year'] === this.currentDate['year'];*/
     }
 
     createMonth(year: number, month: number) {
