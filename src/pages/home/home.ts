@@ -269,11 +269,11 @@ export class HomePage {
         if( freq === 'more'){
           if(this.goalProgresses[category][behavior] > data['goal']['threshold']) msg = 'met';
           else if(this.goalProgresses[category][behavior] < data['goal']['threshold']) msg = 'under';
-          else msg = 'at';
+          else msg = 'at-more';
         } else if(freq === 'less') {
           if(this.goalProgresses[category][behavior] > data['goal']['threshold']) msg = 'over';
           else if(this.goalProgresses[category][behavior] < data['goal']['threshold']) msg = 'met';
-          else msg = 'at';
+          else msg = 'at-less';
         }
       }
     }

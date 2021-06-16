@@ -40,7 +40,8 @@
             <div class="limit-info-message">
               Total for past {{data['goal']['timespan'].toLowerCase()}}: 
               <p class="limit-value" 
-                 [class.goal-ok]="getProgressMsg(data, goal, 'total/goal-at') === 'at'"
+                 [class.goal-ok]="   getProgressMsg(data, goal, 'total/goal-atm') === 'at-more'
+                                  || getProgressMsg(data, goal, 'total/goal-atl') === 'at-less'"
                  [class.goal-met]="getProgressMsg(data, goal, 'total/goal-met') === 'met'"
                  [class.goal-violated]="   getProgressMsg(data, goal, 'total/goal-ove') === 'over'
                                         || getProgressMsg(data, goal, 'total/goal-und') === 'under'">
@@ -56,16 +57,19 @@
             </div>
 
             <div class="goal-met limit-warning-message" *ngIf="getProgressMsg(data, goal, 'msg-met') === 'met'">
-              You met your goal!
+              Good job!
             </div>
-            <div class="goal-ok limit-warning-message" *ngIf="getProgressMsg(data, goal, 'msg-at') === 'at'">
-              You're at your limit!
+            <div class="goal-ok limit-warning-message" *ngIf="getProgressMsg(data, goal, 'msg-atm') === 'at-more'">
+              You're there!
+            </div>
+            <div class="goal-ok limit-warning-message" *ngIf="getProgressMsg(data, goal, 'msg-atl') === 'at-less'">
+              You're at your limit.
             </div>
             <div class="goal-violated limit-warning-message" *ngIf="getProgressMsg(data, goal, 'msg-und') === 'under'">
               Keep going!
             </div>
             <div class="goal-violated limit-warning-message" *ngIf="getProgressMsg(data, goal, 'msg-ove') === 'over'">
-              Try to cut back!
+              Try to cut back.
             </div>
             
             <!-- <div class="goal-met limit-warning-message" *ngIf="goalProgress(data, goal) === 'met'">
