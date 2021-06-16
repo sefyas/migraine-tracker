@@ -36,7 +36,7 @@
                                  [dataStart]="getDataStart(data['id'])" [dataEnd]="getDataEnd(data['id'])"
                                  [trackedMedsToday] = getTrackedMeds() (valueChanged) = 'changeVals($event, data, goal)'>
           </data-element-tracking>
-          <div class="limit-wrapper" *ngIf="data['goal'] && !data['quickTrack'] && data['goal']['freq'] && goal !== 'Symptom' ">
+          <div class="limit-wrapper" *ngIf="isToday() && data['goal'] && !data['quickTrack'] && data['goal']['freq'] && goal !== 'Symptom' ">
             <div class="limit-info-message">
               Total / goal :
               <p class="limit-value" [class.goal-ok]="goalProgress(data, goal) === 'at limit' ||

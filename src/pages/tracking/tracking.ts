@@ -166,6 +166,10 @@ export class TrackingPage {
     }
   }
 
+  isToday(){
+    return this.dateFunctionsProvider.isToday(this.dateSelected[2],this.dateSelected[1], this.dateSelected[0]);
+  }
+
   changeVals (componentEvent : {[eventPossibilities: string] : any}, data : {[dataProps: string] : any},
               dataType: string) {
     console.log("YSS TrackingPage - changeVals: event ", componentEvent, "data ", data);
