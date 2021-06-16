@@ -252,6 +252,7 @@ export class HomePage {
     let category = this.inferTrackingCategory(data);
     let behavior = data['id'];
     //console.log('YSS HomePage - getProgress: progress in context', context, 'for', behavior, 'is', this.goalProgresses[category][behavior]);
+    //console.log('YSS HomePage - getProgress: in context', context, 'for', behavior, 'of', category, 'with calculated progress', this.goalProgresses);
     return this.goalProgresses[category][behavior];
   }
 
