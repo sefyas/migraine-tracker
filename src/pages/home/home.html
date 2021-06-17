@@ -58,7 +58,7 @@
                 </data-element-tracking>
 
                 <div class="limit-wrapper" *ngIf="isToday() && data.goal && data.goal.freq && dataType !== 'Symptom' ">
-                    <div class="limit-info-message" *ngIf="data.goal.timespan!=='Day'">
+                    <div class="limit-info-message">
                         Total for past {{data.goal.timespan.toLowerCase()}}: 
                         <p class="limit-value" 
                            [class.goal-ok]="   getProgressMsg(data, dataType, 'total/goal-atm') === 'at-more'

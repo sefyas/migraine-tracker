@@ -98,12 +98,14 @@ export class GlobalFunctionsServiceProvider {
       timespan = data.goal.timespan;
     }
     let cutoff; 
-    if (timespan.toLowerCase() === "week") {
+    if (timespan.toLowerCase() === "day") {
+      cutoff = this.dateFuns.dateArithmatic(new Date(), 'subtract', 1, 'day');
+    } else if (timespan.toLowerCase() === "week") {
       cutoff = this.dateFuns.dateArithmatic(new Date(), 'subtract', 1, 'week');
     } else if (timespan.toLowerCase() === "month") {
       cutoff = this.dateFuns.dateArithmatic(new Date(), 'subtract', 1, 'month');
     } else {
-      console.log('YSS GlobalFunctionsServiceProvider - calculatePriorGoalProgress: Warning - can only process month or week timespans')
+      console.log('YSS GlobalFunctionsServiceProvider - calculatePriorGoalProgress: Warning - can only process month, week, or day timespans')
       return timesTracked;
     }
     timesTracked = 0;
