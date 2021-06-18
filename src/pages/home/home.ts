@@ -35,6 +35,8 @@ export class HomePage {
 
   private goalProgresses : {[dataType : string] : any} = {};
 
+  public trackedDataChanges : {[property : string] : any} = {};
+
   constructor (public navCtrl: NavController,
                private couchDbService: CouchDbServiceProvider,
                public navParams: NavParams,
@@ -118,6 +120,10 @@ export class HomePage {
         .then(changes => {
           //this.couchDbService.logUsage('data', changes);
           console.log("YSS HomePage - removeClearedData: logged changes", changes);
+          if(changes && Object.keys(changes).length){
+            //console.log("YSS HomePage - saveTrackedData: non-empty changes stored in ");
+            this.trackedDataChanges = {'changes': changes, 'date': this.dateSelected};
+          }
           return changes;
         })
         .then(changes => {        
@@ -146,6 +152,10 @@ export class HomePage {
       .then(changes => {
         //this.couchDbService.logUsage('data', changes);
         console.log("YSS HomePage - saveTrackedData: logged changes", changes);
+        if(changes && Object.keys(changes).length){
+          //console.log("YSS HomePage - saveTrackedData: non-empty changes stored in ");
+          this.trackedDataChanges = {'changes': changes, 'date': this.dateSelected};
+        }
         return changes;
       })
       .then(changes => {        

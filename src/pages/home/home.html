@@ -41,7 +41,10 @@
 	</ion-card>
 
   <ion-content padding text-center *ngIf="activeGoals && activeGoals['dataToTrack']">
-    <ion-calendar #calendar *ngIf="activeGoals !== null" [dateSelected]="dateSelected" (onDaySelect)="onDaySelectClick($event)"></ion-calendar>
+    <ion-calendar #calendar *ngIf="activeGoals !== null" 
+      [dateSelected]="dateSelected" 
+      (onDaySelect)="onDaySelectClick($event)"
+      [dataChanges]="trackedDataChanges"></ion-calendar>
 
     <ng-container *ngFor="let dataType of dataTypes">
 
