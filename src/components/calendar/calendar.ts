@@ -15,6 +15,7 @@ import * as _ from "lodash";
 export class Calendar {
     @Output() onDaySelect = new EventEmitter<any>();
     @Input() dateSelected: number[];
+    @Input() dataChanges: {[category : string] : any};
 
     displayDate : any = {};
     currentDate: any = {};
@@ -36,6 +37,34 @@ export class Calendar {
     ngOnInit() {
         this.initCalendar(this.dateSelected);
         //console.log('YSS Calendar - ngOnInit: currentDate', this.currentDate, 'dateSelected', this.dateSelected);
+    }
+
+    ngOnChanges(changes: {[property : string] : any}){
+        console.log('YSS Calendar - ngOnChanges: called with input', changes);
+        if(    changes
+            && changes.hasOwnProperty('dataChanges')
+            && !changes['dataChanges']['firstChange']){
+            let change = changes['dataChanges']['currentValue']['changes'];
+            let date = changes['dataChanges']['currentValue']['date'];
+            //console.log('YSS Calendar - ngOnChanges: called with input', changes, 'containing', change, 'and', date);
+            let day = this.dateArray.find(element => (   (element['year'] === date[2])
+                                                    && (element['month'] === date[1])
+                                                    && (element['date'] === date[0])));
+            for(let category in change){
+                for(let behavior in change[category]){
+                    if(    (change[category][behavior]['from'] === null) 
+                        && (change[category][behavior]['to'] === null)) continue; //YSS TO-DO generate warning as this should not happen
+                    if(change[category][behavior]['to'] === null) day[category]--;
+                    if(change[category][behavior]['from'] === null) day[category]++;
+                    if(category === 'Symptom'){
+                        if(day[category] > 0) day['symptomExists'] = true;
+                        else day['symptomExists'] = false;
+                        // YSS TO-DO this needs a lot more work
+                    }
+                }
+            }
+            console.log('YSS Calendar - ngOnChanges: called with input', changes, 'containing', change, 'and', date, 'associated with calendar day', day);
+        }
     }
 
     initCalendar(dateSelected) {
@@ -183,11 +212,11 @@ export class Calendar {
         for (let i = 0; i < this.dateArray.length / 7; i++) {
             for (let j = 0; j < 7; j++) {
                 var day = this.dateArray[i * 7 + j];
-                day['changeReported'] = -1;
-                day['symptomReported'] = -1;
-                day['treatmentReported'] = -1;
-                day['contributorReported'] = -1;
-                day['otherReported'] = -1;
+                day['Change'] = -1;
+                day['Symptom'] = -1;
+                day['Treatment'] = -1;
+                day['Contributor'] = -1;
+                day['Other'] = -1;
                 day['symptomExists'] = false;
                 weekDays.push(day);
             }
@@ -204,12 +233,14 @@ export class Calendar {
                 this.getTrackingData(this.weekArray[i][j]).then((trackingDataDoc) => {
                     var info = trackingDataDoc['tracked_data_field'];
                     var data = trackingDataDoc['tracked_data'];
-                    this.weekArray[i][j]['changeReported'] = 'Change' in data ? Object.keys(data['Change']).length : 0;
-                    this.weekArray[i][j]['symptomReported'] = 'Symptom' in data ? Object.keys(data['Symptom']).length : 0;
-                    this.weekArray[i][j]['treatmentReported'] = 'Treatment' in data ? Object.keys(data['Treatment']).length : 0;
-                    this.weekArray[i][j]['contributorReported'] = 'Contributor' in data ? Object.keys(data['Contributor']).length : 0;
-                    this.weekArray[i][j]['otherReported'] = 'Other' in data ? Object.keys(data['Other']).length : 0;
-                    this.weekArray[i][j]['symptomExists'] = 'Symptom' in data ? this.symptomsExist(data['Symptom'], info['Symptom']): false;
+                    this.weekArray[i][j]['Change'] = 'Change' in data ? Object.keys(data['Change']).length : 0;
+                    this.weekArray[i][j]['Symptom'] = 'Symptom' in data ? Object.keys(data['Symptom']).length : 0;
+                    this.weekArray[i][j]['Treatment'] = 'Treatment' in data ? Object.keys(data['Treatment']).length : 0;
+                    this.weekArray[i][j]['Contributor'] = 'Contributor' in data ? Object.keys(data['Contributor']).length : 0;
+                    this.weekArray[i][j]['Other'] = 'Other' in data ? Object.keys(data['Other']).length : 0;
+                    let tmp = {'yyyy': this.weekArray[i][j]['year'], 'mm': this.weekArray[i][j]['month'], 'dd': this.weekArray[i][j]['date']};
+                    this.weekArray[i][j]['symptomaticList'] = 'Symptom' in data ? this.getSymptomatic(data['Symptom'], info['Symptom']) : [];
+                    this.weekArray[i][j]['symptomExists'] = this.weekArray[i][j]['symptomaticList'].length > 0;
                     //this.weekArray[i][j]['symptomExists'] = this.weekArray[i][j]['date'] % 6 === 0 ;
                 });             
             }
@@ -276,66 +307,67 @@ export class Calendar {
         }
     }
 
-    symptomsExist(data, info) {
-        var exist: boolean = false;
-        //console.log("YSS in symptomsExist data is", data, "with info", info);
-        for(const item in data){
+    symptomExist(type, value){
+        if(type === 'binary' && value === 'Yes'){
+            //console.log("YSS Calendar - isPositive: type", type, "and value", value, "indicates presence of symptoms");
+            return true;
+        }
+
+        if(type === 'number' && parseInt(value) > 0){
+            //console.log("YSS Calendar - isPositive: type", type, "and value", value, "indicates presence of symptoms");
+            return true;
+        }
+
+        if(type === 'numeric scale' && value > 0){
+            //console.log("YSS Calendar - isPositive: type", type, "and value", value, "indicates presence of symptoms");
+            return true;
+        }
+
+        if(type === 'category scale' && value !== 'None'){
+            //console.log("YSS Calendar - isPositive: type", type, "and value", value, "indicates presence of symptoms");
+            return true;
+        }
+
+        // YSS TO-DO the second condition is meant to handle the current issue that 
+        //           does not allow clearing text boxes. It can be removed as soon as
+        //           that issue is resolved.
+        // YSS TO-DO we can consider more sophisticated content analysis to decide if
+        //           text indicates presence of symptoms.
+        if(type === 'note' && value.length > 1){
+            //console.log("YSS Calendar - isPositive: type", type, "and value", value, "indicates presence of symptoms");
+            return true;
+        }
+
+        if(type === 'time'){
+            //console.log("YSS Calendar - isPositive: type", type, "and value", value, "indicates presence of symptoms");
+            return true;
+        }
+
+        if(type === 'time range'){
+            //console.log("YSS Calendar - isPositive: type", type, "and value", value, "indicates presence of symptoms");
+            return true;
+        }
+
+        //console.log("YSS Calendar - isPositive: type", type, "and value", value, "indicates no presence of symptoms");
+        return false;
+    }
+
+    getSymptomatic(data, info) {
+        let symptomatic = [];
+        //console.log("YSS in getSymptomatic data is", data, "with info", info);
+        for(let item in data){
             // YSS TO-DO this is to handle cases where entries are created without any 
             //           values associted with them. As soon the entries are only created
             //           if they have values, this check can be removed.
-            if(data[item] === null) {
-                console.log("YSS item", item, "value is undefined.");
+            if(!data[item] || !info[item]) {
+                console.log("YSS Calendar - getSymptomatic: item", item, "value or type is undefined; value:", data[item], ', type:', info[item]);
                 continue;
             }
 
-            if(info[item] === 'binary' && data[item] === 'Yes'){
-                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
-                exist = true;
-                break;
-            }
-
-            if(info[item] === 'number' && parseInt(data[item]) > 0){
-                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
-                exist = true;
-                break;
-            }
-
-            if(info[item] === 'numeric scale' && data[item] > 0){
-                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
-                exist = true;
-                break;
-            }
-
-            if(info[item] === 'category scale' && data[item] !== 'None'){
-                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
-                exist = true;
-                break;
-            }
-
-            // YSS TO-DO the second condition is meant to handle the current issue that 
-            //           does not allow clearing text boxes. It can be removed as soon as
-            //           that issue is resolved.
-            // YSS TO-DO we can consider more sophisticated content analysis to decide if
-            //           text indicates presence of symptoms.
-            if(info[item] === 'note' && data[item].length > 1){
-                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
-                exist = true;
-                break;
-            }
-
-            if(info[item] === 'time'){
-                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
-                exist = true;
-                break;
-            }
-
-            if(info[item] === 'time range'){
-                //console.log("YSS item", item, "of type", info[item], "and value", data[item], "indicates presence of symptoms");
-                exist = true;
-                break;
-            }
+            if(this.symptomExist(info[item], data[item])) symptomatic.push(item);
         }
-        return exist;
+        //console.log('YSS Calendar - getSymptomatic: returning', symptomatic);
+        return symptomatic;
     }
 
     trackingDataReported(day, type) {
@@ -344,23 +376,24 @@ export class Calendar {
         /**/
         switch(type){
             case 'change':
-                reported = day['changeReported'] > 0;
+                reported = day['Change'] > 0;
                 break;
             case 'symptom':
-                reported = day['symptomReported'] > 0;
+                reported = day['Symptom'] > 0;
                 break;
             case 'treatment':
-                reported = day['treatmentReported'] > 0;
+                reported = day['Treatment'] > 0;
                 break;
             case 'contributor':
-                reported = day['contributorReported'] > 0;
+                reported = day['Contributor'] > 0;
                 break;
             case 'other':
-                reported = day['otherReported'] > 0;
+                reported = day['Other'] > 0;
                 break;
             default:
                 reported = false;
         }
+        //console.log('YSS Calendar - trackingDataReported: called for day', day, 'and returning', reported, 'for category', type);
 
         /* 
         switch(type){
@@ -394,23 +427,28 @@ export class Calendar {
     }
 
     noDataReported(day){
-        if (day['changeReported'] > 0){
+        if (day['Change'] > 0){
+            //console.log('YSS Calendar - noDataReported: called for day', day, 'and return false because Change data exists');
             return false;
         }
 
-        if (day['symptomReported'] > 0){
+        if (day['Symptom'] > 0){
+            //console.log('YSS Calendar - noDataReported: called for day', day, 'and return false because Symptom data exists');
             return false;
         }
 
-        if (day['treatmentReported'] > 0){
+        if (day['Treatment'] > 0){
+            //console.log('YSS Calendar - noDataReported: called for day', day, 'and return false because Treatment data exists');
             return false;
         }
 
-        if (day['contributorReported'] > 0){
+        if (day['Contributor'] > 0){
+            //console.log('YSS Calendar - noDataReported: called for day', day, 'and return false because Contributor data exists');
             return false;
         }
 
-        if (day['otherReported'] > 0){
+        if (day['Other'] > 0){
+            //console.log('YSS Calendar - noDataReported: called for day', day, 'and return false because Other data exists');
             return false;
         }
 
@@ -432,6 +470,7 @@ export class Calendar {
         }
         */
 
+        //console.log('YSS Calendar - noDataReported: called for day', day, 'and return true because no data exists');
         return true;
     }
 
