@@ -40,7 +40,7 @@ export class Calendar {
     }
 
     ngOnChanges(changes: {[property : string] : any}){
-        console.log('YSS Calendar - ngOnChanges: called with input', changes);
+        //console.log('YSS Calendar - ngOnChanges: called with input', changes);
         if(    changes
             && changes.hasOwnProperty('dataChanges')
             && !changes['dataChanges']['firstChange']){
@@ -52,18 +52,28 @@ export class Calendar {
                                                     && (element['date'] === date[0])));
             for(let category in change){
                 for(let behavior in change[category]){
-                    if(    (change[category][behavior]['from'] === null) 
-                        && (change[category][behavior]['to'] === null)) continue; //YSS TO-DO generate warning as this should not happen
-                    if(change[category][behavior]['to'] === null) day[category]--;
-                    if(change[category][behavior]['from'] === null) day[category]++;
+                    let oldVal = change[category][behavior]['from'];
+                    let newVal = change[category][behavior]['to'];
+                    let dtype = change[category][behavior]['dtype'];
+                    //console.log('YSS Calendar - ngOnChanges: updating day for change from', oldVal, 'to', newVal, 'in', behavior, 'of', category, 'with type', dtype);
+                    if((oldVal === null) && (newVal === null)) continue; //YSS TO-DO generate warning as this should not happen
+                    if(newVal === null) day[category]--;
+                    if(oldVal === null) day[category]++;
                     if(category === 'Symptom'){
-                        if(day[category] > 0) day['symptomExists'] = true;
-                        else day['symptomExists'] = false;
-                        // YSS TO-DO this needs a lot more work
+                        if(this.symptomExist(dtype, newVal)){
+                            if(!this.symptomExist(dtype, oldVal)){
+                                day['symptomaticList'].push(behavior);
+                                //console.log('YSS Calendar - ngOnChanges: appended', behavior, 'to the list of symptomatic behaviors', day['symptomaticList']);
+                            }
+                        } else {
+                            day['symptomaticList'] = day['symptomaticList'].filter(item => item !== behavior);
+                            //console.log('YSS Calendar - ngOnChanges: removed', behavior, 'from the list of symptomatic behaviors', day['symptomaticList']);
+                        }
+                        day['symptomExists'] = day['symptomaticList'].length > 0;
                     }
                 }
             }
-            console.log('YSS Calendar - ngOnChanges: called with input', changes, 'containing', change, 'and', date, 'associated with calendar day', day);
+            //console.log('YSS Calendar - ngOnChanges: called with input', changes, 'containing', change, 'and', date, 'associated with calendar day', day);
         }
     }
 
@@ -217,6 +227,7 @@ export class Calendar {
                 day['Treatment'] = -1;
                 day['Contributor'] = -1;
                 day['Other'] = -1;
+                day['symptomaticList'] = null;
                 day['symptomExists'] = false;
                 weekDays.push(day);
             }

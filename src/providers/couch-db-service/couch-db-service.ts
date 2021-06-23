@@ -234,6 +234,7 @@ export class CouchDbServiceProvider {
     return newTrack;
   }
 
+  //YSS TO-DO data types should be added to changes under property dtype
   static getChanges(oldData, newData){
     // make a copy of the old data
     let changes = {};

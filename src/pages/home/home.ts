@@ -105,7 +105,7 @@ export class HomePage {
 
   removeClearedData(goal, data) {
     this.saving = true;
-    //console.log('YSS HomePage - removeClearedDatatracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected);
+    console.log('YSS HomePage - removeClearedDatatracked: tracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected, 'for routine', this.dataToTrack);
     this.couchDbService.deleteData(goal, data, this.dateSelected)
         .then(changes => {
           this.saving = false;
@@ -121,6 +121,7 @@ export class HomePage {
           //this.couchDbService.logUsage('data', changes);
           console.log("YSS HomePage - removeClearedData: logged changes", changes);
           if(changes && Object.keys(changes).length){
+            //YSS NOTE no need to provide dtype with changes in this case
             //console.log("YSS HomePage - saveTrackedData: non-empty changes stored in ");
             this.trackedDataChanges = {'changes': changes, 'date': this.dateSelected};
           }
@@ -137,7 +138,7 @@ export class HomePage {
    */
   saveTrackedData() {
     this.saving = true;
-    //console.log('YSS HomePage - saveTrackedData: tracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected)
+    console.log('YSS HomePage - saveTrackedData: tracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected, 'for routine', this.dataToTrack)
     this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
       .then((changes)=>{
         this.saving = false
@@ -153,7 +154,14 @@ export class HomePage {
         //this.couchDbService.logUsage('data', changes);
         console.log("YSS HomePage - saveTrackedData: logged changes", changes);
         if(changes && Object.keys(changes).length){
-          //console.log("YSS HomePage - saveTrackedData: non-empty changes stored in ");
+          for(let category in Object(changes)){
+            for(let behavior in changes[category]){
+              let info = this.dataToTrack[category].find(element => element['id'] === behavior);
+              changes[category][behavior]['dtype'] = info ? info['field'] : null;
+              //console.log('YSS HomePage - saveTrackedData: update datatype info', info, 'for', behavior, 'of', category);
+              // YSS - TO-DO it's better to specify dtype in changes within DB service
+            }
+          }
           this.trackedDataChanges = {'changes': changes, 'date': this.dateSelected};
         }
         return changes;
