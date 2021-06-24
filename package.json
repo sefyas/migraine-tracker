@@ -54,6 +54,7 @@
     "ionicons": "3.0.0",
     "is-extendable": "^1.0.1",
     "is-windows": "^1.0.2",
+    "jquery": "^3.6.0",
     "moment": "^2.25.3",
     "ng2-charts-x": "^2.0.6",
     "parse": "^2.11.0",

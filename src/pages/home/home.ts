@@ -3,6 +3,7 @@ import { Events } from 'ionic-angular';
 import { ModalController, NavController, NavParams } from 'ionic-angular';
 import { Storage } from "@ionic/storage";
 import * as moment from 'moment';
+import * as $ from "jquery";
 
 import { GoalTypePage } from "../addGoal/goal-type/goal-type";
 import { LoginPage } from "../login/login";
@@ -26,6 +27,8 @@ export class HomePage {
   private tracked : {[dataType : string] : any} = {};
   private trackedFields : any = {};
   private saving: boolean = false;
+  private JQstatus: boolean = false;
+  private saveStatus: string = 'success';
   dataToTrack : {[dataType : string] : DataElement[]} = {};
   dataList : {[dataType : string] : string} = {};
   dataTypes : string[];
@@ -65,6 +68,30 @@ export class HomePage {
       this.loggedIn();
     } else {
       this.login();
+    }
+  }
+
+  ngAfterViewInit(){
+    let homePageObjectRef = this;
+    $(document).ready(function(){
+      homePageObjectRef.JQstatus = true;
+      //console.log('YSS HomePage - ngAfterViewInit: Home view is initialized, and JQuery is thus ready.', document, this, homePageObjectRef);
+      console.log('YSS HomePage - ngAfterViewInit: Home view is initialized, and JQuery is thus ready.');
+    });
+  }
+
+  fade(){
+    console.log('YSS HomePage - fade: is jquery ready?', this.JQstatus);
+    if(this.JQstatus){
+      console.log('YSS HomePage - fade: change fade!');
+      if(this.saveStatus === 'success') {
+        console.log('YSS HomePage - fade: fading out!');
+        $("#jqtest").fadeOut(()=>{this.saveStatus = 'failure';});    
+      }
+      else if(this.saveStatus === 'failure') {
+        console.log('YSS HomePage - fade: fading in!');
+        $("#jqtest").fadeIn(()=>{this.saveStatus = 'success';});
+      }
     }
   }
 
@@ -109,15 +136,20 @@ export class HomePage {
     this.couchDbService.deleteData(goal, data, this.dateSelected)
         .then(changes => {
           this.saving = false;
+          this.saveStatus = 'success'; // success sign (check-mark)
           console.log("YSS HomePage - removeClearedData: retured with changes ", changes);
           return changes;
-          //YSS TO-DO show check-mark sign
         })
         .catch(err => {
-          console.log("YSS HomePage - removeClearedData: retured with error", err)
-          //YSS TO-DO show error sign
+          this.saveStatus = 'error'; // error sign (exclamation)
+          console.log("YSS HomePage - removeClearedData: retured with error", err);
         })
         .then(changes => {
+          //YSS TO-DO show sign of success / error
+          if(this.JQstatus){ 
+            $("#jqtest").fadeIn();
+            $("#jqtest").fadeOut(() => {this.saveStatus = 'idle';});
+          }
           //this.couchDbService.logUsage('data', changes);
           console.log("YSS HomePage - removeClearedData: logged changes", changes);
           if(changes && Object.keys(changes).length){
@@ -142,15 +174,20 @@ export class HomePage {
     this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
       .then((changes)=>{
         this.saving = false
+        this.saveStatus = 'success'; // success sign (check-mark)
         console.log("YSS HomePage - saveTrackedData: received changes:", changes);
         return changes;         
-        //YSS TO-DO show check-mark sign
       })
       .catch(err => {
+        this.saveStatus = 'error'; // error sign (exclamation)
         console.log("YSS HomePage - saveTrackedData: retured with error:", err);
-        //YSS TO-DO show error sign
       })
       .then(changes => {
+        //YSS TO-DO show sign of success / error
+        if(this.JQstatus){ 
+          $("#jqtest").fadeIn();
+          $("#jqtest").fadeOut(() => {this.saveStatus = 'idle';});
+        }
         //this.couchDbService.logUsage('data', changes);
         console.log("YSS HomePage - saveTrackedData: logged changes", changes);
         if(changes && Object.keys(changes).length){
