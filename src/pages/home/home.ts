@@ -80,21 +80,6 @@ export class HomePage {
     });
   }
 
-  fade(){
-    console.log('YSS HomePage - fade: is jquery ready?', this.JQstatus);
-    if(this.JQstatus){
-      console.log('YSS HomePage - fade: change fade!');
-      if(this.saveStatus === 'success') {
-        console.log('YSS HomePage - fade: fading out!');
-        $("#jqtest").fadeOut(()=>{this.saveStatus = 'failure';});    
-      }
-      else if(this.saveStatus === 'failure') {
-        console.log('YSS HomePage - fade: fading in!');
-        $("#jqtest").fadeIn(()=>{this.saveStatus = 'success';});
-      }
-    }
-  }
-
   /**
    * Direct to the login page if there's no user credential info stored in cache
    */
