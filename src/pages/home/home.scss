@@ -26,12 +26,20 @@ page-home {
     min-width: 44px;
   }
 
-  .spinner-shown{
+  .spinner-visible{
     visibility: visible;
   }
 
-  .spinner-hidden{
+  .spinner-invisible{
     visibility: hidden;
+  }
+
+  .spinner-hidden{
+    display: none;
+  }
+
+  .feedback-hidden{
+    display: none;
   }
 
   .align-right {

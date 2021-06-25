@@ -28,7 +28,8 @@ export class HomePage {
   private trackedFields : any = {};
   private saving: boolean = false;
   private JQstatus: boolean = false;
-  private saveSuccess: boolean = false;
+  private saveSuccess: boolean = null;
+  private showFeedback: boolean = false;
   dataToTrack : {[dataType : string] : DataElement[]} = {};
   dataList : {[dataType : string] : string} = {};
   dataTypes : string[];
@@ -116,14 +117,15 @@ export class HomePage {
   }
 
   feedbackOnSave(){
+    this.showFeedback = true;
     let homePageObjectRef = this;
     if(this.JQstatus){ 
-      console.log("YSS HomePage - feedbackOnSave: called");
-      $("#jqtest").fadeIn(200, 'swing', function(){
-        console.log("YSS HomePage - feedbackOnSave: fadeIn", homePageObjectRef.saveSuccess);
-        $("#jqtest").fadeOut(800, 'swing', function(){
-          homePageObjectRef.saveSuccess = false;
-          console.log("YSS HomePage - feedbackOnSave: fadeOut", homePageObjectRef.saveSuccess);
+      console.log("YSS HomePage - feedbackOnSave: showing feedback?", this.showFeedback, 'DOM matches bef fade-i', $("#jqtest"));
+      $("#savefeedback").fadeIn(10000, 'swing', function(){
+        console.log("YSS HomePage - feedbackOnSave: fade-i with er?", homePageObjectRef.saveSuccess ? 'Y' : 'N', 'DOM matches bef fade-o', $("#jqtest"));
+        $("#savefeedback").fadeOut(800, 'swing', function(){
+          homePageObjectRef.showFeedback = false;
+          console.log("YSS HomePage - feedbackOnSave: fade-o with er?", homePageObjectRef.saveSuccess ? 'Y' : 'N', 'DOM matches aft fade-o', $("#jqtest"));
         });
       }); // NOTE the sum of these values equals the intentional delay when saving in DB
     }

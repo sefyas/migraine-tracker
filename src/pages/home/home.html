@@ -9,17 +9,25 @@
     </ion-title>
 
     <ion-buttons end>
-      <button ion-button class="navbar-spinner" icon-only>
-        <ion-spinner [ngClass]="saving? 'spinner-shown': 'spinner-hidden'" color="light"></ion-spinner>
+      <button ion-button class="navbar-spinner" [ngClass]="showFeedback? 'spinner-hidden': ''" icon-only>
+        <ion-spinner [ngClass]="saving? 'spinner-visible': 'spinner-invisible'" 
+                     color="light"></ion-spinner>      
       </button>
+      <img id='savefeedback' [ngClass]="showFeedback? '': 'feedback-hidden'" [src]="'../../assets/pages/' + (saveSuccess ? 'success' : 'error') + '_icon.svg' " alt="">
     </ion-buttons>
+
+    <!-- <ion-buttons end>
+      <button ion-button icon-only>
+        <img id='jqtest' [src]="'../../assets/pages/' + (saveSuccess ? 'success' : 'error') + '_icon.svg' " alt="">
+      </button>
+    </ion-buttons> -->
   </ion-navbar>
 </ion-header>
 
 <ion-content>
 
   <!-- <p id='jqtest'>{{saveStatus}}</p> -->
-  <img id='jqtest' class='save-icon' [src]="'../../assets/pages/' + (saveSuccess ? 'success' : 'error') + '_icon.svg' " alt="">
+  <!-- <img id='jqtest' class='save-icon' [src]="'../../assets/pages/' + (saveSuccess ? 'success' : 'error') + '_icon.svg' " alt=""> -->
 
   <ion-card class="no-goal-card" *ngIf="activeGoals === null">
     <ion-card-content>
