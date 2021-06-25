@@ -18,7 +18,8 @@
 
 <ion-content>
 
-  <p id='jqtest'>{{saveStatus}}</p>
+  <!-- <p id='jqtest'>{{saveStatus}}</p> -->
+  <img id='jqtest' class='save-icon' [src]="'../../assets/pages/' + (saveSuccess ? 'success' : 'error') + '_icon.svg' " alt="">
 
   <ion-card class="no-goal-card" *ngIf="activeGoals === null">
     <ion-card-content>

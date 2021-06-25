@@ -28,7 +28,7 @@ export class HomePage {
   private trackedFields : any = {};
   private saving: boolean = false;
   private JQstatus: boolean = false;
-  private saveStatus: string = 'success';
+  private saveSuccess: boolean = false;
   dataToTrack : {[dataType : string] : DataElement[]} = {};
   dataList : {[dataType : string] : string} = {};
   dataTypes : string[];
@@ -115,28 +115,39 @@ export class HomePage {
     });
   }
 
+  feedbackOnSave(){
+    let homePageObjectRef = this;
+    if(this.JQstatus){ 
+      console.log("YSS HomePage - feedbackOnSave: called");
+      $("#jqtest").fadeIn(200, 'swing', function(){
+        console.log("YSS HomePage - feedbackOnSave: fadeIn", homePageObjectRef.saveSuccess);
+        $("#jqtest").fadeOut(800, 'swing', function(){
+          homePageObjectRef.saveSuccess = false;
+          console.log("YSS HomePage - feedbackOnSave: fadeOut", homePageObjectRef.saveSuccess);
+        });
+      }); // NOTE the sum of these values equals the intentional delay when saving in DB
+    }
+  }
+
   removeClearedData(goal, data) {
     this.saving = true;
     console.log('YSS HomePage - removeClearedDatatracked: tracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected, 'for routine', this.dataToTrack);
     this.couchDbService.deleteData(goal, data, this.dateSelected)
-        .then(changes => {
+        .then(changes => { // data is saved on DB
           this.saving = false;
-          this.saveStatus = 'success'; // success sign (check-mark)
+          this.saveSuccess = true; // success sign (check-mark)
           console.log("YSS HomePage - removeClearedData: retured with changes ", changes);
           return changes;
         })
-        .catch(err => {
-          this.saveStatus = 'error'; // error sign (exclamation)
+        .catch(err => { // data is not saved on DB
+          this.saveSuccess = false; // error sign (exclamation)
           console.log("YSS HomePage - removeClearedData: retured with error", err);
         })
         .then(changes => {
           //YSS TO-DO show sign of success / error
-          if(this.JQstatus){ 
-            $("#jqtest").fadeIn();
-            $("#jqtest").fadeOut(() => {this.saveStatus = 'idle';});
-          }
+          this.feedbackOnSave(); // NOTE we go down the promise chain indepent of resolution or rejection
           //this.couchDbService.logUsage('data', changes);
-          console.log("YSS HomePage - removeClearedData: logged changes", changes);
+          //console.log("YSS HomePage - removeClearedData: logged changes", changes);
           if(changes && Object.keys(changes).length){
             //YSS NOTE no need to provide dtype with changes in this case
             //console.log("YSS HomePage - saveTrackedData: non-empty changes stored in ");
@@ -157,24 +168,21 @@ export class HomePage {
     this.saving = true;
     console.log('YSS HomePage - saveTrackedData: tracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected, 'for routine', this.dataToTrack)
     this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
-      .then((changes)=>{
+      .then((changes)=>{ // data is saved on DB
         this.saving = false
-        this.saveStatus = 'success'; // success sign (check-mark)
+        this.saveSuccess = true; // success sign (check-mark)
         console.log("YSS HomePage - saveTrackedData: received changes:", changes);
         return changes;         
       })
-      .catch(err => {
-        this.saveStatus = 'error'; // error sign (exclamation)
+      .catch(err => { // data is not saved on DB
+        this.saveSuccess = false; // error sign (exclamation)
         console.log("YSS HomePage - saveTrackedData: retured with error:", err);
       })
-      .then(changes => {
+      .then(changes => { // log changes
         //YSS TO-DO show sign of success / error
-        if(this.JQstatus){ 
-          $("#jqtest").fadeIn();
-          $("#jqtest").fadeOut(() => {this.saveStatus = 'idle';});
-        }
+        this.feedbackOnSave(); // NOTE we go down the promise chain indepent of resolution or rejection
         //this.couchDbService.logUsage('data', changes);
-        console.log("YSS HomePage - saveTrackedData: logged changes", changes);
+        //console.log("YSS HomePage - saveTrackedData: logged changes", changes);
         if(changes && Object.keys(changes).length){
           for(let category in Object(changes)){
             for(let behavior in changes[category]){
@@ -188,7 +196,7 @@ export class HomePage {
         }
         return changes;
       })
-      .then(changes => {        
+      .then(changes => { // update progress    
         //console.log("YSS HomePage - saveTrackedData: changes", changes, "tracked", this.tracked, "dataToTrack", this.dataToTrack);
         this.updateProgress(changes);
       });
@@ -362,10 +370,22 @@ export class HomePage {
   }
 
   onEraseClick(data) {
+    //console.log('YSS HomePage - onEraseClick: eraser icon clicked with input', data,'; deleting category', data['dataType'], 'behavior', data['name'], 'in tracked data', this.tracked);
+    if (!this.tracked){
+      console.log('YSS HomePage - onEraseClick: tracked is undefined or null so nothing happens');
+      return;
+    }
+    if(Object.keys(this.tracked).length === 0) {
+      console.log('YSS HomePage - onEraseClick: tracked is empty so nothing happens');
+      return;
+    }
     let dataType = this.inferTrackingCategory(data);
-    //console.log("YSS HomePage - onEraseClick eraser icon clicked for goal", data['dataType'], " and data", data['name'], "data is", data, "among tracked data", this.tracked, "with value", this.tracked[dataType][data['id']]);
+    if(!this.tracked.hasOwnProperty(dataType)) {
+      console.log('YSS HomePage - onEraseClick: no category', dataType, 'in tracked data', this.tracked);
+      return;
+    }
     delete this.tracked[dataType][data['id']];
-    // YSS TO-DO if this.tracked[goal] is empty after deletion, remove it
+    // YSS TO-DO consider if this.trackedFields should also be updated
     this.removeClearedData(dataType, data);
   }
 
