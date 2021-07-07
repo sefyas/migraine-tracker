@@ -6,6 +6,7 @@ import {GlobalFunctionsServiceProvider} from "../../providers/global-functions-s
 import {CouchDbServiceProvider} from "../../providers/couch-db-service/couch-db-service";
 import {DataDetailsServiceProvider} from "../../providers/data-details-service/data-details-service";
 import {DateFunctionServiceProvider} from "../../providers/date-function-service/date-function-service";
+import * as $ from "jquery";
 
 /**
  * Generated class for the TrackingPage page.
@@ -24,6 +25,9 @@ export class TrackingPage {
   private goalProgresses : {[dataType : string] : any} = {};
   private previouslyTracked : any;
   private saving: boolean = false;
+  private JQstatus: boolean = false;
+  private saveSuccess: boolean = null;
+  private showFeedback: boolean = false;
   dataToTrack : {[dataType : string] : DataElement[]} = {};
   dateSelected : any;
   goal : any;
@@ -50,7 +54,12 @@ export class TrackingPage {
     this.calculatePriorDataProgresses();
   }
 
-  ionViewDidLoad() {
+  ngAfterViewInit(){
+    let trackingPageObjectRef = this;
+    $(document).ready(function(){
+      trackingPageObjectRef.JQstatus = true;
+      console.log('YSS TrackingPage - ngAfterViewInit:', trackingPageObjectRef.goal, 'view is initialized, and JQuery is thus ready.');
+    });
   }
 
   // ================= BUTTONS Start =================
@@ -98,25 +107,41 @@ export class TrackingPage {
     });
   }
 
+  feedbackOnSave(){
+    this.showFeedback = true;
+    let trackingPageObjectRef = this;
+    if(this.JQstatus){ 
+      //console.log("YSS TrackingPage - feedbackOnSave: showing feedback?", this.showFeedback, 'DOM matches bef fade-i', $("#savefeedback"));
+      $("#savefeedback").fadeIn(200, 'swing', function(){
+        //console.log("YSS TrackingPage - feedbackOnSave: fade-i with er?", trackingPageObjectRef.saveSuccess ? 'Y' : 'N', 'DOM matches bef fade-o', $("#savefeedback"));
+        $("#savefeedback").fadeOut(800, 'swing', function(){
+          trackingPageObjectRef.showFeedback = false;
+          //console.log("YSS TrackingPage - feedbackOnSave: fade-o with er?", trackingPageObjectRef.saveSuccess ? 'Y' : 'N', 'DOM matches aft fade-o', $("#savefeedback"));
+        });
+      }); // NOTE the sum of these values equals the intentional delay when saving in DB
+    }
+  }
+
   removeClearedData(goal, data) { //YSS TO-DO goal is this.goal; refactor to use this.goal instead of passing in goal
     this.saving = true;
     this.couchDbService.deleteData(goal, data, this.dateSelected)
-        .then((changes)=>{
+        .then((changes)=>{ // data is saved on DB
           this.saving = false;
+          this.saveSuccess = true; // success sign (check-mark)
           console.log("YSS TrackingPage - removeClearedData: retured with changes ", changes);
           return changes;
-          //YSS TO-DO show check-mark sign
         })
-        .catch(err => {
+        .catch(err => { // data is not saved on DB
+          this.saveSuccess = false; // error sign (exclamation)
           console.log("YSS TrackingPage - removeClearedData: retured with error", err)
-          //YSS TO-DO show error sign
         })
-        .then(changes => {
+        .then(changes => { // log changes
+          this.feedbackOnSave(); // NOTE we go down the promise chain indepent of resolution or rejection
           //this.couchDbService.logUsage('data', changes);
-          console.log("YSS TrackingPage - removeClearedData: logged changes", changes);
+          //console.log("YSS TrackingPage - removeClearedData: logged changes", changes);
           return changes;
         })
-        .then(changes => {        
+        .then(changes => { // update progress     
           //console.log("YSS TrackingPage - removeClearedData: changes", changes, "tracked", this.tracked, "dataToTrack", this.dataToTrack);
           this.updateProgress(changes);
         });
@@ -126,22 +151,23 @@ export class TrackingPage {
     this.saving = true;
     console.log('YSS TrackingPage - saveTrackedData: tracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected)
     this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
-      .then((changes)=>{
-        this.saving = false
+      .then((changes)=>{// data is saved on DB
+        this.saving = false;
+        this.saveSuccess = true; // success sign (check-mark)
         console.log("YSS TrackingPage - saveTrackedData: received changes ", changes);
         return changes;
-        //YSS TO-DO show check-mark sign
       })
-      .catch(err => {
+      .catch(err => { // data is not saved on DB
+        this.saveSuccess = false; // error sign (exclamation)
         console.log("YSS TrackingPage - saveTrackedData: retured with error", err);
-        //YSS TO-DO show error sign
       })
-      .then(changes => {
+      .then(changes => { // log changes
+        this.feedbackOnSave(); // NOTE we go down the promise chain indepent of resolution or rejection
         //this.couchDbService.logUsage('data',changes);
-        console.log("YSS TrackingPage - saveTrackedData: logged changes", changes);
+        //console.log("YSS TrackingPage - saveTrackedData: logged changes", changes);
         return changes;
       })
-      .then(changes => {        
+      .then(changes => { // update progress      
         //console.log("YSS TrackingPage - saveTrackedData: changes", changes, "tracked", this.tracked, "dataToTrack", this.dataToTrack);
         this.updateProgress(changes);
       });

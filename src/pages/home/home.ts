@@ -120,12 +120,12 @@ export class HomePage {
     this.showFeedback = true;
     let homePageObjectRef = this;
     if(this.JQstatus){ 
-      console.log("YSS HomePage - feedbackOnSave: showing feedback?", this.showFeedback, 'DOM matches bef fade-i', $("#jqtest"));
+      //console.log("YSS HomePage - feedbackOnSave: showing feedback?", this.showFeedback, 'DOM matches bef fade-i', $("#savefeedback"));
       $("#savefeedback").fadeIn(200, 'swing', function(){
-        console.log("YSS HomePage - feedbackOnSave: fade-i with er?", homePageObjectRef.saveSuccess ? 'Y' : 'N', 'DOM matches bef fade-o', $("#jqtest"));
+        //console.log("YSS HomePage - feedbackOnSave: fade-i with er?", homePageObjectRef.saveSuccess ? 'Y' : 'N', 'DOM matches bef fade-o', $("#savefeedback"));
         $("#savefeedback").fadeOut(800, 'swing', function(){
           homePageObjectRef.showFeedback = false;
-          console.log("YSS HomePage - feedbackOnSave: fade-o with er?", homePageObjectRef.saveSuccess ? 'Y' : 'N', 'DOM matches aft fade-o', $("#jqtest"));
+          //console.log("YSS HomePage - feedbackOnSave: fade-o with er?", homePageObjectRef.saveSuccess ? 'Y' : 'N', 'DOM matches aft fade-o', $("#savefeedback"));
         });
       }); // NOTE the sum of these values equals the intentional delay when saving in DB
     }
@@ -145,8 +145,7 @@ export class HomePage {
           this.saveSuccess = false; // error sign (exclamation)
           console.log("YSS HomePage - removeClearedData: retured with error", err);
         })
-        .then(changes => {
-          //YSS TO-DO show sign of success / error
+        .then(changes => { // log changes
           this.feedbackOnSave(); // NOTE we go down the promise chain indepent of resolution or rejection
           //this.couchDbService.logUsage('data', changes);
           //console.log("YSS HomePage - removeClearedData: logged changes", changes);
@@ -157,7 +156,7 @@ export class HomePage {
           }
           return changes;
         })
-        .then(changes => {        
+        .then(changes => { // update progress    
           //console.log("YSS HomePage - removeClearedData: changes", changes, "tracked", this.tracked, "dataToTrack", this.dataToTrack);
           this.updateProgress(changes);
         });
@@ -171,7 +170,7 @@ export class HomePage {
     console.log('YSS HomePage - saveTrackedData: tracked', this.tracked, 'trackedFields', this.trackedFields, 'on date', this.dateSelected, 'for routine', this.dataToTrack)
     this.couchDbService.logTrackedData(this.tracked, this.trackedFields, this.dateSelected)
       .then((changes)=>{ // data is saved on DB
-        this.saving = false
+        this.saving = false;
         this.saveSuccess = true; // success sign (check-mark)
         console.log("YSS HomePage - saveTrackedData: received changes:", changes);
         return changes;         
@@ -181,7 +180,6 @@ export class HomePage {
         console.log("YSS HomePage - saveTrackedData: retured with error:", err);
       })
       .then(changes => { // log changes
-        //YSS TO-DO show sign of success / error
         this.feedbackOnSave(); // NOTE we go down the promise chain indepent of resolution or rejection
         //this.couchDbService.logUsage('data', changes);
         //console.log("YSS HomePage - saveTrackedData: logged changes", changes);

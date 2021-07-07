@@ -6,8 +6,15 @@
  
     <ion-title text-center>{{monthNames[dateSelected[1]] + " " + dateSelected[0] + ", " + dateSelected[2]}}</ion-title>
 
-    <button class="header-spinner" ion-button icon-only>
+    <!-- <button class="header-spinner" ion-button icon-only>
       <ion-spinner [ngClass]="saving? 'spinner-shown': 'spinner-hidden'" color="light"></ion-spinner>
+    </button> -->
+    <button ion-button class="header-spinner" icon-only>
+      <ion-spinner [ngClass]="[showFeedback? 'spinner-hidden': '',
+                               saving? 'spinner-visible': 'spinner-invisible']"
+                   color="light"></ion-spinner> 
+      <img id='savefeedback' [ngClass]="showFeedback? '': 'feedback-hidden'" 
+           [src]="'../../assets/pages/' + (saveSuccess ? 'success' : 'error') + '_icon.svg' " alt="">     
     </button>
   </ion-toolbar>
 </ion-header>

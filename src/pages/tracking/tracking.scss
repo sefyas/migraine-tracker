@@ -15,19 +15,29 @@ page-tracking {
       //margin-left: 7%;
       //margin-right: 7%;
       font-size: 10pt;
+      min-width: 44px;
       color: white;
     }
 
     .header-spinner {
+      min-width: 44px;
       background: none;
     }
 
-    .spinner-shown{
+    .spinner-visible{
       visibility: visible;
     }
   
-    .spinner-hidden{
+    .spinner-invisible{
       visibility: hidden;
+    }
+
+    .spinner-hidden{
+      display: none;
+    }
+
+    .feedback-hidden{
+      display: none;
     }
   }
 
