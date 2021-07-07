@@ -1,23 +1,14 @@
-<svg height='54px' 
-     width='55px'  
+<svg height='32px' 
+     width='32px'  
      fill="#E60000" 
-     xmlns:dc="http://purl.org/dc/elements/1.1/" 
-     xmlns:cc="http://creativecommons.org/ns#" 
-     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
-     xmlns:svg="http://www.w3.org/2000/svg" 
      xmlns="http://www.w3.org/2000/svg" 
-     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" 
-     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" 
-     version="1.1" x="0px" y="0px" viewBox="0 0 100 100">
-    <g transform="translate(0,-952.36218)">
-        <path style="color:#000000;enable-background:accumulate;" 
-              d="m 50,960.36217 c -23.19595,0 -42,18.8042 -42,42.00003 0,23.1959 18.80405,42 42,42 23.19595,0 42,-18.8041 42,-42 0,-23.19583 -18.80405,-42.00003 -42,-42.00003 z m 0,12 c 2.20912,0 4,1.7909 4,4 l -1,37.00003 c 0,1.6568 -1.34316,3 -3,3 -1.65685,0 -3,-1.3432 -3,-3 l -1,-37.00003 c 0,-2.2091 1.79087,-4 4,-4 z m 0,50.00003 c 2.76142,0 5,2.2386 5,5 0,2.7614 -2.23858,5 -5,5 -2.76142,0 -5,-2.2386 -5,-5 0,-2.7614 2.23858,-5 5,-5 z" 
-              fill="#E60000" 
-              stroke="none" 
-              marker="none" 
-              visibility="visible" 
-              display="inline" o
-              verflow="visible">
-        </path>
-    </g>
+     xmlns:xlink="http://www.w3.org/1999/xlink" 
+     version="1.1" 
+     x="0px" 
+     y="0px" 
+     viewBox="0 0 100 100" 
+     enable-background="new 0 0 100 100" 
+     xml:space="preserve">
+    <path d="M49.9,78c-4.2,0-7.6,3.5-7.6,7.8v1.5c0,4.3,3.4,7.7,7.6,7.7c4.2,0,7.7-3.4,7.7-7.7v-1.5C57.6,81.5,54.2,78,49.9,78L49.9,78z   M49.8,5c-6.3,0-11.9,6.1-11.3,12.4l3.8,47c0.2,3.7,3.1,6.9,6.9,7.2c4.3,0.3,8.1-3,8.4-7.2l3.9-47C62,11.1,56.6,5,49.8,5z">
+    </path>
 </svg>

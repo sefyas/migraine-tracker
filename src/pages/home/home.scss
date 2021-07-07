@@ -14,11 +14,15 @@ page-home {
     justify-content: center;
   }
 
-  .save-icon {
-    width: 36pt;
+  .navbar-spinner{
+    margin-top: 0;
+    margin-right: 6px;
+    margin-bottom: 0;
+    margin-left: 6px !important;
+    min-width: 44px;
   }
 
-  .navbar-spinner{
+  .feedback-img {
     margin-top: 0;
     margin-right: 6px;
     margin-bottom: 0;
@@ -40,6 +44,22 @@ page-home {
 
   .feedback-hidden{
     display: none;
+  }
+
+  .spinner-fwd{
+    z-index: 2;
+  }
+
+  .spinner-bwd{
+    z-index: 1;
+  }
+
+  .feedback-fwd{
+    z-index: 2;
+  }
+
+  .feedback-bwd{
+    z-index: 1;
   }
 
   .align-right {

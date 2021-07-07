@@ -121,7 +121,7 @@ export class HomePage {
     let homePageObjectRef = this;
     if(this.JQstatus){ 
       console.log("YSS HomePage - feedbackOnSave: showing feedback?", this.showFeedback, 'DOM matches bef fade-i', $("#jqtest"));
-      $("#savefeedback").fadeIn(10000, 'swing', function(){
+      $("#savefeedback").fadeIn(200, 'swing', function(){
         console.log("YSS HomePage - feedbackOnSave: fade-i with er?", homePageObjectRef.saveSuccess ? 'Y' : 'N', 'DOM matches bef fade-o', $("#jqtest"));
         $("#savefeedback").fadeOut(800, 'swing', function(){
           homePageObjectRef.showFeedback = false;

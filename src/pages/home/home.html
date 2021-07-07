@@ -9,18 +9,32 @@
     </ion-title>
 
     <ion-buttons end>
-      <button ion-button class="navbar-spinner" [ngClass]="showFeedback? 'spinner-hidden': ''" icon-only>
+      <!-- separate buttons / display approach -->
+      <!-- <button ion-button class="navbar-spinner" [ngClass]="showFeedback? 'spinner-hidden': ''" icon-only>
         <ion-spinner [ngClass]="saving? 'spinner-visible': 'spinner-invisible'" 
                      color="light"></ion-spinner>      
       </button>
-      <img id='savefeedback' [ngClass]="showFeedback? '': 'feedback-hidden'" [src]="'../../assets/pages/' + (saveSuccess ? 'success' : 'error') + '_icon.svg' " alt="">
-    </ion-buttons>
-
-    <!-- <ion-buttons end>
-      <button ion-button icon-only>
-        <img id='jqtest' [src]="'../../assets/pages/' + (saveSuccess ? 'success' : 'error') + '_icon.svg' " alt="">
+      <button ion-button id='savefeedback' class='feedback-img' [ngClass]="showFeedback? '': 'feedback-hidden'" icon-only>
+        <img [src]="'../../assets/pages/' + (saveSuccess ? 'success' : 'error') + '_icon.svg' " alt="">
+      </button> -->
+      <!-- separate buttons / z-index approach -->
+      <!-- <button ion-button class="navbar-spinner" [ngClass]="showFeedback? 'spinner-bwd': 'spinner-fwd'" icon-only>
+        <ion-spinner [ngClass]="saving? 'spinner-visible': 'spinner-invisible'" 
+                     color="light"></ion-spinner>      
       </button>
-    </ion-buttons> -->
+      <button ion-button id='savefeedback' class='feedback-img' [ngClass]="showFeedback? 'feedback-fwd': 'feedback-bwd'" icon-only>
+        <img [src]="'../../assets/pages/' + (saveSuccess ? 'success' : 'error') + '_icon.svg' " alt="">
+      </button> -->
+
+      <!-- single button /display approach -->
+      <button ion-button class="navbar-spinner" icon-only>
+        <ion-spinner [ngClass]="[showFeedback? 'spinner-hidden': '',
+                                 saving? 'spinner-visible': 'spinner-invisible']"
+                     color="light"></ion-spinner> 
+        <img id='savefeedback' [ngClass]="showFeedback? '': 'feedback-hidden'" 
+             [src]="'../../assets/pages/' + (saveSuccess ? 'success' : 'error') + '_icon.svg' " alt="">     
+      </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 
