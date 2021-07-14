@@ -43,11 +43,12 @@ export class DataConfigPage {
     this.modifyGoal = this.params['modifyGoal'];
     this.modifyData = this.params['modifyData'];
     this.getDataInfo(this.configuredRoutine['dataToTrack']);
-    console.log("YSS DataConfigPage - configuredRoutines:", this.configuredRoutine);
-    console.log("YSS DataConfigPage - params:", this.params);
-    console.log("YSS DataConfigPage - behaviors to track / recommended:", this.recommendedData);
-    console.log("YSS DataConfigPage - behaviors to track / common:", this.otherData);
-    console.log("YSS DataConfigPage - behaviors to track / custom:", this.customData);
+    console.log("YSS DataConfigPage - constructor: configuredRoutines", this.configuredRoutine);
+    console.log("YSS DataConfigPage - constructor: params", this.params);
+    console.log("YSS DataConfigPage - constructor: behaviors to track / recommended", this.recommendedData);
+    console.log("YSS DataConfigPage - constructor: behaviors to track / common", this.otherData);
+    console.log("YSS DataConfigPage - constructor: behaviors to track / custom", this.customData);
+    console.log("YSS DataConfigPage - constructor: behaviors to track / exanded", this.commonExpanded);
 
     if (this.modifyGoal) {
       this.workoutProgress = Math.min( ( (this.selectedConfigData.indexOf(this.params['dataPage']) + 1)
@@ -83,6 +84,7 @@ export class DataConfigPage {
    * Called when the previous navigation button is clicked
    */
   onClickPrevious() {
+    //YSS TO-DO is this alright that we do not do anything here? why aren't we passing selectedData similar to onClickNext?
     this.navCtrl.pop({animate: false});
   }
 
@@ -94,6 +96,23 @@ export class DataConfigPage {
         this.recommendedData, this.otherData, this.customData);
 
     if (this.configuredRoutine['goals']) {
+      if(!this.configuredRoutine.hasOwnProperty('dataToTrack')) {
+        this.configuredRoutine['dataToTrack'] = {};
+      }
+      if (this.startDate) { // set start date for each data selected
+        for (let i=0; i< selectedData.length; i++) {
+          selectedData[i]['startDate'] = this.startDate;
+        }
+      }
+      if (selectedData.length > 0) {
+        this.configuredRoutine['dataToTrack'][this.dataObject['dataType']] = selectedData;
+      } else {
+        delete this.configuredRoutine['dataToTrack'][this.dataObject['dataType']];
+      }
+      //console.log('YSS DataConfigPage - onClickNext: 1 / selectedData', selectedData, 'configuredRoutine', this.configuredRoutine);
+      /* 
+      // YSS NOTE this does not work when we remove items from a category to the point that 
+      //          no items remain in that category.
       if (selectedData.length > 0) { // set selected data
         if (!this.configuredRoutine['dataToTrack']) { // if there is no data selected yet, create a new dictionary
           this.configuredRoutine['dataToTrack'] = {};
@@ -105,6 +124,7 @@ export class DataConfigPage {
         }
         this.configuredRoutine['dataToTrack'][this.dataObject['dataType']] = selectedData;
       }
+      */
       let nextConfigData = this.dataDetailsServiceProvider.findNextConfigData(
           this.configuredRoutine['goals'], this.dataObject);
       if (this.modifyData) { // more data configure to do
@@ -126,6 +146,7 @@ export class DataConfigPage {
     } else {
       this.viewCtrl.dismiss({'selected': selectedData});
     }
+    //console.log('YSS DataConfigPage - onClickNext: 2/ selectedData', selectedData, 'configuredRoutine', this.configuredRoutine);
   }
 
   /**

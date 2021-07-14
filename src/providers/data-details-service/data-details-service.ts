@@ -232,21 +232,28 @@ export class DataDetailsServiceProvider {
             skip = true;
           }
         }
-        // YSS TO-DO this should be changed to skip only if related behaviors for the goals 
-        //           specified under 'skipIfGoals' are selected. This probably requires change
-        //           to 'skipIfGoals' data to list both the goal and the behavior. Also, goalIDs
-        //           along with selected behaviors for each goal should be provided.
-        // altenatively, the filtering step can be moved to data-config where we exactly know 
-        // the goals and the behaviors selected for each. 
-        else if(dataObject['skipIfGoals']){
-          for(let j=0; j<dataObject['skipIfGoals'].length; j++){
-            if(goalIDs.indexOf(dataObject['skipIfGoals'][j])>-1){
-              skip = true;
-              break;
+        else if(   dataObject['skipIfGoals'] 
+                && dataObject['skipIfGoals'].filter(item => goalIDs.includes(item)).length > 0){
+          // YSS NOTE skip only if behaviors related to goals under 'skipIfGoals' are selected.
+          if(dataObject['skipIfBehaviors']){
+            for(let category in dataObject['skipIfBehaviors']){
+              //console.log('YSS DataDetailsServiceProvider - getDataLists: checking if', dataObject['skipIfBehaviors'][category], 'of', category, 'are tracked in', alreadyTracking);
+              if(!alreadyTracking.hasOwnProperty(category)){
+                console.log('YSS DataDetailsServiceProvider - getDataLists: no selection under', category, 'in', alreadyTracking, '; nothing to skip on off');
+                continue;
+              } else {
+                let behaviors = dataObject['skipIfBehaviors'][category].find(config_item => alreadyTracking[category].find(selected_item => selected_item['id'] === config_item[0])? true: false);
+                if(behaviors){
+                  console.log('YSS DataDetailsServiceProvider - getDataLists: skipping', dataObject, 'because', behaviors, 'are tracked under', category);
+                  skip = true;
+                  break;
+                } 
+              }
             }
+          } else {
+            console.log('YSS DataDetailsServiceProvider - getDataLists: no behaviors are specified to skip on.');
           }
-        }
-        else{
+        } else{
           console.log("CONDITION BUT NO FUNCTION!");
         }
       }
